@@ -76,6 +76,8 @@ input[type=color]{width:44px;height:32px;border:1px solid var(--line);border-rad
 .rows{display:flex;flex-direction:column;gap:8px}
 .crow{position:relative;display:grid;grid-template-columns:22px 26px 80px minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
 .crow.current{border-color:var(--mane)}
+.crow.ingroup{border-left:4px solid var(--mane)}
+.gtag{font-family:var(--f-mono);font-size:11px;color:var(--mane)}
 .crow.dragging{opacity:.45}
 .crow.drop-before::before,.crow.drop-after::after{content:"";position:absolute;left:8px;right:8px;height:3px;border-radius:2px;background:var(--mane)}
 .crow.drop-before::before{top:-6px}.crow.drop-after::after{bottom:-6px}
@@ -446,7 +448,7 @@ const RARE = /rare|promo|shiny|secret|illustration|special|ultra|holo|★/i;
 const CARD_FIELDS = [
   ["set","Set","w2"],["year","Año",""],["num","Número",""],
   ["label","Etiqueta (serie)","w2"],["rarity","Rareza",""],["variants","Variantes",""],
-  ["illustrator","Ilustrador","w2"],["note","Dato en pantalla","w2 area"],
+  ["illustrator","Ilustrador","w2"],["idioma","Idioma",""],["grupo","Grupo (mismo arte)",""],["note","Dato en pantalla","w2 area"],
   ["script","Guion (solo teleprompter)","w2 area"]
 ];
 const THEMES = {
@@ -464,7 +466,7 @@ const SHOW = [["counter","Contador y barra de progreso"],["strip","Tablero de ca
 
 /* ================= State ================= */
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false}; }
+function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false,idioma:"",grupo:""}; }
 function newProject(name){ return {id:uid("p"),name,eyebrow:"Master list",title1:name,title2:"Master List",introLine:"Una especie, todas sus cartas",footer:"",cards:[]}; }
 function defaultBrand(){ return {theme:"fuego",accent:"#ffb347",accent2:"#ff6a3d",bg:"#1b1420",font:"Big Shoulders Display",bgImage:null,bgDim:60,
   logo:{url:null,pos:"tr",size:10,opacity:100}, handle:{show:false,text:"@tucanal",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
@@ -582,8 +584,15 @@ function heroRect(){ const h = BH*0.93, w = h*63/88; return {x: BX + (BW-w)/2, y
 
 const sc = {page:0, pageX:0, pageA:1, filled:-1, hero:null, focus:0, pop:{}, fileA:null, fileB:-1, fileT:1, prog:0, intro:1};
 let idx = -1;
-const hiIndex = () => sc.hero ? sc.hero.i : idx + 1;
-const hiCount = () => sc.hero ? sc.hero.i + 1 : idx + 1;
+const hiIndex = () => sc.group ? sc.group.a : sc.hero ? sc.hero.i : idx + 1;
+const hiCount = () => sc.group ? sc.group.b + 1 : sc.hero ? sc.hero.i + 1 : idx + 1;
+const isHi = i => sc.group ? (i >= sc.group.a && i <= sc.group.b && i > sc.filled) : i === hiIndex();
+function groupAt(i, limit){
+  const list = cards(), c = list[i]; if(!c) return [i, i];
+  const g = String(c.grupo || "").trim(); if(!g) return [i, i];
+  let j = i; while(j + 1 <= limit && list[j + 1] && String(list[j + 1].grupo || "").trim() === g) j++;
+  return [i, j];
+}
 
 function draw(){
   const t = TT(), p = P();
@@ -597,7 +606,7 @@ function draw(){
     if(sh > .3 && !reduced) ctx.translate((Math.random() - .5)*sh, (Math.random() - .5)*sh);
     if(VM.punch !== 1){ ctx.translate(W/2, H/2); ctx.scale(VM.punch, VM.punch); ctx.translate(-W/2, -H/2); }
     if(s.tipo === "binder" || s.tipo === "titulo"){
-      drawBg(t); drawBinder(t, p); drawSide(t, p); if(sc.hero) drawHero(t); if(sc.intro > .001) drawIntro(t, p);
+      drawBg(t); drawBinder(t, p); drawSide(t, p); if(sc.hero) drawHero(t); if(sc.heroes) drawHeroes(t); if(sc.intro > .001) drawIntro(t, p);
     } else drawScene(s, el);
     ctx.restore();
     ctx.globalAlpha = 1; ctx.filter = "none"; ls(0); ctx.textAlign = "left";
@@ -609,6 +618,7 @@ function draw(){
   drawBinder(t, p);
   drawSide(t, p);
   if(sc.hero) drawHero(t);
+  if(sc.heroes) drawHeroes(t);
   if(sc.intro > .001) drawIntro(t, p);
   drawOverlay(t);
 }
@@ -651,14 +661,14 @@ function drawBinder(t, p){
     if(i <= sc.filled) drawCard(t, c, cardRectIn(r), c.falta ? {gray:true, stamp:1} : {tick: sc.pop[i] ?? 1});
     else if(sh.ghost){
       ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-      ctx.globalAlpha = sc.pageA * (i === hi ? .9 : .5); ctx.fillStyle = t.dust;
+      ctx.globalAlpha = sc.pageA * (isHi(i) ? .9 : .5); ctx.fillStyle = t.dust;
       ctx.font = fDisp(31); ls(1); ctx.fillText(c.num || "—", r.x + r.w/2, r.y + r.h/2 - 6, r.w - 20);
       ctx.font = fMono(15); ls(.5);
       ctx.fillText(c.set || "", r.x + r.w/2, r.y + r.h/2 + 20, r.w - 20);
       ctx.fillText(c.year || "", r.x + r.w/2, r.y + r.h/2 + 42, r.w - 20);
       ctx.globalAlpha = sc.pageA; ls(0); ctx.textAlign = "left";
     }
-    if(i === hi && i > sc.filled){
+    if(isHi(i) && i > sc.filled){
       ctx.save(); ctx.shadowColor = rgba(t.acc,.45); ctx.shadowBlur = 34;
       rr(r.x+1.5, r.y+1.5, r.w-3, r.h-3, 10); ctx.strokeStyle = t.acc; ctx.lineWidth = 3.5; ctx.stroke(); ctx.restore();
     }
@@ -721,6 +731,36 @@ function drawHero(t){
   drawCard(t, cards()[h.i] || newCard(), {x:h.x, y:h.y, w:h.w, h:h.h}, {big:true, glow:h.glow ?? 1, zoom:{s:h.zs, x:h.zx, y:h.zy}, stamp:h.stamp || 0});
   ctx.restore();
 }
+function drawHeroes(t){
+  for(const h of sc.heroes){
+    if(h.a <= 0) continue;
+    const c = cards()[h.i] || newCard();
+    ctx.save(); ctx.globalAlpha = h.a;
+    drawCard(t, c, {x:h.x, y:h.y, w:h.w, h:h.h}, {big:true, stamp:h.stamp || 0, gray:false});
+    const lang = (c.idioma || "").toUpperCase();
+    if(lang && h.chip > 0){
+      ctx.globalAlpha = h.a*h.chip; ctx.font = fMono(Math.max(14, Math.min(26, h.w*.11))); const tw = ctx.measureText(lang).width + 22, ch = Math.max(24, Math.min(40, h.w*.17));
+      const cx = h.x + (h.w - tw)/2, cy = h.y + h.h + 10; rr(cx, cy, tw, ch, 7); ctx.fillStyle = t.acc; ctx.fill();
+      ctx.fillStyle = t.onAcc; ctx.textAlign = "center"; ctx.fillText(lang, h.x + h.w/2, cy + ch*.7); ctx.textAlign = "left";
+    }
+    ctx.restore();
+  }
+}
+function groupLayout(n){
+  const A = {x:BX + 24, y:BY + 24, w:BW - 48, h:BH - 48}, gap = 22, chip = 52; let best = null;
+  for(let rows = 1; rows <= 4; rows++){
+    const cols = Math.ceil(n/rows);
+    let ch = (A.h - gap*(rows - 1) - chip*rows)/rows, cw = ch*63/88; const maxw = (A.w - gap*(cols - 1))/cols;
+    if(cw > maxw){ cw = maxw; ch = cw*88/63; }
+    if(!best || cw > best.cw) best = {rows, cols, cw, ch};
+  }
+  const out = [], totalH = best.rows*(best.ch + chip) + gap*(best.rows - 1); let k = 0;
+  for(let r = 0; r < best.rows; r++){
+    const inRow = Math.min(best.cols, n - k), rowW = inRow*best.cw + gap*(inRow - 1);
+    for(let c = 0; c < inRow; c++, k++) out.push({x:A.x + (A.w - rowW)/2 + c*(best.cw + gap), y:A.y + (A.h - totalH)/2 + r*(best.ch + chip + gap), w:best.cw, h:best.ch});
+  }
+  return out;
+}
 function drawSide(t, p){
   const sh = S.brand.show, n = p.cards.length;
   let y = BY;
@@ -738,7 +778,7 @@ function drawSide(t, p){
   shown.forEach((ln, li) => { let x = SX; for(const [w, col, ww] of ln){ ctx.fillStyle = col; ctx.fillText(w, x, y + size*.82 + li*lh, SW); x += ww + sp; } });
   y += shown.length*lh + 34;
   if(sh.counter){
-    const done = String(Math.max(0, hiCount())).padStart(2,"0");
+    const done = String(Math.max(0, Math.round(sc.cnt ?? hiCount()))).padStart(2,"0");
     ctx.font = fDisp(123); ctx.fillStyle = t.cream; ctx.fillText(done, SX, y + 98);
     const dw = ctx.measureText(done).width;
     ctx.font = fDisp(46); ctx.fillStyle = t.dust; ctx.fillText("/ " + n, SX + dw + 16, y + 98);
@@ -763,7 +803,7 @@ function drawSide(t, p){
       const cx = SX + (i%cols)*(cell+gap), cy = stripTop + Math.floor(i/cols)*(cell+gap);
       rr(cx, cy, cell, cell, Math.min(5, cell*.18));
       if(i <= sc.filled){ ctx.fillStyle = (p.cards[i] && p.cards[i].falta) ? "#e8262b" : t.check; ctx.fill(); }
-      else if(i === hi){ ctx.strokeStyle = t.acc; ctx.lineWidth = 3; ctx.stroke(); }
+      else if(isHi(i)){ ctx.strokeStyle = t.acc; ctx.lineWidth = 3; ctx.stroke(); }
       else { ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.stroke(); }
     }
   }
@@ -799,6 +839,11 @@ function drawFile(t, p, i, y, maxY, FX = SX, FW = SW){
       x += w + 10;
     }
     y += rowH + 22;
+  }
+  if(sc.group && i === sc.group.a && sc.group.b > sc.group.a){
+    const langs = p.cards.slice(sc.group.a, sc.group.b + 1).map(x => (x.idioma || "?").toUpperCase());
+    ctx.font = fBody(22, 600); ctx.fillStyle = t.acc; const lab = `Mismo arte en ${langs.length} idiomas: `;
+    ctx.fillText(lab + langs.join(" · "), FX, y + 22, FW); y += 44;
   }
   if(sh.illustrator && c.illustrator){
     ctx.font = fBody(22); ctx.fillStyle = t.dust; const lab = "Ilustración: ";
@@ -878,7 +923,7 @@ function cancelAnim(){ run++; killTweens(); queued = 0; held = null; busyAnim = 
 function drawAt(i){
   cancelAnim();
   idx = clamp(i, -1, cards().length - 1);
-  sc.page = idx < 0 ? 0 : Math.floor(idx/PER); sc.filled = idx; sc.hero = null; sc.focus = 0; sc.pop = {}; sc.pageX = 0; sc.pageA = 1; sc.intro = idx < 0 ? 1 : 0;
+  sc.page = idx < 0 ? 0 : Math.floor(idx/PER); sc.filled = idx; sc.hero = null; sc.heroes = null; sc.group = null; sc.cnt = undefined; sc.focus = 0; sc.pop = {}; sc.pageX = 0; sc.pageA = 1; sc.intro = idx < 0 ? 1 : 0;
   setFile(idx, false); setProgress(false); highlightRow(); updPrompter(); requestDraw();
 }
 async function flipTo(p, my){
@@ -909,12 +954,71 @@ async function showBig(i, my){
   if(c.falta && my === run){ await sleep(reduced ? 0 : 250); if(my !== run) return false; playSfx("stamp"); VM.shake = 18; await tween(380, v => h.stamp = v, p => p); }
   return my === run;
 }
+async function showGroup(a, b, my){
+  const list = cards(), p = Math.floor(a/PER);
+  if(sc.intro > 0){ const f = sc.intro; tween(600, v => sc.intro = f*(1-v), easeOut); }
+  sc.filled = a - 1;
+  if(sc.page !== p){ if(!(await flipTo(p, my))) return false; }
+  await Promise.all(list.slice(a, b + 1).map(c => loadImg(cardSrc(c), 2500)));
+  if(my !== run) return false;
+  const rects = groupLayout(b - a + 1);
+  sc.heroes = rects.map((r, k) => ({i:a + k, x:r.x, y:r.y, w:r.w, h:r.h, a:0, stamp:0, chip:0, r}));
+  sc.group = {a, b}; idx = b;
+  const from = a; sc.cnt = from;
+  setFile(a, true); setProgress(true); highlightRow();
+  held = {i:a, end:b, step:-1, group:true}; updPrompter();
+  playSfx("whoosh");
+  tween(380, v => sc.focus = v, easeOut);
+  await Promise.all(sc.heroes.map((h, k) => (async () => {
+    await sleep(reduced ? 0 : k*85); if(my !== run) return;
+    playSfx("thump"); sc.cnt = from + k + 1;
+    const r = h.r;
+    await tween(380, v => { const s = .7 + .3*backOut(v); h.w = r.w*s; h.h = r.h*s; h.x = r.x + (r.w - h.w)/2; h.y = r.y + (r.h - h.h)/2 + 30*(1 - v); h.a = Math.min(1, v*1.6); h.chip = v; }, p => p);
+  })()));
+  if(my !== run) return false;
+  sc.cnt = undefined;
+  const miss = sc.heroes.filter(h => (list[h.i] || {}).falta);
+  for(const h of miss){ if(my !== run) return false; playSfx("stamp"); VM.shake = 14; await tween(260, v => h.stamp = v, p => p); }
+  return my === run;
+}
+async function settleGroup(my){
+  const hs = sc.heroes || []; held = null; updPrompter();
+  const pageOf = k => Math.floor(k/PER);
+  let rest = hs.slice();
+  tween(520, v => sc.focus = 1 - v, easeInOut);
+  while(rest.length){
+    const pg = pageOf(rest[0].i);
+    if(pg !== sc.page){
+      await Promise.all(rest.map(h => { const a0 = h.a; return tween(220, v => h.a = a0*(1 - v), easeIn); }));
+      if(!(await flipTo(pg, my))) return false;
+      const now = rest.filter(h => pageOf(h.i) === pg); rest = rest.filter(h => pageOf(h.i) !== pg);
+      for(const h of now){ if(my !== run) return false; sc.filled = h.i; sc.pop[h.i] = 0; playSfx((cards()[h.i] || {}).falta ? "thump" : "check"); tween(380, v => sc.pop[h.i] = v, p => p); await sleep(reduced ? 0 : 70); }
+      sc.heroes = sc.heroes.filter(h => !now.includes(h));
+      continue;
+    }
+    const now = rest.filter(h => pageOf(h.i) === pg); rest = rest.filter(h => pageOf(h.i) !== pg);
+    await Promise.all(now.map((h, k) => (async () => {
+      await sleep(reduced ? 0 : k*55); if(my !== run) return;
+      const tr = cardRectIn(pocketRect(h.i % PER)), f = {x:h.x, y:h.y, w:h.w, h:h.h};
+      await tween(640, v => { h.x = f.x + (tr.x - f.x)*v; h.y = f.y + (tr.y - f.y)*v; h.w = f.w + (tr.w - f.w)*v; h.h = f.h + (tr.h - f.h)*v; h.chip = 1 - v; }, easeInOut);
+      if(my !== run) return;
+      sc.filled = Math.max(sc.filled, h.i); sc.pop[h.i] = 0; h.a = 0;
+      playSfx((cards()[h.i] || {}).falta ? "thump" : "check"); tween(380, v => sc.pop[h.i] = v, p => p);
+    })()));
+    if(my !== run) return false;
+    sc.heroes = sc.heroes.filter(h => !now.includes(h));
+  }
+  sc.heroes = null; sc.group = null; sc.focus = 0;
+  await sleep(reduced ? 0 : 200);
+  return my === run;
+}
 async function zoomTo(s, x, y){
   const h = sc.hero; if(!h) return;
   const f = {s:h.zs, x:h.zx, y:h.zy};
   await tween(700, v => { h.zs = f.s + (s-f.s)*v; h.zx = f.x + (x-f.x)*v; h.zy = f.y + (y-f.y)*v; }, easeInOut);
 }
 async function settle(my){
+  if(held && held.group) return settleGroup(my);
   if(!held || !sc.hero){ held = null; return true; }
   const i = held.i, h = sc.hero; held = null; updPrompter();
   if(h.zs > 1.001){ await zoomTo(1, .5, .5); if(my !== run) return false; }
@@ -929,10 +1033,11 @@ async function settle(my){
   await sleep(reduced ? 0 : 220);
   return my === run;
 }
-async function showNext(my, mode){
-  let ok = await showBig(idx + 1, my); if(!ok) return false;
+async function showNext(my, mode, limit = cards().length - 1){
+  const [ga, gb] = groupAt(idx + 1, limit);
+  let ok = gb > ga ? await showGroup(ga, gb, my) : await showBig(idx + 1, my); if(!ok) return false;
   if(mode !== "tap"){
-    const zs = (cards()[held.i] || {}).zooms || [];
+    const zs = held.group ? [] : (cards()[held.i] || {}).zooms || [];
     for(let k=0;k<zs.length;k++){ await sleep(+mode); if(my !== run || !held) return false; held.step = k; updPrompter(); await zoomTo(zs[k].s, zs[k].x, zs[k].y); }
     await sleep(+mode); if(my !== run) return false;
     ok = await settle(my);
@@ -945,16 +1050,16 @@ async function binderAdvance(limit){
   busyAnim = true;
   const my = run, mode = $("hold").value; let ok = true;
   if(held){
-    const zs = (cards()[held.i] || {}).zooms || [];
+    const zs = held.group ? [] : (cards()[held.i] || {}).zooms || [];
     if(mode === "tap" && held.step < zs.length - 1){ held.step++; updPrompter(); const z = zs[held.step]; await zoomTo(z.s, z.x, z.y); }
-    else { ok = await settle(my); if(ok && my === run && idx < limit && mode === "tap") ok = await showNext(my, mode); }
-  } else if(idx < limit){ ok = await showNext(my, mode); }
+    else { ok = await settle(my); if(ok && my === run && idx < limit && mode === "tap") ok = await showNext(my, mode, limit); }
+  } else if(idx < limit){ ok = await showNext(my, mode, limit); }
   if(my !== run) return;
   busyAnim = false; updPrompter();
   if(queued){ queued--; advance(); }
 }
 async function binderZoom(){
-  if(!held || !sc.hero || busyAnim) return;
+  if(!held || held.group || !sc.hero || busyAnim) return;
   busyAnim = true; const my = run, h = sc.hero, zs = (cards()[held.i] || {}).zooms || [];
   if(h.zs > 1.001){ await zoomTo(1, .5, .5); if(held) held.step = -1; }
   else { const z = zs[0] || {s:2.4, x:.5, y:.5}; held.step = zs.length ? 0 : -1; await zoomTo(z.s, z.x, z.y); }
@@ -1400,6 +1505,7 @@ function nextHint(){
   if(!s) return "→ empieza el video";
   if(s.tipo === "binder"){
     const end = VM.range[1];
+    if(held && held.group){ const nc = cards()[held.end + 1]; return held.end < end && nc ? `→ se guardan las ${held.end - held.i + 1} y sigue <b>${esc(nc.set)}</b> ${esc(nc.num)}` : `→ se guardan las ${held.end - held.i + 1}`; }
     if(held){ const zs = (cards()[held.i] || {}).zooms || []; if($("hold").value === "tap" && held.step < zs.length - 1) return `<b>→ zoom ${held.step + 2}</b>`; const nc = cards()[held.i + 1]; return held.i < end && nc ? `→ se ubica y sigue <b>${esc(nc.set)}</b> ${esc(nc.num)}` : "→ se ubica la carta" ; }
     if(idx < end){ const nc = cards()[idx + 1]; return `→ muestra <b>${esc(nc.set)}</b> ${esc(nc.num)}`; }
     return nextScene;
@@ -1414,7 +1520,8 @@ function promptVideo(){
   let title = `Escena ${VM.i + 1} de ${list.length} · ${sceneLabel(s)}` + (s.capitulo ? ` · ${s.capitulo}` : ""), txt = s.guion;
   if(s.tipo === "binder" && (held || idx >= VM.range[0])){
     const c = cards()[held ? held.i : idx];
-    if(c){ title += ` · ${c.set} ${c.num}`; txt = (held ? (c.script || c.note) : "") || (held ? "" : s.guion); if(!txt) txt = held ? "" : "(seguí con la próxima carta)"; }
+    if(c && held && held.group){ title += ` · ${c.set} · mismo arte en ${held.end - held.i + 1} idiomas`; txt = cards().slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note || ""; }
+    else if(c){ title += ` · ${c.set} ${c.num}`; txt = (held ? (c.script || c.note) : "") || (held ? "" : s.guion); if(!txt) txt = held ? "" : "(seguí con la próxima carta)"; }
   }
   $("pCount").textContent = title;
   $("pText").innerHTML = txt ? esc(txt) : `<span class="muted">Sin guion para este paso.</span>`;
@@ -1676,13 +1783,14 @@ function updPrompter(){
     $("pText").innerHTML = `<span class="muted">Presentá la especie. Tocá → para la primera carta.</span>`;
   } else {
     const zs = c.zooms || [];
-    $("pCount").textContent = `Carta ${cur+1} de ${list.length}` + (c.set ? ` · ${c.set}` : "") + (held && zs.length ? ` · zoom ${Math.max(0, held.step+1)} de ${zs.length}` : "");
-    const txt = c.script || c.note;
+    $("pCount").textContent = (held && held.group ? `Cartas ${held.i+1}–${held.end+1} de ${list.length} · mismo arte en ${held.end - held.i + 1} idiomas` : `Carta ${cur+1} de ${list.length}`) + (c.set ? ` · ${c.set}` : "") + (held && !held.group && zs.length ? ` · zoom ${Math.max(0, held.step+1)} de ${zs.length}` : "");
+    const txt = held && held.group ? list.slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note : c.script || c.note;
     $("pText").innerHTML = txt ? esc(txt) : `<span class="muted">Sin guion para esta carta.</span>`;
   }
-  const nextI = held ? held.i + 1 : idx + 1, nc = list[nextI];
+  const nextI = held ? (held.end ?? held.i) + 1 : idx + 1, nc = list[nextI];
   let nextTxt;
-  if(held){
+  if(held && held.group) nextTxt = nc ? `→ se guardan las ${held.end - held.i + 1} y sigue <b>${esc(nc.set || "carta " + (nextI+1))}</b>` : `→ se guardan las ${held.end - held.i + 1}`;
+  else if(held){
     const zs = (c && c.zooms) || [], mode = $("hold").value;
     nextTxt = mode === "tap" && held.step < zs.length - 1 ? `<b>→ zoom ${held.step+2}</b>` : nc ? `→ se ubica y sigue <b>${esc(nc.set || "carta " + (nextI+1))}</b> ${esc(nc.num)}` : `→ se ubica la última carta`;
   } else nextTxt = nc ? `Próxima: <b>${esc(nc.set || "carta " + (nextI+1))}</b> ${esc(nc.num)}` : "Terminaste: tocá Terminar.";
@@ -1983,7 +2091,8 @@ function rowHTML(c, i){
     const ctl = cls.includes("area") ? `<textarea id="${id}" data-k="${k}" rows="2">${esc(c[k])}</textarea>` : `<input type="text" id="${id}" data-k="${k}" value="${esc(c[k])}">`;
     return `<div class="fld ${cls.replace("area","")}"><label for="${id}">${l}</label>${ctl}</div>`;
   }).join("");
-  return `<div class="crow" data-i="${i}" data-id="${c.id}">
+  const list = cards(), g = String(c.grupo || "").trim(), inG = g && ((list[i-1] && String(list[i-1].grupo||"").trim() === g) || (list[i+1] && String(list[i+1].grupo||"").trim() === g));
+  return `<div class="crow${inG ? " ingroup" : ""}" data-i="${i}" data-id="${c.id}">
     <button class="handle" data-drag aria-label="Arrastrar para reordenar la carta ${i+1}" title="Arrastrar para reordenar">⋮⋮</button>
     <span class="idx">${String(i+1).padStart(2,"0")}</span>
     <button class="thumb${src ? " has" : ""}" title="${esc(c.file || "")}" data-act="img" aria-label="${src ? "Editar" : "Subir"} imagen de la carta ${i+1}">${src ? `<img src="${esc(src)}" alt="">` : c.file ? `Falta<br>${esc(c.file)}` : "Subir imagen"}${busy.has(c.id) ? `<span class="busy">Subiendo…</span>` : ""}</button>
@@ -1993,6 +2102,8 @@ function rowHTML(c, i){
       <button class="small" data-act="show">Ver</button>
       <button class="small" data-act="zoom" ${src ? "" : "disabled"}>Zoom${n ? ` <span class="zbadge">${n}</span>` : ""}</button>
       <button class="small" data-act="replace">${src ? "Cambiar imagen" : "Elegir imagen"}</button>
+      ${i > 0 ? `<button class="small" data-act="join" title="Mismo arte que la carta de arriba (otro idioma)">${inG && list[i-1] && String(list[i-1].grupo||"").trim() === g ? "Separar" : "Unir con la de arriba"}</button>` : ""}
+      ${inG ? `<span class="gtag">Mismo arte</span>` : ""}
       <button class="small danger" data-act="del">Quitar</button>
     </div>
   </div>`;
@@ -2007,6 +2118,7 @@ $("rows").addEventListener("input", e => {
   const k = e.target.dataset.k; if(!k) return;
   const row = e.target.closest(".crow"), c = cards()[+row.dataset.i];
   checkpoint("f:" + c.id + ":" + k); c[k] = e.target.type === "checkbox" ? e.target.checked : e.target.value; requestDraw(); dirty();
+  if(k === "grupo"){ clearTimeout(renderRows.t); renderRows.t = setTimeout(() => { const id = document.activeElement && document.activeElement.id; renderRows(); if(id && $(id)){ $(id).focus(); try{ $(id).setSelectionRange($(id).value.length, $(id).value.length); }catch(err){} } }, 700); }
 });
 let pickFor = null;
 $("rows").addEventListener("click", e => {
@@ -2014,6 +2126,13 @@ $("rows").addEventListener("click", e => {
   const row = btn.closest(".crow"), i = +row.dataset.i, c = cards()[i], act = btn.dataset.act;
   if(act === "img"){ if(cardSrc(c)) openEditor(c); else { pickFor = c.id; $("one").click(); } return; }
   if(act === "replace"){ pickFor = c.id; $("one").click(); return; }
+  if(act === "join"){
+    const prev = cards()[i-1]; if(!prev) return; checkpoint();
+    const pg = String(prev.grupo || "").trim();
+    if(pg && String(c.grupo || "").trim() === pg){ const old = c.grupo; c.grupo = ""; for(let k = i+1; k < cards().length && cards()[k].grupo === old; k++) cards()[k].grupo = ""; }
+    else { const gid = pg || ("g-" + (prev.num || prev.id)).toLowerCase().replace(/[^a-z0-9-]+/g, "-"); prev.grupo = gid; c.grupo = gid; }
+    renderRows(); requestDraw(); dirty(); return;
+  }
   if(act === "zoom"){ openZoom(c); return; }
   if(act === "show"){ if(VM.on){ $("modeSel").value = "binder"; setMode("binder"); } drawAt(i); $("host").scrollIntoView({behavior: reduced ? "auto" : "smooth", block:"center"}); return; }
   if(act === "del"){
@@ -2301,8 +2420,8 @@ $("zDone").onclick = () => { closeModal("mZoom"); renderRows(); requestDraw(); }
 /* ================= Paste from spreadsheet ================= */
 const SYN = {set:["set","expansion","expansión","edicion","edición","coleccion","colección"], year:["año","ano","year","fecha","release","lanzamiento"], num:["numero","número","num","number","#","nro","n°","nº"],
   label:["etiqueta","serie","series","era","bloque"], rarity:["rareza","rarity"], variants:["variantes","variants","variante","version","versión"], illustrator:["ilustrador","illustrator","artista","artist","ilustradora"],
-  note:["nota","dato","note","notes","notas","descripcion","descripción"], script:["guion","guión","script","texto"]};
-const ORDER = ["set","year","num","label","rarity","variants","illustrator","note","script"];
+  note:["nota","dato","note","notes","notas","descripcion","descripción"], script:["guion","guión","script","texto"], idioma:["idioma","language","lang","lengua"], grupo:["grupo","arte","group","mismo arte"]};
+const ORDER = ["set","year","num","label","rarity","variants","illustrator","idioma","grupo","note","script"];
 const FIELD_LABEL = Object.fromEntries(CARD_FIELDS.map(([k,l]) => [k,l]));
 let pasteRows = [], pasteMap = [];
 function parsePaste(t){

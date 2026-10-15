@@ -90,6 +90,12 @@ Referencias: Casey Neistat "Do What You Can't" (energía, tipografía cinética,
 - Cerrá con `cierre` y una pregunta para los comentarios.
 - Los nombres de archivo que pidas: en minúsculas, sin espacios ni tildes (`media/caballo-galopando.gif`).
 
+## Cartas en `binder.json`
+
+Cada carta tiene, entre otros: `set`, `year`, `num`, `label`, `rarity`, `variants`, `illustrator`, `note` (dato en pantalla), `script` (lo que dice en el teleprompter), `falta` (true si no la tiene: X roja), `idioma` (`EN`, `JP`, `KO`, `ZH-T`, `ZH-S`, `FR`, `DE`, `IT`, `ES`, `PT`, `TH`, `ID`…) y `grupo`.
+
+**Mismo arte en varios idiomas:** las cartas seguidas con el mismo `grupo` (por ejemplo `"base-44"`) aparecen todas juntas en grande, cada una con su idioma, y se guardan juntas en el binder con un solo →; el contador suma todas. Al armar una lista multi-idioma, ordená cada grupo seguido (EN, JP, KO, ZH, FR, DE, IT, ES, PT…) y poné el `script` solo en la primera carta del grupo.
+
 ## Notas técnicas
 
 - Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080; la grabación usa `captureStream` + `MediaRecorder`, con el micrófono, la música y efectos sintetizados mezclados por Web Audio.

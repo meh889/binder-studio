@@ -24,6 +24,10 @@ Si sumás imágenes a la carpeta mientras la herramienta está abierta, tocá **
 
 Tipos de escena: ráfaga, portada, cartel cinético (golpe, barrido, máquina de escribir, contador), binder, carta en grande, imagen o clip, lista y cierre. En los carteles, `*palabra*` sale grande y en color, `_palabra_` chica en cursiva y `~palabra~` aparece y se tacha.
 
+## Mismo arte en varios idiomas
+
+Si una carta tiene el mismo arte en varios idiomas, tocá **Unir con la de arriba** en cada versión (o completá el campo **Grupo** con el mismo nombre) y poné el **Idioma** de cada una. En el video aparecen todas juntas en grande, cada una con su idioma, y con un solo → se guardan todas en el binder y el contador las suma.
+
 ## Nombres de las imágenes
 
 Si la imagen se llama como el número de la carta, cae sola en su lugar:
