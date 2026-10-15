@@ -587,10 +587,12 @@ let idx = -1;
 const hiIndex = () => sc.group ? sc.group.a : sc.hero ? sc.hero.i : idx + 1;
 const hiCount = () => sc.group ? sc.group.b + 1 : sc.hero ? sc.hero.i + 1 : idx + 1;
 const isHi = i => sc.group ? (i >= sc.group.a && i <= sc.group.b && i > sc.filled) : i === hiIndex();
+const MAX_GROUP = 12;
+function groupSize(i){ const list = cards(), g = String((list[i] || {}).grupo || "").trim(); if(!g) return 1; let a = i, b = i; while(a > 0 && String(list[a-1].grupo || "").trim() === g) a--; while(list[b+1] && String(list[b+1].grupo || "").trim() === g) b++; return {a, b, n:b - a + 1}; }
 function groupAt(i, limit){
   const list = cards(), c = list[i]; if(!c) return [i, i];
   const g = String(c.grupo || "").trim(); if(!g) return [i, i];
-  let j = i; while(j + 1 <= limit && list[j + 1] && String(list[j + 1].grupo || "").trim() === g) j++;
+  let j = i; while(j + 1 <= limit && j - i + 1 < MAX_GROUP && list[j + 1] && String(list[j + 1].grupo || "").trim() === g) j++;
   return [i, j];
 }
 
@@ -737,17 +739,20 @@ function drawHeroes(t){
     const c = cards()[h.i] || newCard();
     ctx.save(); ctx.globalAlpha = h.a;
     drawCard(t, c, {x:h.x, y:h.y, w:h.w, h:h.h}, {big:true, stamp:h.stamp || 0, gray:false});
-    const lang = (c.idioma || "").toUpperCase();
-    if(lang && h.chip > 0){
-      ctx.globalAlpha = h.a*h.chip; ctx.font = fMono(Math.max(14, Math.min(26, h.w*.11))); const tw = ctx.measureText(lang).width + 22, ch = Math.max(24, Math.min(40, h.w*.17));
-      const cx = h.x + (h.w - tw)/2, cy = h.y + h.h + 10; rr(cx, cy, tw, ch, 7); ctx.fillStyle = t.acc; ctx.fill();
-      ctx.fillStyle = t.onAcc; ctx.textAlign = "center"; ctx.fillText(lang, h.x + h.w/2, cy + ch*.7); ctx.textAlign = "left";
+    const lang = (c.idioma || "").toUpperCase(), vr = String(c.variants || "").replace(/["“”]/g, "").replace(/Holofoil/gi, "Holo").replace(/,?\s*Code:.*$/i, "").trim();
+    if((lang || vr) && h.chip > 0){
+      ctx.globalAlpha = h.a*h.chip; const fs = Math.max(13, Math.min(24, h.w*.1)), ch = fs*1.6;
+      ctx.font = fMono(fs); const tw = Math.min(h.w + 30, ctx.measureText(lang || "·").width + 18);
+      const cx = h.x + (h.w - tw)/2, cy = h.y + h.h + 8; rr(cx, cy, tw, ch, 6); ctx.fillStyle = t.acc; ctx.fill();
+      ctx.fillStyle = t.onAcc; ctx.textAlign = "center"; ctx.fillText(lang || "·", h.x + h.w/2, cy + ch*.72, h.w + 20);
+      if(vr && !/^normal$/i.test(vr)){ ctx.font = fBody(Math.max(11, fs*.72), 600); ctx.fillStyle = t.cream; ctx.fillText(vr, h.x + h.w/2, cy + ch + fs*.95, h.w + 16); }
+      ctx.textAlign = "left";
     }
     ctx.restore();
   }
 }
 function groupLayout(n){
-  const A = {x:BX + 24, y:BY + 24, w:BW - 48, h:BH - 48}, gap = 22, chip = 52; let best = null;
+  const A = {x:BX + 24, y:BY + 18, w:BW - 48, h:BH - 36}, gap = 22, chip = 66; let best = null;
   for(let rows = 1; rows <= 4; rows++){
     const cols = Math.ceil(n/rows);
     let ch = (A.h - gap*(rows - 1) - chip*rows)/rows, cw = ch*63/88; const maxw = (A.w - gap*(cols - 1))/cols;
@@ -789,7 +794,7 @@ function drawSide(t, p){
   }
   const footY = BY + BH - 4;
   let stripTop = footY - 30, cell = 0, cols = 0, gap = 7;
-  if(sh.strip && n){
+  if(sh.strip && n && n <= 75){
     cols = Math.min(15, n); cell = (SW - gap*(cols-1))/cols; const rows = Math.ceil(n/cols);
     if(rows*(cell+gap) > 170) cell = 170/rows - gap;
     stripTop = footY - 30 - rows*(cell+gap) + gap;
@@ -797,7 +802,7 @@ function drawSide(t, p){
   const maxY = stripTop - 24;
   if(sc.fileA !== null && sc.fileT < 1){ ctx.save(); ctx.globalAlpha = 1 - sc.fileT; drawFile(t, p, sc.fileA, y, maxY); ctx.restore(); }
   ctx.save(); ctx.globalAlpha = sc.fileT; drawFile(t, p, sc.fileB, y, maxY); ctx.restore();
-  if(sh.strip && n){
+  if(sh.strip && n && n <= 75){
     const hi = hiIndex();
     for(let i=0;i<n;i++){
       const cx = SX + (i%cols)*(cell+gap), cy = stripTop + Math.floor(i/cols)*(cell+gap);
@@ -841,9 +846,10 @@ function drawFile(t, p, i, y, maxY, FX = SX, FW = SW){
     y += rowH + 22;
   }
   if(sc.group && i === sc.group.a && sc.group.b > sc.group.a){
-    const langs = p.cards.slice(sc.group.a, sc.group.b + 1).map(x => (x.idioma || "?").toUpperCase());
-    ctx.font = fBody(22, 600); ctx.fillStyle = t.acc; const lab = `Mismo arte en ${langs.length} idiomas: `;
-    ctx.fillText(lab + langs.join(" · "), FX, y + 22, FW); y += 44;
+    const G = groupSize(sc.group.a), all = p.cards.slice(G.a, G.b + 1), langs = [...new Set(all.map(x => (x.idioma || "?").toUpperCase()))];
+    ctx.font = fBody(22, 600); ctx.fillStyle = t.acc;
+    ctx.fillText(`Mismo arte: ${G.n} versiones en ${langs.length} ${langs.length === 1 ? "idioma" : "idiomas"}` + (G.n > sc.group.b - sc.group.a + 1 ? ` · ${sc.group.a - G.a + 1}–${sc.group.b - G.a + 1} de ${G.n}` : ""), FX, y + 22, FW); y += 34;
+    ctx.font = fMono(17); ctx.fillStyle = t.dust; wrap(langs.join(" · "), FW).slice(0, 2).forEach((l, k) => ctx.fillText(l, FX, y + 20 + k*26, FW)); y += 26*Math.min(2, wrap(langs.join(" · "), FW).length) + 18;
   }
   if(sh.illustrator && c.illustrator){
     ctx.font = fBody(22); ctx.fillStyle = t.dust; const lab = "Ilustración: ";
