@@ -1,0 +1,85 @@
+# Binder Studio — guía para Claude
+
+Binder Studio (`index.html`, una sola página, sin build) arma videos de *master lists* de Pokémon TCG: un binder virtual animado más escenas de edición (ráfagas, carteles cinéticos, cartas en grande), grabadas directo desde el navegador con la voz del creador.
+
+El usuario trabaja con **una carpeta por especie** en su compu:
+
+```
+Ponyta/
+├── binder.json      cartas (la herramienta lo escribe)
+├── video.json       plan del video: escenas (lo escribe Claude a partir del guion; la herramienta lo relee sola)
+├── 60.jpg, SH11.png imágenes de cartas (nombre = número de carta)
+├── media/           imágenes, GIF y clips para ráfagas y escenas
+├── musica/          música de fondo
+├── _editadas/       recortes hechos con el editor
+└── videos/          videos grabados
+```
+
+## Cuando el usuario pasa un guion
+
+Tu trabajo es **proponer la edición**: convertir el guion en `video.json`. Leé `binder.json` de su carpeta para saber qué cartas hay y en qué posición. Si la carpeta está vinculada a la sesión, escribí `video.json` directo ahí (la herramienta lo detecta al volver a la pestaña); si no, mandalo como archivo para que lo guarde en la carpeta.
+
+Después, en el chat: un resumen corto de la estructura (escenas y capítulos) y **la lista de archivos que tiene que conseguir** para `media/` (lo que pusiste en cada `pide`).
+
+## Formato de `video.json`
+
+```json
+{
+  "app": "binder-studio-video",
+  "version": 1,
+  "titulo": "Todas las cartas de Ponyta",
+  "musica": "musica/tema.mp3",
+  "escenas": [ { "tipo": "...", "capitulo": "...", "guion": "...", ... } ]
+}
+```
+
+Campos comunes a todas las escenas:
+- `tipo`: uno de los de abajo.
+- `guion`: lo que el creador dice en esa escena. Aparece en el teleprompter mientras graba. Copiá el texto del guion original, repartido entre escenas; no lo reescribas salvo para cortarlo.
+- `capitulo` (opcional): nombre del capítulo de YouTube que empieza en esta escena. Poné entre 4 y 8 capítulos en todo el video, el primero en la primera escena.
+
+Tipos:
+
+| tipo | campos | qué hace |
+|---|---|---|
+| `rafaga` | `items` (lista), `ritmo` (seg por elemento, ej. `"0.28"`), `fin` (`"auto"` o `"espera"`) | Montaje rápido con zoom de golpe, sacudida y flashes. |
+| `titulo` | — | Portada con el título de la especie y la cantidad de cartas. |
+| `cartel` | `estilo` (`golpe`, `barrido`, `maquina`, `contador`), `texto`, `valor` (contador), `fondo` | Tipografía cinética a pantalla completa. |
+| `binder` | `cartas` (posiciones, `"1-9"`) | El binder virtual: cada → muestra la carta en grande y la guarda en su bolsillo. Usa el guion de cada carta (`script` en binder.json). |
+| `carta` | `carta` (número `"SH11/99"` o posición `"#13"`), `texto` | Una carta en grande con su ficha. Los zooms marcados en la carta se recorren con →. |
+| `media` | `media` (`"media/archivo.ext"`), `pide`, `texto` | Imagen, GIF o clip a pantalla completa con texto encima. |
+| `lista` | `titulo`, `items` (lista) | Puntos que aparecen de a uno con cada →. |
+| `cierre` | `texto` | Cierre con logo, texto y botón de suscripción. |
+
+Elementos de `items` en una ráfaga (strings):
+- `"media/fuego.gif | GIF de llamas"`: archivo de la carpeta `media/`, y después de `|` qué tiene que conseguir el usuario.
+- `"carta SH11/99"` o `"carta #13"`: una carta del binder, grande, sobre su propio fondo desenfocado.
+- `"texto 29 CARTAS"`: una palabra o frase corta sobre color sólido.
+- `"color"` o `"color acento"`: flash de color.
+
+Texto de los carteles (`texto`):
+- Cada línea es un renglón (`\n`).
+- `*palabra*` = grande y en color de acento. `_palabra_` = chica, en cursiva (contraste de tamaños, estilo Casey Neistat). `~palabra~` = aparece y se tacha.
+- Pocas palabras por cartel (2 a 7). Es un golpe visual, no un subtítulo.
+
+`fondo` de un cartel: `blanco` (texto negro, el clásico), `negro`, `acento`, `marca` (el fondo del canal), `carta SH11/99` (la carta desenfocada) o un archivo `media/…`.
+
+## Estilo de edición del canal
+
+Referencias: Casey Neistat "Do What You Can't" (energía, tipografía cinética, cortes al ritmo) y Check The Box (formato de master list: binder, reglas, cartas que faltan con X roja).
+
+- **Gancho en los primeros 10 segundos**: abrí con una `rafaga` de 6 a 10 elementos (ritmo 0.25–0.35) que mezcle cartas llamativas del binder, 1 o 2 textos con datos duros (cantidad de cartas, años) y 1 o 2 GIF/clips temáticos. Después, un `cartel` golpe con la pregunta o promesa del video, y recién ahí la `titulo`.
+- **Reglas** de la lista en una `lista` corta (3 puntos) si el guion las menciona.
+- **Separá el binder por eras** (Wizards, EX, Diamante y Perla/Platino, HGSS/BW, XY, Sun & Moon, Sword & Shield, Scarlet & Violet). Antes de cada tramo, un `cartel` (alterná `barrido` y `golpe`) con el nombre de la era. Cada tramo es un capítulo.
+- **Cartas especiales** (shiny, promos, la más cara, errores, stamps) van como escena `carta` aparte, antes del tramo de binder que la contiene, con un `texto` corto ("LA *MÁS BUSCADA*").
+- **Datos numéricos** fuertes del guion (precios, cantidades, años) → `cartel` estilo `contador`.
+- Usá `media` para chistes o referencias del guion (un GIF de reacción, una escena del anime). Siempre con `pide` claro y concreto.
+- Ritmo: no pongas más de ~45 segundos seguidos de binder sin un cartel o una carta especial en el medio.
+- Cerrá con `cierre` y una pregunta para los comentarios.
+- Los nombres de archivo que pidas: en minúsculas, sin espacios ni tildes (`media/caballo-galopando.gif`).
+
+## Notas técnicas
+
+- Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080; la grabación usa `captureStream` + `MediaRecorder`, con el micrófono, la música y efectos sintetizados mezclados por Web Audio.
+- `binder.json` = cartas y marca; `video.json` = escenas. La herramienta guarda ambos.
+- Los datos de cartas salen de TCGdex (repo `tcgdex/cards-database`, se puede clonar desde la sesión).

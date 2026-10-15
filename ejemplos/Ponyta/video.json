@@ -1,0 +1,154 @@
+{
+ "app": "binder-studio-video",
+ "version": 1,
+ "titulo": "Todas las cartas de Ponyta en inglés",
+ "musica": "",
+ "escenas": [
+  {
+   "tipo": "rafaga",
+   "capitulo": "Intro",
+   "guion": "(Música sola mientras pasa la ráfaga.)",
+   "items": [
+    "carta SH11/99",
+    "media/fuego.gif | GIF de llamas o fuego, cuanto más intenso mejor",
+    "texto 29 CARTAS",
+    "carta SWSH013/307",
+    "media/galope.gif | GIF de un caballo galopando o de Ponyta corriendo en el anime",
+    "texto 25 AÑOS",
+    "carta 077/165",
+    "color acento",
+    "carta SV047/122",
+    "texto UNA SOLA ESPECIE"
+   ],
+   "ritmo": "0.3",
+   "fin": "auto"
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "",
+   "guion": "¿Cuántas cartas de Ponyta salieron en inglés? Te apuesto a que son más de las que pensás.",
+   "estilo": "golpe",
+   "texto": "¿CUÁNTAS CARTAS DE\n*PONYTA*\n_salieron en inglés?_",
+   "valor": "",
+   "fondo": "blanco"
+  },
+  {
+   "tipo": "titulo",
+   "capitulo": "",
+   "guion": "Hoy las repasamos todas, una por una, desde el año 2000 hasta hoy."
+  },
+  {
+   "tipo": "lista",
+   "capitulo": "Reglas",
+   "guion": "Antes de arrancar, las reglas de esta master list.",
+   "titulo": "LAS *REGLAS*",
+   "items": [
+    "Solo cartas en inglés",
+    "Ordenadas por fecha de salida",
+    "Sin cartas de TCG Pocket"
+   ]
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "Era Wizards",
+   "guion": "Arrancamos con la era de Wizards of the Coast.",
+   "estilo": "barrido",
+   "texto": "ERA *WIZARDS*\n2000 – 2003",
+   "valor": "",
+   "fondo": "negro"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "Seis cartas en tres años, y dos son de Blaine.",
+   "cartas": "1-6"
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "EX a Platino",
+   "guion": "Después vienen EX, Diamante y Perla, y Platino.",
+   "estilo": "barrido",
+   "texto": "*EX* · *DIAMANTE Y PERLA*\n_y_ PLATINO",
+   "valor": "",
+   "fondo": "negro"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "Acá la lista empieza a crecer: solo Arceus tiene tres Ponyta distintas.",
+   "cartas": "7-12"
+  },
+  {
+   "tipo": "carta",
+   "capitulo": "La shiny de Arceus",
+   "guion": "Y la tercera de Arceus es la joya de la lista: la Ponyta shiny de la subserie SH.",
+   "carta": "SH11/99",
+   "texto": "LA *MÁS BUSCADA*"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "La guardamos y seguimos con Triumphant.",
+   "cartas": "13-14"
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "XY y Sun & Moon",
+   "guion": "En XY pasa algo curioso: Flashfire y Generations usan exactamente la misma ilustración.",
+   "estilo": "golpe",
+   "texto": "MISMO ARTE,\n*OTRA CARTA*",
+   "valor": "",
+   "fondo": "carta 14/83"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "Ojo con esas dos al armar el binder.",
+   "cartas": "15-20"
+  },
+  {
+   "tipo": "media",
+   "capitulo": "Ponyta de Galar",
+   "guion": "Y en Sword & Shield aparece algo nuevo: Ponyta de Galar, tipo Psíquico y con melena de unicornio.",
+   "media": "media/ponyta-galar.jpg",
+   "pide": "Imagen de Ponyta de Galar (del anime o del juego)",
+   "texto": "LLEGA *GALAR*"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "Tres Ponyta de Galar, incluida la shiny de Shining Fates.",
+   "cartas": "21-25"
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "Scarlet & Violet",
+   "guion": "Y cerramos con Escarlata y Púrpura.",
+   "estilo": "barrido",
+   "texto": "ERA *ESCARLATA*\n_y_ *PÚRPURA*",
+   "valor": "",
+   "fondo": "negro"
+  },
+  {
+   "tipo": "binder",
+   "capitulo": "",
+   "guion": "Las cuatro más nuevas, desde el set 151 hasta Destined Rivals.",
+   "cartas": "26-29"
+  },
+  {
+   "tipo": "cartel",
+   "capitulo": "Resumen",
+   "guion": "En total: veintinueve cartas de una sola especie.",
+   "estilo": "contador",
+   "texto": "CARTAS. *UNA ESPECIE.*",
+   "valor": "29",
+   "fondo": "marca"
+  },
+  {
+   "tipo": "cierre",
+   "capitulo": "Cierre",
+   "guion": "Contame en los comentarios cuál te falta a vos, y nos vemos en la próxima especie.",
+   "texto": "¿CUÁL TE FALTA\n*A VOS*?"
+  }
+ ]
+}
