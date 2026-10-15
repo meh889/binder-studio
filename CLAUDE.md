@@ -15,7 +15,19 @@ Ponyta/
 └── videos/          videos grabados
 ```
 
-## Cuando el usuario pasa un guion
+## Antes del plan: trabajar el guion juntos
+
+El usuario quiere ir y venir con el guion hasta dejarlo lo mejor posible. Puede mandar un guion entero, un borrador o solo ideas sueltas. En cada vuelta:
+
+- Devolvé el guion completo mejorado, en castellano rioplatense y en el tono de él (hablado, no escrito: frases cortas, que se puedan decir de un tirón).
+- Marcá en pocas líneas qué cambiaste y por qué, y hacé 1 o 2 preguntas concretas (una anécdota propia, cuál es su carta favorita, si tiene alguna).
+- Cuidá: el gancho de los primeros 10 segundos (una pregunta, una promesa o un dato sorprendente), dar motivos para quedarse hasta el final (adelantar la carta más rara o un ranking), una frase por carta que diga algo que no se ve en la imagen, y un cierre con pregunta para comentarios.
+- Chequeá los datos (sets, años, ilustradores, rarezas) contra TCGdex y avisá si algo no cierra. No inventes precios ni datos: si hace falta un número que no podés confirmar, dejalo marcado para que él lo complete.
+- Estimá la duración (unas 150 palabras por minuto más el tiempo de binder).
+
+Recién cuando el usuario aprueba el guion, pasás al plan. Desde ahí la regla es usar su texto tal cual, repartido entre escenas.
+
+## Cuando el usuario pasa un guion aprobado
 
 Tu trabajo es **proponer la edición**: convertir el guion en `video.json`. Leé `binder.json` de su carpeta para saber qué cartas hay y en qué posición. Si la carpeta está vinculada a la sesión, escribí `video.json` directo ahí (la herramienta lo detecta al volver a la pestaña); si no, mandalo como archivo para que lo guarde en la carpeta.
 
