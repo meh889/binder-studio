@@ -1,0 +1,1245 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T18:19:27+00:00",
+  "title": "Design System: Binder Studio",
+  "extensions": {
+    "colorMeta": {
+      "case": {
+        "role": "neutral",
+        "displayName": "Vitrina",
+        "canonical": "#101315",
+        "tonalRamp": [
+          "#21272b",
+          "#39444b",
+          "#52616b",
+          "#6a7e8b",
+          "#8899a5",
+          "#a8b5bd",
+          "#cbd2d7",
+          "#f1f3f4"
+        ]
+      },
+      "shelf": {
+        "role": "neutral",
+        "displayName": "Estante",
+        "canonical": "#171b1e",
+        "tonalRamp": [
+          "#21272b",
+          "#3a444b",
+          "#52606b",
+          "#6a7d8b",
+          "#8998a4",
+          "#a8b4bd",
+          "#cbd2d7",
+          "#f1f2f4"
+        ]
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Vidrio",
+        "canonical": "#1f2428",
+        "tonalRamp": [
+          "#21272b",
+          "#3a434b",
+          "#52606a",
+          "#6b7c8a",
+          "#8998a4",
+          "#a9b4bc",
+          "#cbd2d7",
+          "#f1f2f4"
+        ]
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "Riel",
+        "canonical": "#272d32",
+        "tonalRamp": [
+          "#22272b",
+          "#3a434a",
+          "#535f6a",
+          "#6b7c8a",
+          "#8a98a3",
+          "#a9b3bc",
+          "#cbd2d7",
+          "#f1f2f4"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Tinta de tubo",
+        "canonical": "#e9eef0",
+        "tonalRamp": [
+          "#1f292d",
+          "#36484f",
+          "#4c6670",
+          "#638492",
+          "#839faa",
+          "#a4b9c1",
+          "#c8d5da",
+          "#f0f3f5"
+        ]
+      },
+      "dim": {
+        "role": "neutral",
+        "displayName": "Tenue",
+        "canonical": "#97a1a6",
+        "tonalRamp": [
+          "#232729",
+          "#3d4447",
+          "#576166",
+          "#717e84",
+          "#8e999f",
+          "#adb4b8",
+          "#ced2d5",
+          "#f1f3f3"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Apagado",
+        "canonical": "#8b959a",
+        "tonalRamp": [
+          "#242729",
+          "#3e4447",
+          "#586165",
+          "#727d83",
+          "#8f999e",
+          "#adb4b8",
+          "#ced2d4",
+          "#f1f3f3"
+        ]
+      },
+      "light": {
+        "role": "neutral",
+        "displayName": "Luz",
+        "canonical": "rgba(233,238,240,.42)",
+        "tonalRamp": [
+          "#1f292d",
+          "#36484f",
+          "#4c6670",
+          "#638492",
+          "#839faa",
+          "#a4b9c1",
+          "#c8d5da",
+          "#f0f3f5"
+        ]
+      },
+      "tag-yellow": {
+        "role": "tertiary",
+        "displayName": "Etiqueta amarilla",
+        "canonical": "#f4d23a",
+        "tonalRamp": [
+          "#483c04",
+          "#7e6807",
+          "#b3940a",
+          "#e8c00d",
+          "#f4d239",
+          "#f7de6e",
+          "#faeba8",
+          "#fef9e7"
+        ]
+      },
+      "tag-pink": {
+        "role": "tertiary",
+        "displayName": "Etiqueta rosa",
+        "canonical": "#f49ac1",
+        "tonalRamp": [
+          "#450822",
+          "#780d3b",
+          "#aa1354",
+          "#dd186d",
+          "#ea428b",
+          "#f075aa",
+          "#f6accc",
+          "#fce8f1"
+        ]
+      },
+      "tag-mint": {
+        "role": "tertiary",
+        "displayName": "Etiqueta menta",
+        "canonical": "#8fd9b6",
+        "tonalRamp": [
+          "#133927",
+          "#226344",
+          "#308d61",
+          "#3eb77e",
+          "#63ca99",
+          "#8dd8b5",
+          "#bae8d2",
+          "#ecf9f3"
+        ]
+      },
+      "paper": {
+        "role": "tertiary",
+        "displayName": "Papel blanco",
+        "canonical": "#f3efe6",
+        "tonalRamp": [
+          "#342b19",
+          "#5a4b2b",
+          "#7f6b3d",
+          "#a58b4f",
+          "#bba572",
+          "#cdbd98",
+          "#e1d7c1",
+          "#f7f4ee"
+        ]
+      },
+      "tag-ink": {
+        "role": "tertiary",
+        "displayName": "Tinta de etiqueta",
+        "canonical": "#1d1a14",
+        "tonalRamp": [
+          "#2d291f",
+          "#4e4636",
+          "#70644d",
+          "#918264",
+          "#aa9d83",
+          "#c1b7a4",
+          "#dad4c9",
+          "#f5f3f0"
+        ]
+      },
+      "price": {
+        "role": "tertiary",
+        "displayName": "Tinta de precio",
+        "canonical": "#c8281f",
+        "tonalRamp": [
+          "#420d0a",
+          "#731712",
+          "#a32119",
+          "#d42a21",
+          "#e3524a",
+          "#ea807b",
+          "#f3b3b0",
+          "#fceae9"
+        ]
+      },
+      "rec": {
+        "role": "secondary",
+        "displayName": "Tinta de grabación",
+        "canonical": "#d42a22",
+        "tonalRamp": [
+          "#420d0b",
+          "#721712",
+          "#a3201a",
+          "#d32a22",
+          "#e2524b",
+          "#ea807b",
+          "#f2b3b0",
+          "#fbeae9"
+        ]
+      },
+      "video-mat": {
+        "role": "neutral",
+        "displayName": "Playmat",
+        "canonical": "#1f1d1c",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#272523",
+          "#444140",
+          "#63615f",
+          "#848280",
+          "#a7a4a3",
+          "#cbc8c7",
+          "#f1eeec"
+        ]
+      },
+      "video-binder-negro": {
+        "role": "neutral",
+        "displayName": "Tapa negra",
+        "canonical": "#161719",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#242527",
+          "#414244",
+          "#606164",
+          "#818285",
+          "#a4a5a8",
+          "#c8c9cc",
+          "#edeef1"
+        ]
+      },
+      "video-binder-gris": {
+        "role": "neutral",
+        "displayName": "Tapa gris",
+        "canonical": "#3a3c40",
+        "tonalRamp": [
+          "#0a0b0e",
+          "#232529",
+          "#404246",
+          "#5f6166",
+          "#808287",
+          "#a3a5aa",
+          "#c7c9ce",
+          "#eceef4"
+        ]
+      },
+      "video-binder-azul": {
+        "role": "neutral",
+        "displayName": "Tapa azul",
+        "canonical": "#1c2a47",
+        "tonalRamp": [
+          "#020923",
+          "#162441",
+          "#324260",
+          "#516182",
+          "#7182a5",
+          "#93a5c9",
+          "#b6caef",
+          "#e7effe"
+        ]
+      },
+      "video-binder-rojo": {
+        "role": "neutral",
+        "displayName": "Tapa roja",
+        "canonical": "#5a1f1e",
+        "tonalRamp": [
+          "#1f0001",
+          "#470c0e",
+          "#692c2a",
+          "#8c4c48",
+          "#b16d68",
+          "#d78f8a",
+          "#fdb3ad",
+          "#ffe9e7"
+        ]
+      },
+      "video-binder-verde": {
+        "role": "neutral",
+        "displayName": "Tapa verde",
+        "canonical": "#1f3a2a",
+        "tonalRamp": [
+          "#000f05",
+          "#102b1c",
+          "#2e4938",
+          "#4d6957",
+          "#6d8b78",
+          "#8fae9a",
+          "#b3d2be",
+          "#d8f8e3"
+        ]
+      },
+      "video-binder-violeta": {
+        "role": "neutral",
+        "displayName": "Tapa violeta",
+        "canonical": "#2d2340",
+        "tonalRamp": [
+          "#0f051e",
+          "#291f3b",
+          "#463c5b",
+          "#655b7c",
+          "#867c9e",
+          "#a99ec3",
+          "#cdc2e8",
+          "#f1ebff"
+        ]
+      },
+      "video-page": {
+        "role": "neutral",
+        "displayName": "Página del binder",
+        "canonical": "#101112",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242526",
+          "#414243",
+          "#606163",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9cb",
+          "#edeff0"
+        ]
+      },
+      "video-paper": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#efebe2",
+        "tonalRamp": [
+          "#0d0b06",
+          "#28251e",
+          "#45423a",
+          "#646159",
+          "#86827a",
+          "#a8a59c",
+          "#cdc9c0",
+          "#f2eee5"
+        ]
+      },
+      "video-proxy-paper": {
+        "role": "neutral",
+        "displayName": "Papel de copia",
+        "canonical": "#f2efe8",
+        "tonalRamp": [
+          "#0d0b07",
+          "#272520",
+          "#44423c",
+          "#64615b",
+          "#85827c",
+          "#a8a59e",
+          "#ccc9c2",
+          "#f1eee7"
+        ]
+      },
+      "video-ink": {
+        "role": "neutral",
+        "displayName": "Tinta impresa",
+        "canonical": "#1b1b1c",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424243",
+          "#616162",
+          "#828283",
+          "#a5a5a6",
+          "#c9c9ca",
+          "#eeeef0"
+        ]
+      },
+      "video-grey": {
+        "role": "neutral",
+        "displayName": "Gris impreso",
+        "canonical": "#67645c",
+        "tonalRamp": [
+          "#0d0b06",
+          "#27251e",
+          "#45423a",
+          "#646159",
+          "#85827a",
+          "#a8a59c",
+          "#ccc9c0",
+          "#f2eee5"
+        ]
+      },
+      "video-pen": {
+        "role": "secondary",
+        "displayName": "Birome",
+        "canonical": "#1e3a86",
+        "tonalRamp": [
+          "#010035",
+          "#061964",
+          "#1f3b87",
+          "#3c5cab",
+          "#5b7fd1",
+          "#7da2f8",
+          "#b0c9fe",
+          "#e7efff"
+        ]
+      },
+      "video-postit": {
+        "role": "tertiary",
+        "displayName": "Post-it",
+        "canonical": "#ffe57a",
+        "tonalRamp": [
+          "#0f0b00",
+          "#2d2500",
+          "#4e4100",
+          "#726002",
+          "#998105",
+          "#bda434",
+          "#e2c95d",
+          "#ffefb0"
+        ]
+      },
+      "video-postit-ink": {
+        "role": "tertiary",
+        "displayName": "Tinta de post-it",
+        "canonical": "#26285e",
+        "tonalRamp": [
+          "#07012f",
+          "#1c1c51",
+          "#373b73",
+          "#555b96",
+          "#757dba",
+          "#979fe0",
+          "#bcc5fe",
+          "#eaedff"
+        ]
+      },
+      "video-highlighter": {
+        "role": "secondary",
+        "displayName": "Resaltador",
+        "canonical": "rgba(255,222,64,.78)",
+        "tonalRamp": [
+          "#0f0b00",
+          "#2d2500",
+          "#4e4100",
+          "#726002",
+          "#988106",
+          "#bfa416",
+          "#e9c818",
+          "#ffefac"
+        ]
+      },
+      "video-lamp": {
+        "role": "neutral",
+        "displayName": "Lámpara",
+        "canonical": "rgba(255,234,204,.16)",
+        "tonalRamp": [
+          "#130900",
+          "#312208",
+          "#503f25",
+          "#705e44",
+          "#927f64",
+          "#b6a286",
+          "#dac6a9",
+          "#ffecd1"
+        ]
+      },
+      "video-notebook-rule": {
+        "role": "neutral",
+        "displayName": "Renglón",
+        "canonical": "rgba(70,110,180,.3)",
+        "tonalRamp": [
+          "#000827",
+          "#001f5a",
+          "#193e80",
+          "#385fa4",
+          "#5882c9",
+          "#7aa5ef",
+          "#accafd",
+          "#e6efff"
+        ]
+      },
+      "video-notebook-margin": {
+        "role": "neutral",
+        "displayName": "Margen del cuaderno",
+        "canonical": "rgba(205,60,60,.38)",
+        "tonalRamp": [
+          "#1f0001",
+          "#4c0207",
+          "#7f0713",
+          "#b21d25",
+          "#da4947",
+          "#ff726c",
+          "#feb3ac",
+          "#ffe9e6"
+        ]
+      },
+      "video-accent": {
+        "role": "primary",
+        "displayName": "Acento del canal",
+        "canonical": "#ffb347",
+        "tonalRamp": [
+          "#130900",
+          "#352000",
+          "#5c3a01",
+          "#855604",
+          "#b0740a",
+          "#dd9319",
+          "#ffba5e",
+          "#ffebd4"
+        ]
+      },
+      "video-accent-2": {
+        "role": "primary",
+        "displayName": "Acento 2",
+        "canonical": "#ff6a3d",
+        "tonalRamp": [
+          "#1c0300",
+          "#470e00",
+          "#742205",
+          "#aa3100",
+          "#dc4917",
+          "#fd7750",
+          "#fdb5a0",
+          "#fee9e3"
+        ]
+      },
+      "video-cream": {
+        "role": "neutral",
+        "displayName": "Crema",
+        "canonical": "#fbefe2",
+        "tonalRamp": [
+          "#110903",
+          "#2c231a",
+          "#4a4036",
+          "#695f54",
+          "#8b8075",
+          "#aea397",
+          "#d3c7ba",
+          "#f8ecdf"
+        ]
+      },
+      "video-dust": {
+        "role": "neutral",
+        "displayName": "Polvo",
+        "canonical": "#a8949e",
+        "tonalRamp": [
+          "#13070e",
+          "#2f2028",
+          "#4d3c45",
+          "#6d5b64",
+          "#8f7c86",
+          "#b39ea9",
+          "#d7c2cd",
+          "#fde7f2"
+        ]
+      },
+      "video-kin-ink": {
+        "role": "neutral",
+        "displayName": "Tinta de cartel",
+        "canonical": "#121014",
+        "tonalRamp": [
+          "#0c0a0e",
+          "#262428",
+          "#434146",
+          "#626065",
+          "#848186",
+          "#a6a4a9",
+          "#cbc8ce",
+          "#f0edf3"
+        ]
+      },
+      "video-kin-small": {
+        "role": "neutral",
+        "displayName": "Chica sobre papel",
+        "canonical": "#3b3640",
+        "tonalRamp": [
+          "#0d0911",
+          "#27232c",
+          "#453f4a",
+          "#645f6a",
+          "#85808b",
+          "#a8a2ae",
+          "#ccc6d3",
+          "#f2ebf8"
+        ]
+      },
+      "video-strike": {
+        "role": "tertiary",
+        "displayName": "Rojo de tachado",
+        "canonical": "#e8262b",
+        "tonalRamp": [
+          "#1f0001",
+          "#4c0205",
+          "#7f060e",
+          "#b6101a",
+          "#eb2a2e",
+          "#fc766b",
+          "#feb3aa",
+          "#ffe9e6"
+        ]
+      },
+      "video-subscribe": {
+        "role": "tertiary",
+        "displayName": "Rojo Suscribite",
+        "canonical": "#e62117",
+        "tonalRamp": [
+          "#1e0000",
+          "#4c0201",
+          "#7f0603",
+          "#b60f09",
+          "#ec2a1e",
+          "#fc7665",
+          "#ffb3a7",
+          "#fee9e5"
+        ]
+      },
+      "video-overlay-chip": {
+        "role": "neutral",
+        "displayName": "Pastilla de postproducción",
+        "canonical": "rgba(8,6,10,.62)",
+        "tonalRamp": [
+          "#0c0a0f",
+          "#272429",
+          "#444047",
+          "#636066",
+          "#848187",
+          "#a7a3aa",
+          "#cbc7cf",
+          "#f1edf4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Nombre de carta en el inspector, títulos de diálogo."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cabeceras de panel y onboarding."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Títulos de sección del inspector y popovers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Único tamaño de lectura; jerarquía por peso."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Etiquetas de campo y metadatos en dim."
+      },
+      "teleprompter": {
+        "displayName": "Teleprompter",
+        "purpose": "Guion en el estudio, ajustable vía --pf."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Solo etiquetas de papel."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Número de carta en la etiqueta de precio."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "code y editor de capítulos."
+      },
+      "video-kinetic": {
+        "displayName": "Cartel",
+        "purpose": "Carteles cinéticos en mayúsculas; fuente display de la marca por defecto (Big Shoulders Display)."
+      },
+      "video-kinetic-bebas": {
+        "displayName": "Cartel · Bebas Neue",
+        "purpose": "Fuente display alternativa elegible en Marca."
+      },
+      "video-kinetic-anton": {
+        "displayName": "Cartel · Anton",
+        "purpose": "Fuente display alternativa elegible en Marca."
+      },
+      "video-kinetic-archivo": {
+        "displayName": "Cartel · Archivo Black",
+        "purpose": "Fuente display alternativa elegible en Marca."
+      },
+      "video-kinetic-small": {
+        "displayName": "Palabra chica",
+        "purpose": "_Palabras chicas_ de los carteles, itálica, ×0.46 de la base."
+      },
+      "video-counter": {
+        "displayName": "Contador",
+        "purpose": "Número del cartel contador."
+      },
+      "video-print-title": {
+        "displayName": "Título impreso",
+        "purpose": "Título de la hoja, la ficha y la etiqueta de tapa."
+      },
+      "video-print-subtitle": {
+        "displayName": "Segunda línea impresa",
+        "purpose": "Segunda línea del título en tinta de acento impresa."
+      },
+      "video-print-row": {
+        "displayName": "Fila del checklist",
+        "purpose": "Set, número e idioma en la hoja."
+      },
+      "video-print-meta": {
+        "displayName": "Datos impresos",
+        "purpose": "Página, pie y línea de datos, en gris."
+      },
+      "video-print-body": {
+        "displayName": "Nota impresa",
+        "purpose": "Dato de la carta en la ficha."
+      },
+      "video-print-button": {
+        "displayName": "Suscribite del cierre",
+        "purpose": "Botón y usuario de la escena de cierre."
+      },
+      "video-hand-count": {
+        "displayName": "Contador a mano",
+        "purpose": "29/47 en birome."
+      },
+      "video-hand-note": {
+        "displayName": "Post-it",
+        "purpose": "Dato de la carta escrito a mano."
+      },
+      "video-hand-list": {
+        "displayName": "Lista a mano",
+        "purpose": "Puntos de la lista en el cuaderno."
+      },
+      "video-overlay": {
+        "displayName": "Postproducción",
+        "purpose": "Etiqueta de usuario y Suscribite superpuestos."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "0 18px 48px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.4)",
+        "purpose": "Menús y popovers."
+      },
+      {
+        "name": "toast",
+        "value": "0 14px 36px rgba(0,0,0,.5)",
+        "purpose": "Toasts; el de aviso suma inset 0 2px 0 #f4d23a."
+      },
+      {
+        "name": "dialog",
+        "value": "0 30px 80px rgba(0,0,0,.6)",
+        "purpose": "Diálogos sobre velo rgba(6,8,9,.72)."
+      },
+      {
+        "name": "stage",
+        "value": "0 0 0 1px #1f2428, 0 22px 60px rgba(0,0,0,.55)",
+        "purpose": "Canvas del escenario."
+      },
+      {
+        "name": "lit-shelf",
+        "value": "inset 0 1.5px 0 rgba(233,238,240,.8), inset 0 22px 26px -20px rgba(233,238,240,.16)",
+        "purpose": "Fila seleccionada del estante."
+      },
+      {
+        "name": "lit-segment",
+        "value": "inset 0 2px 0 rgba(233,238,240,.42)",
+        "purpose": "Segmento activo de la tira."
+      },
+      {
+        "name": "acetate",
+        "value": "inset 0 0 0 1px rgba(233,238,240,.26), inset 0 1px 0 rgba(255,255,255,.35)",
+        "purpose": "Marco toploader."
+      },
+      {
+        "name": "focus-field",
+        "value": "inset 0 0 0 1.5px rgba(233,238,240,.42)",
+        "purpose": "Foco de campos de texto."
+      },
+      {
+        "name": "video-sheet",
+        "value": "blur 20px, offset 9px 14px, rgba(0,0,0,.5)",
+        "purpose": "Canvas: hoja de checklist y ficha."
+      },
+      {
+        "name": "video-notebook",
+        "value": "blur 22px, offset 10px 16px, rgba(0,0,0,.5)",
+        "purpose": "Canvas: cuaderno de la lista."
+      },
+      {
+        "name": "video-postit",
+        "value": "blur 16px, offset 5px 9px, rgba(0,0,0,.32)",
+        "purpose": "Canvas: post-it."
+      },
+      {
+        "name": "video-cover-label",
+        "value": "blur 8px, offset 2px 3px, rgba(0,0,0,.5)",
+        "purpose": "Canvas: etiqueta de la tapa."
+      },
+      {
+        "name": "video-cover",
+        "value": "blur 24px, offset 8px 6px, rgba(0,0,0,.55)",
+        "purpose": "Canvas: tapa del binder al abrirse."
+      },
+      {
+        "name": "video-page",
+        "value": "blur 10px, offset 3px 4px, rgba(0,0,0,.55)",
+        "purpose": "Canvas: página sobre la tapa."
+      },
+      {
+        "name": "video-card",
+        "value": "rounded shadow blur 34px, alpha .55 (pocket) / .5 (big)",
+        "purpose": "Canvas: sombra de carta; crece con la altura en la mano."
+      },
+      {
+        "name": "video-kinetic-dark",
+        "value": "blur 28px, offset 0 6px, rgba(0,0,0,.5)",
+        "purpose": "Canvas: texto de cartel sobre fondo oscuro."
+      },
+      {
+        "name": "video-overlay",
+        "value": "blur 18px rgba(0,0,0,.4) (logo); blur 16px rgba(0,0,0,.45) (Suscribite); blur 30px rgba(0,0,0,.5) (Suscribite del cierre)",
+        "purpose": "Canvas: postproducción."
+      },
+      {
+        "name": "video-lamp",
+        "value": "radial from (16% W, -14% H) to 1.28 W: rgba(255,234,204,.16) → 0 at 40% → rgba(0,0,0,.4)",
+        "purpose": "Canvas: luz de la lámpara."
+      },
+      {
+        "name": "video-vignette",
+        "value": "radial 0.42 H → 1.08 H: 0 → rgba(0,0,0,.32)",
+        "purpose": "Canvas: viñeta de lente."
+      },
+      {
+        "name": "video-focus",
+        "value": "blur 4px at half resolution + rgba(0,0,0,.18)",
+        "purpose": "Canvas: profundidad de campo con una carta en la mano."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.23,1,.32,1)",
+        "purpose": "Entradas, press de botón, swing de etiqueta, toasts."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(.77,0,.175,1)",
+        "purpose": "Token declarado para desplazamientos simétricos."
+      },
+      {
+        "name": "state",
+        "value": "140ms ease",
+        "purpose": "Hover, color y foco."
+      },
+      {
+        "name": "press",
+        "value": "scale(.97)",
+        "purpose": ":active de botones."
+      },
+      {
+        "name": "menu-in",
+        "value": "160ms (popover 180ms) scale(.97) translateY(-4px)",
+        "purpose": "Menús y popovers."
+      },
+      {
+        "name": "dialog-in",
+        "value": "220ms scale(.97)",
+        "purpose": "Diálogos."
+      },
+      {
+        "name": "toast-in",
+        "value": "400ms translateY(12px); salida 150ms",
+        "purpose": "Toasts."
+      },
+      {
+        "name": "tag-swing",
+        "value": "420ms rotate -9deg → 3deg → 0",
+        "purpose": "Etiqueta nueva."
+      },
+      {
+        "name": "rec-blink",
+        "value": "1.2s infinite, opacity .35",
+        "purpose": "Punto de grabación; se apaga con reduced motion."
+      },
+      {
+        "name": "video-lift",
+        "value": "springEase(.84, .56s), 720ms",
+        "purpose": "Canvas: la carta sube a la cámara."
+      },
+      {
+        "name": "video-lower",
+        "value": "springEase(1, .5s), 640ms",
+        "purpose": "Canvas: la carta baja sin rebote."
+      },
+      {
+        "name": "video-snug",
+        "value": "springEase(.62, .19s), 260ms",
+        "purpose": "Canvas: la carta toca el fondo del bolsillo."
+      },
+      {
+        "name": "video-deal",
+        "value": "springEase(.8, .42s), 560ms",
+        "purpose": "Canvas: cartas del grupo repartidas."
+      },
+      {
+        "name": "video-cover-open",
+        "value": "760ms easeInOut, camera distance 2600px",
+        "purpose": "Canvas: abrir la tapa."
+      },
+      {
+        "name": "video-page-turn",
+        "value": "640ms easeInOut",
+        "purpose": "Canvas: pasar la página."
+      },
+      {
+        "name": "video-tick",
+        "value": "300ms easeOut",
+        "purpose": "Canvas: tilde en birome."
+      },
+      {
+        "name": "video-camera-sway",
+        "value": "dx 2.6·sin(t/2300)+1.2·sin(t/1130+1), dy 1.9·sin(t/2710+2)+.8·sin(t/970), rot .0011, zoom ±.0016",
+        "purpose": "Canvas: cámara en vivo; apagada con reduced motion."
+      },
+      {
+        "name": "video-golpe",
+        "value": "230ms from scale 1.6, 165ms per word, +70ms per row",
+        "purpose": "Canvas: cartel golpe."
+      },
+      {
+        "name": "video-barrido",
+        "value": "260ms row stagger, 300ms reveal + 280ms bar",
+        "purpose": "Canvas: cartel barrido."
+      },
+      {
+        "name": "video-maquina",
+        "value": "34ms per letter, caret 380ms",
+        "purpose": "Canvas: cartel máquina."
+      },
+      {
+        "name": "video-contador",
+        "value": "1500ms easeOut count, 8% bounce over 250ms",
+        "purpose": "Canvas: cartel contador."
+      },
+      {
+        "name": "video-scene-cut",
+        "value": "white flash 80% over 230ms + zoom 1.07→1 over 430ms",
+        "purpose": "Canvas: transición entre escenas."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "min-width 1800px"
+      },
+      {
+        "name": "desk",
+        "value": "max-width 1560px"
+      },
+      {
+        "name": "compact",
+        "value": "max-width 1180px"
+      },
+      {
+        "name": "stack",
+        "value": "max-width 980px"
+      },
+      {
+        "name": "inspector-narrow",
+        "value": "@container max-width 379px"
+      }
+    ],
+    "videoThemes": {
+      "fuego": {
+        "accent": "#ffb347",
+        "accent2": "#ff6a3d",
+        "bg": "#1f1d1c"
+      },
+      "psiquico": {
+        "accent": "#ff9ad5",
+        "accent2": "#b98cff",
+        "bg": "#1f1c24"
+      },
+      "agua": {
+        "accent": "#6cc7ff",
+        "accent2": "#3d7bff",
+        "bg": "#18202a"
+      },
+      "planta": {
+        "accent": "#9be36b",
+        "accent2": "#3fbf7f",
+        "bg": "#1a221c"
+      },
+      "electrico": {
+        "accent": "#ffe14d",
+        "accent2": "#ffb000",
+        "bg": "#211f1a"
+      },
+      "fantasma": {
+        "accent": "#b69cff",
+        "accent2": "#7a5cff",
+        "bg": "#1d1b23"
+      },
+      "neutro": {
+        "accent": "#f2f2f2",
+        "accent2": "#9aa4b2",
+        "bg": "#1d1e20"
+      }
+    },
+    "videoGeometry": {
+      "canvas": "1920x1080",
+      "binder": "BX 74, BY 44, BW 860, BH 992, BROT -0.012",
+      "page": "PG 744x932 (86px from spine, 30px elsewhere)",
+      "pockets": "3x3, margin 22, gap 14, card 63/88",
+      "sheet": "SHEET x 1004, y 58, 792x1130, rot 0.017",
+      "hero": "HERO cx BCX+6, cy 548, h 900, rot -0.034",
+      "postit": "520 x >=240 at (250, 756) in sheet space, rot -0.035",
+      "notebook": "1420x1016 at (250, 64), rot -0.008, rules every 74px from 222",
+      "overlayMargin": "40px, 16px stack gap"
+    }
+  },
+  "components": [
+    {
+      "name": "Botón",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Acción por defecto: vidrio con tinta.",
+      "html": "<button class=\"ds-btn\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\"><path d=\"M12 5v14M5 12h14\"/></svg>Agregar</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 13px;border:0;border-radius:7px;background:#1f2428;color:#e9eef0;font:600 14px/1.45 \"M PLUS 2\",system-ui,sans-serif;cursor:pointer;transition:background-color 140ms ease,transform 140ms cubic-bezier(.23,1,.32,1)}.ds-btn:hover{background:#272d32}.ds-btn:active{transform:scale(.97)}.ds-btn:focus-visible{outline:2px solid #e9eef0;outline-offset:2px}.ds-ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round}"
+    },
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La acción principal, invertida a tinta.",
+      "html": "<button class=\"ds-btn-primary\">Terminar</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;min-height:34px;padding:0 13px;border:0;border-radius:7px;background:#e9eef0;color:#101315;font:600 14px/1.45 \"M PLUS 2\",system-ui,sans-serif;cursor:pointer;transition:background-color 140ms ease,transform 140ms cubic-bezier(.23,1,.32,1)}.ds-btn-primary:hover{background:#fff}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:2px solid #e9eef0;outline-offset:2px}"
+    },
+    {
+      "name": "Botón Grabar",
+      "kind": "button",
+      "refersTo": "button-rec",
+      "description": "Solo para grabar: tinta roja.",
+      "html": "<button class=\"ds-btn-rec\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"5\" fill=\"currentColor\" stroke=\"none\"/></svg>Grabar</button>",
+      "css": ".ds-btn-rec{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 13px;border:0;border-radius:7px;background:#d42a22;color:#fff;font:600 14px/1.45 \"M PLUS 2\",system-ui,sans-serif;cursor:pointer;transition:background-color 140ms ease}.ds-btn-rec:hover{background:#bb2219}.ds-btn-rec:focus-visible{outline:2px solid #e9eef0;outline-offset:2px}.ds-ic{width:18px;height:18px}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo hundido en la vitrina con etiqueta tenue.",
+      "html": "<label class=\"ds-fld\"><span>Ilustrador</span><input class=\"ds-input\" type=\"text\" placeholder=\"Yuka Morii\"></label>",
+      "css": ".ds-fld{display:flex;flex-direction:column;gap:5px;font:500 12.5px \"M PLUS 2\",system-ui,sans-serif;color:#97a1a6;background:#171b1e;padding:12px}.ds-input{background:#101315;border:0;border-radius:7px;padding:8px 10px;color:#e9eef0;font:500 14px/1.45 \"M PLUS 2\",system-ui,sans-serif;box-shadow:inset 0 0 0 1px transparent;transition:box-shadow 140ms ease}.ds-input::placeholder{color:#8b959a}.ds-input:focus{outline:none;box-shadow:inset 0 0 0 1.5px rgba(233,238,240,.42)}"
+    },
+    {
+      "name": "Selector de vista",
+      "kind": "nav",
+      "refersTo": "view-tab-selected",
+      "description": "Riel segmentado de la barra superior.",
+      "html": "<div class=\"ds-views\"><button aria-selected=\"true\">Cartas <small>47</small></button><button>Plan del video <small>9</small></button><button>Marca</button></div>",
+      "css": ".ds-views{display:inline-flex;gap:2px;background:#171b1e;border-radius:9px;padding:3px}.ds-views button{border:0;background:transparent;color:#97a1a6;font:700 14px \"M PLUS 2\",system-ui,sans-serif;padding:6px 14px;border-radius:7px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:background-color 140ms ease,color 140ms ease}.ds-views small{font-weight:500;color:#8b959a;font-size:12px}.ds-views button:hover{color:#e9eef0}.ds-views button[aria-selected=true]{background:#e9eef0;color:#101315}.ds-views button[aria-selected=true] small{color:#4b5459}.ds-views button:focus-visible{outline:2px solid #e9eef0;outline-offset:2px}"
+    },
+    {
+      "name": "Chip de filtro",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filtro del estante; presionado se invierte a tinta.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"true\">Todas <b>47</b></button> <button class=\"ds-chip\"><i style=\"background:#f4d23a\"></i>Sin guion <b>14</b></button>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:0;border-radius:999px;background:#1f2428;color:#97a1a6;font:600 13px \"M PLUS 2\",system-ui,sans-serif;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}.ds-chip i{width:8px;height:8px;border-radius:2px}.ds-chip b{font-weight:600;opacity:.75}.ds-chip[aria-pressed=true]{background:#e9eef0;color:#101315}.ds-chip:hover{color:#e9eef0}.ds-chip[aria-pressed=true]:hover{color:#101315}.ds-chip:focus-visible{outline:2px solid #e9eef0;outline-offset:2px}"
+    },
+    {
+      "name": "Etiquetas de papel",
+      "kind": "custom",
+      "refersTo": "tag-pending",
+      "description": "Estados de la carta en papel con agujero perforado.",
+      "html": "<div class=\"ds-tags\"><span class=\"ds-tag y\">sin guion</span><span class=\"ds-tag p\">falta imagen</span><span class=\"ds-tag m\">lista</span><span class=\"ds-tag o\">me falta</span></div>",
+      "css": ".ds-tags{display:flex;gap:5px;background:#171b1e;padding:12px}.ds-tag{position:relative;display:inline-flex;align-items:center;height:20px;padding:0 7px 0 15px;border-radius:3px;font:600 12px/1 \"Klee One\",\"M PLUS 2\",system-ui,sans-serif;color:#1d1a14;transform-origin:8px 50%;animation:ds-swing 420ms cubic-bezier(.23,1,.32,1)}.ds-tag::before{content:\"\";position:absolute;left:5px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:#171b1e}.ds-tag.y{background:#f4d23a}.ds-tag.p{background:#f49ac1}.ds-tag.m{background:#8fd9b6}.ds-tag.o{background:#f3efe6;color:#c8281f}@keyframes ds-swing{0%{transform:rotate(-9deg);opacity:0}55%{transform:rotate(3deg);opacity:1}100%{transform:rotate(0)}}@media (prefers-reduced-motion:reduce){.ds-tag{animation:none}}"
+    },
+    {
+      "name": "Etiqueta de precio",
+      "kind": "custom",
+      "refersTo": "price-tag",
+      "description": "Número de carta en el inspector, papel rotado.",
+      "html": "<div class=\"ds-pwrap\"><span class=\"ds-price\">007/086</span></div>",
+      "css": ".ds-pwrap{background:#171b1e;padding:16px}.ds-price{position:relative;display:inline-flex;align-items:center;padding:5px 10px 5px 18px;border-radius:4px;background:#f3efe6;color:#c8281f;font:600 24px/1 \"Klee One\",\"M PLUS 2\",system-ui,sans-serif;font-variant-numeric:tabular-nums;transform:rotate(-2deg)}.ds-price::before{content:\"\";position:absolute;left:6px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#171b1e}"
+    },
+    {
+      "name": "Fila del estante",
+      "kind": "card",
+      "refersTo": "section-card",
+      "description": "Carta en toploader; seleccionada con borde de estante iluminado.",
+      "html": "<div class=\"ds-shelf\"><div class=\"ds-row\"><span class=\"ds-tl\"></span><span><b>Aquapolis 136/147</b><small>#10 · EN · Chris Fulop</small></span></div><div class=\"ds-row sel\"><span class=\"ds-tl\"></span><span><b>EX Delta Species 007/086</b><small>#16 · JP · Unlimited</small></span></div></div>",
+      "css": ".ds-shelf{background:#171b1e;padding:8px;width:300px;font:500 14px/1.45 \"M PLUS 2\",system-ui,sans-serif;color:#e9eef0}.ds-row{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:8px;border-radius:10px;cursor:pointer;transition:background-color 140ms ease}.ds-row:hover{background:#1f2428}.ds-row b{display:block;font-weight:700}.ds-row small{display:block;font-size:12.5px;color:#97a1a6}.ds-row.sel{background:#272d32;box-shadow:inset 0 1.5px 0 rgba(233,238,240,.8),inset 0 22px 26px -20px rgba(233,238,240,.16)}.ds-tl{width:44px;aspect-ratio:63/88;border-radius:5px;background:linear-gradient(155deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 38%,rgba(255,255,255,.03) 62%,rgba(255,255,255,.11));box-shadow:inset 0 0 0 1px rgba(233,238,240,.26),inset 0 1px 0 rgba(255,255,255,.35)}"
+    },
+    {
+      "name": "Video · fila del checklist",
+      "kind": "custom",
+      "refersTo": "video-checklist-sheet",
+      "description": "Canvas: hoja impresa con casilla, tilde en birome y fila resaltada.",
+      "html": "<div class=\"ds-vsheet\"><div class=\"ds-vrow\"><span class=\"ds-vbox\">&#10003;</span><i>29</i><b>XY Black Star Promos</b><em>Staff</em><span class=\"ds-vnum\">XY176 &nbsp;EN</span></div><div class=\"ds-vrow hl\"><span class=\"ds-vbox\"></span><i>30</i><b>XY-P Promotional cards</b><span class=\"ds-vnum\">279/XY-P &nbsp;JP</span></div><div class=\"ds-vrow\"><span class=\"ds-vbox\"></span><i>31</i><b>XY-P Promotional cards</b><span class=\"ds-vfalta\">falta</span><span class=\"ds-vnum\">298/XY-P &nbsp;JP</span></div></div>",
+      "css": ".ds-vsheet{background:#efebe2;padding:12px 31px;width:396px;transform:rotate(.017rad);box-shadow:5px 7px 10px rgba(0,0,0,.5);font:500 12px \"Libre Franklin\",\"Helvetica Neue\",Arial,sans-serif;color:#1b1b1c}.ds-vrow{display:flex;align-items:center;gap:8px;height:25px;position:relative}.ds-vrow.hl::before{content:\"\";position:absolute;left:20px;right:0;top:3px;bottom:3px;background:rgba(255,222,64,.78);mix-blend-mode:multiply}.ds-vrow>*{position:relative}.ds-vbox{width:13px;height:13px;border:1px solid rgba(24,24,24,.8);color:#1e3a86;font:700 16px/10px \"Caveat\",\"Segoe Print\",cursive}.ds-vrow i{font-style:normal;font-weight:600;font-size:10.5px;color:#67645c;width:16px}.ds-vrow b{font-weight:600}.ds-vrow em{font-style:normal;color:#67645c}.ds-vfalta{font:600 15px \"Caveat\",\"Segoe Print\",cursive;color:rgba(90,88,82,.85)}.ds-vnum{margin-left:auto}"
+    },
+    {
+      "name": "Video · post-it",
+      "kind": "custom",
+      "refersTo": "video-postit",
+      "description": "Canvas: el dato de la carta escrito a mano.",
+      "html": "<div class=\"ds-vpost\">Premio por participar en el 20th Anniversary Festa.<br>Ilustró Naoki Saito</div>",
+      "css": ".ds-vpost{width:208px;min-height:72px;padding:14px 10px 16px;background:linear-gradient(rgba(150,110,0,.08) 0 11px,transparent 11px),#ffe57a;color:#26285e;font:600 15px/1.06 \"Caveat\",\"Segoe Print\",cursive;transform:rotate(-.035rad);box-shadow:2px 4px 8px rgba(0,0,0,.32)}"
+    },
+    {
+      "name": "Video · cartel golpe",
+      "kind": "custom",
+      "refersTo": "video-kinetic-paper",
+      "description": "Canvas: cartel sobre papel con palabra grande en acento y palabras chicas en itálica.",
+      "html": "<div class=\"ds-vkin\"><p>¿EN CUÁNTAS CARTAS</p><p class=\"big\">APARECE</p><p class=\"small\">sin ser el protagonista?</p></div>",
+      "css": ".ds-vkin{background:#efebe2;padding:24px;text-align:center;color:#121014}.ds-vkin p{margin:0;font:900 38px/.86 \"Big Shoulders Display\",\"Arial Narrow\",Impact,sans-serif;text-transform:uppercase}.ds-vkin .big{font-size:52px;color:#bf8635}.ds-vkin .small{margin-top:10px;font:italic 600 17.5px \"Instrument Sans\",system-ui,sans-serif;text-transform:none;color:#3b3640}.ds-vkin p{animation:ds-golpe 230ms cubic-bezier(.33,1,.68,1) both}.ds-vkin .big{animation-delay:165ms}.ds-vkin .small{animation-delay:330ms}@keyframes ds-golpe{from{transform:scale(1.6);opacity:0}to{transform:scale(1);opacity:1}}@media (prefers-reduced-motion:reduce){.ds-vkin p{animation:none}}"
+    },
+    {
+      "name": "Video · Suscribite del cierre",
+      "kind": "button",
+      "refersTo": "video-subscribe-end",
+      "description": "Canvas: botón Suscribite de la escena de cierre, sobre el playmat.",
+      "html": "<div class=\"ds-vend\"><span class=\"ds-vsub\"><svg viewBox=\"0 0 60 44\" width=\"30\" height=\"22\"><rect width=\"60\" height=\"44\" rx=\"12\" fill=\"#fff\"/><path d=\"M24 12l18 10-18 10z\" fill=\"#e62117\"/></svg>Suscribite</span><small>@tucanal</small></div>",
+      "css": ".ds-vend{background:#1f1d1c;padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px}.ds-vsub{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 15px 0 19px;border-radius:11px;background:#e62117;color:#fff;font:600 25px \"Libre Franklin\",\"Helvetica Neue\",Arial,sans-serif;box-shadow:0 0 15px rgba(0,0,0,.5)}.ds-vend small{font:600 17px \"Libre Franklin\",Arial,sans-serif;color:rgba(240,236,228,.78)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La vitrina de la tienda de cartas",
+    "overview": "La interfaz es una vitrina oscura de vidrio bajo luz de tubo: la colección está en un estante iluminado, cada carta dentro de su toploader, con etiquetas de papel escritas a mano que dicen lo que todavía le falta. Al lado, el escenario 16:9 siempre muestra el resultado. La carcasa es casi monocroma: dos valores de fondo (vitrina y estante), dos grises de vidrio para superficies y estados, y una sola tinta clara. El color aparece solo donde reporta un estado: en las etiquetas de papel y en la tinta roja de grabación.\n\nLa densidad es de herramienta de trabajo para un monitor grande: un solo tamaño de lectura (14px) y jerarquía por peso, no por escalones de tamaño. Las cosas se separan por tono de superficie, no por líneas. El escenario no se rige por este sistema: el canvas de 1920×1080 que se graba es un sistema propio, con sus tokens `video-*`, documentado en [Canvas de video](#canvas-de-video-19201080) al final de este archivo.",
+    "keyCharacteristics": [
+      "Carcasa de dos valores (`case`, `shelf`) más dos superficies de vidrio (`glass`, `rail`) y una tinta (`ink`).",
+      "Color solo en etiquetas de papel con agujero perforado y en la tinta roja de grabación.",
+      "M PLUS 2 para toda palabra de interfaz; Klee One solo en etiquetas y en el número de la etiqueta de precio.",
+      "Cada miniatura de carta va en un marco de toploader de acetato.",
+      "La fila seleccionada se lee como un estante con borde iluminado.",
+      "Sin bordes: separación por tono y por sombras inset de 1px."
+    ],
+    "rules": [
+      {
+        "name": "La Regla del Color que Informa",
+        "body": "Fuera del escenario, un color solo aparece si reporta un estado de una carta, del guardado o de la grabación. El acento del canal no tiñe la herramienta: vive en el escenario y en la vista Marca.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de la Tinta Roja",
+        "body": "`rec` significa grabar y nada más. Un botón destructivo usa texto rosado claro (#ff9d93) sobre vidrio, nunca el fondo rojo.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de una Sola Lectura",
+        "body": "Un tamaño de lectura (14px) y jerarquía por peso (500 / 600 / 700 / 800). Números que cambian (contadores, tiempo, posición) usan `font-variant-numeric: tabular-nums`.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Lápiz",
+        "body": "Klee One solo en papel: etiquetas y etiqueta de precio. Nunca en botones, títulos ni campos.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Luz de Arriba",
+        "body": "Lo seleccionado se ilumina desde el borde superior (inset claro arriba), nunca con un contorno de color ni un fondo de acento.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla de la Tinta Impresa",
+        "body": "Un color de marca impreso en papel se lee más oscuro que en pantalla: si su luminancia pasa .45 se mezcla 38% con negro (`paperInk`). En carteles sobre papel la palabra grande se oscurece 25% si la luminancia del acento pasa .6.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de un Solo Acento",
+        "body": "El acento del tema es el único color saturado del mundo filmado, además de los materiales (post-it, resaltador, birome) y el rojo de Suscribite.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de las Dos Manos",
+        "body": "Lo que salió de una impresora va en Libre Franklin; lo que escribió el creador va en Caveat y en birome. Nada impreso en Caveat, nada a mano en Libre Franklin.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Golpe",
+        "body": "La fuente display se usa solo en carteles cinéticos y en el contador, siempre en mayúsculas. Instrument Sans itálica solo para las palabras `_chicas_` y la postproducción.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Lámpara",
+        "body": "Toda luz viene de la lámpara de arriba a la izquierda y toda sombra cae hacia abajo a la derecha. No hay otra fuente de luz.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** mantener la carcasa en sus cuatro tonos (`case`, `shelf`, `glass`, `rail`) y separar por tono, no por líneas.",
+      "**Do** expresar selección y actividad invirtiendo a tinta (`ink` con texto `case`) o con el borde superior iluminado.",
+      "**Do** poner cada miniatura de carta en un toploader de proporción 63/88.",
+      "**Do** reportar el estado de una carta con una etiqueta de papel (amarilla, rosa, menta o blanca con tinta roja), en Klee One 12px.",
+      "**Do** usar 140ms para hover y estados, `cubic-bezier(.23,1,.32,1)` para entradas, y limitar los hover a `(hover:hover) and (pointer:fine)`.",
+      "**Do** usar cifras tabulares en todo contador, tiempo o número de carta.",
+      "**Do** pintar cada material una vez y cachearlo (`texCanvas`); el mundo entero se mueve con `camera()` y recibe `lightTex` y el grano.",
+      "**Do** usar los resortes del mundo: `LIFT` (0.84, 0.56s, 720ms), `LOWER` (1, 0.5s, 640ms), `SNUG` (0.62, 0.19s, 260ms), `DEAL` (0.8, 0.42s, 560ms).",
+      "**Do** escribir con Caveat en `video-pen` todo lo que hace el creador (tildes, contador, lista) e imprimir en Libre Franklin todo lo impreso.",
+      "**Do** dejar vacío el bolsillo de la carta que falta y anotar \"falta\" a mano en el checklist.",
+      "**Do** oscurecer el acento al imprimirlo en papel (`paperInk`).",
+      "**Do** apagar el balanceo de cámara, el de la mano y las sacudidas con `prefers-reduced-motion` (los tweens terminan al instante)."
+    ],
+    "donts": [
+      "**Don't** teñir la carcasa con el acento del canal ni con ningún color que no reporte estado.",
+      "**Don't** usar `rec` para nada que no sea grabar; lo destructivo va en texto #ff9d93.",
+      "**Don't** usar Klee One fuera de etiquetas y etiqueta de precio.",
+      "**Don't** agregar bordes de 1px a paneles, campos o tarjetas; los contornos son sombras inset.",
+      "**Don't** aplicar estas reglas al canvas grabado: el escenario de 1920×1080 se gobierna con su propio sistema, en [Canvas de video](#canvas-de-video-19201080).",
+      "**Don't** marcar una carta que falta con una X roja ni con un tachado.",
+      "**Don't** usar degradés violetas, brillos alrededor de texto o elementos, etiquetas monoespaciadas con tracking ni grillas de cuadrados decorativas. La única grilla es la de 3×3 bolsillos del binder, y la única luz es la de la lámpara.",
+      "**Don't** usar la fuente display fuera de carteles cinéticos y el contador, ni Instrument Sans fuera de las palabras chicas y la postproducción.",
+      "**Don't** usar `video-subscribe` para nada que no sea el botón Suscribite.",
+      "**Don't** dejar quieto algo del mundo ni mover con la cámara algo de postproducción."
+    ],
+    "videoNorthStar": "El binder filmado sobre la mesa",
+    "videoKeyCharacteristics": [
+      "Un mundo de materiales pintados una vez (playmat, cuero sintético con cierre y costura, página negra con bolsillos soldados, papel, post-it) y una sola luz.",
+      "Lo del mundo se mueve con la cámara y recibe la lámpara; lo de postproducción (logo, usuario, Suscribite) queda quieto encima.",
+      "Imprenta (Libre Franklin) para lo que salió de la impresora, birome (Caveat en `video-pen`) para lo que escribió el creador.",
+      "Carteles cinéticos en la fuente display de la marca, mayúsculas, con `*grande*` en acento y `_chica_` en Instrument Sans itálica.",
+      "Movimiento con resortes: la mano sube, baja y la carta toca el fondo del bolsillo.",
+      "La carta que falta deja el bolsillo vacío."
+    ]
+  }
+}

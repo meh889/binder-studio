@@ -1,0 +1,5 @@
+# Impeccable working files: decision sketches, review captures, hook cache and the direction contract.
+# GitHub Pages serves everything committed here, and the contract must never ship beside the app.
+.impeccable/*
+!.impeccable/design.json
+.DS_Store
