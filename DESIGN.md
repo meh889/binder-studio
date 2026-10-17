@@ -613,7 +613,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 - **Encuadre del binder:** binder de 860×992 en (74, 44) girado −0.012 rad; la página va 86px adentro del lomo y 30px de los otros bordes (744×932). 3×3 bolsillos con margen de 22px y separación de 14px; cada carta 63/88, 18px más baja que su bolsillo, corrida hasta ±2.5px y ±0.008 rad siempre igual (sale de su id).
 - **Hoja de checklist:** 792×1130 en (1004, 58), girada 0.017 rad, cortada por el borde inferior del cuadro. Márgenes de 62px; título arriba a la izquierda, contador a mano arriba a la derecha (y 150); "Página" en y 266 con una línea de 2px debajo; filas de 50px (mínimo 40px) hasta y 752; casilla de 26px con trazo de 2px.
 - **Post-it:** 520px de ancho y al menos 240px de alto, en (250, 756) dentro de la hoja, girado −0.035 rad, encimado sobre la hoja mientras la carta está en la mano.
-- **Carta en la mano:** 900px de alto, centrada en (BCX + 6, 548), girada −0.034 rad, tapando la página. En grupo (mismo arte), hasta 12 cartas repartidas en hasta 4 filas sobre el área del binder, con 18px de separación, giro alternado de 0.05–0.09 rad y una etiquetita de papel con el idioma a mano.
+- **Carta en la mano:** 900px de alto, centrada en (BCX + 6, 548), girada −0.034 rad, tapando la página. En grupo (mismo arte y misma condición), hasta 9 cartas, las que entran en lo que queda de la hoja, repartidas en hasta 4 filas sobre el área del binder, con 18px de separación, giro alternado de 0.05–0.09 rad y una etiquetita de papel con el idioma a mano.
 - **Escena carta:** carta de 880px de alto en x 488 y la ficha impresa en el lugar de la hoja.
 - **Lista:** cuaderno de 1420×1016 en (250, 64), girado −0.008 rad; renglones desde y 222 cada 74px y margen rojo en x 150.
 - **Postproducción:** logo, usuario y Suscribite apilados en las esquinas con 40px de margen y 16px entre elementos. El logo del canal viene con la app (`marca/logo-sticker.png`, 6% del ancho) y un logo subido lo reemplaza; en el cierre no se repite en la esquina.
@@ -658,7 +658,7 @@ La carta sube a la cámara con `LIFT`, el fondo se desenfoca (460ms), el post-it
 El bolsillo queda vacío y la fila del checklist dice "falta" a mano, sin tilde. En la mano y en la escena carta aparece como impresión casera: papel `video-proxy-paper` con margen del 6.5%, imagen desaturada (saturate .82, contrast .9, brightness 1.04), sin brillo y con una esquina levantada. El post-it agrega "Esta me falta."
 
 #### Checklist y post-it
-Hoja de papel con título impreso, contador a mano, "Página X de Y", y nueve filas: casilla, posición, set y variante, número e idioma. Post-it con el grupo ("Mismo arte, N versiones: …"), el dato de la carta y "Ilustró …".
+Hoja de papel con título impreso, contador a mano, "Página X de Y", y nueve filas: casilla, posición, set y variante, número e idioma. Post-it con el grupo ("1st Edition, N versiones: …", o "Mismo arte, …" en la impresión común), el dato de la carta y "Ilustró …".
 
 #### Carteles cinéticos
 Cuatro estilos: **golpe** (cada palabra cae desde escala 1.6 en 230ms, 165ms entre palabras y 70ms extra por renglón; la grande sacude la cámara), **barrido** (una barra de acento barre cada renglón, 260ms de desfase, 300ms + 280ms), **máquina** (34ms por letra con cursor que parpadea cada 380ms) y **contador** (cuenta en 1500ms y rebota 8%). Fondos: papel, playmat, cartulina de acento con grano, la carta desenfocada (blur 16, saturate 1.35, brightness .5) o un archivo de `media/` con velo negro al 50%.

@@ -750,12 +750,22 @@ const sc = {page:0, filled:-1, hero:null, heroes:null, group:null, focus:0, pop:
 let idx = -1;
 const hiIndex = () => sc.group ? sc.group.a : sc.hero ? sc.hero.i : idx + 1;
 const hiCount = () => sc.group ? sc.group.b + 1 : sc.hero ? sc.hero.i + 1 : idx + 1;
-const MAX_GROUP = 12;
 function groupSize(i){ const list = cards(), g = String((list[i] || {}).grupo || "").trim(); if(!g) return 1; let a = i, b = i; while(a > 0 && String(list[a-1].grupo || "").trim() === g) a--; while(list[b+1] && String(list[b+1].grupo || "").trim() === g) b++; return {a, b, n:b - a + 1}; }
+// The print a version belongs to, for grouping: Normal, Unlimited (any copyright line) and per-card codes are the
+// regular print; 1st Edition, Shadowless, Reverse, Holo and every stamp or promo are each their own.
+function printKey(c){
+  const v = String(c.variants || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/["“”]/g, "").replace(/,?\s*code:.*$/, "").replace(/©[\s\d\-–]*/g, " ")
+    .replace(/holofoil/g, "holo").replace(/reverse holo/g, "reverse").replace(/1st edition|first edition|1ra edicion|primera edicion/g, "1st");
+  return v.replace(/\b(normal|unlimited|ilimitada|regular)\b/g, " ").replace(/[^a-z0-9']+/g, " ").trim();
+}
+// One → brings up the versions of one art in one print that sit next to each other (the Unlimited of every
+// language together, the 1st Edition apart…), and never more than the pockets left on the page.
 function groupAt(i, limit){
   const list = cards(), c = list[i]; if(!c) return [i, i];
   const g = String(c.grupo || "").trim(); if(!g) return [i, i];
-  let j = i; while(j + 1 <= limit && j - i + 1 < MAX_GROUP && list[j + 1] && String(list[j + 1].grupo || "").trim() === g) j++;
+  const k = printKey(c), last = Math.min(limit, i + PER - 1 - i % PER);
+  let j = i; while(j + 1 <= last && list[j + 1] && String(list[j + 1].grupo || "").trim() === g && printKey(list[j + 1]) === k) j++;
   return [i, j];
 }
 
@@ -1139,7 +1149,8 @@ function drawPostit(t, p){
   const n = sc.note; if(!n || n.a <= .01) return;
   const c = p.cards[n.i]; if(!c) return;
   const sh = S.brand.show, lines = [];
-  if(n.group){ const G = groupSize(n.i); if(G.n > 1){ const langs = [...new Set(p.cards.slice(G.a, G.b + 1).map(x => (x.idioma || "?").toUpperCase()))]; lines.push(`Mismo arte, ${G.n} versiones: ${andList(langs)}`); } }
+  if(n.group && sc.group && sc.group.b > sc.group.a){ const sel = p.cards.slice(sc.group.a, sc.group.b + 1), langs = [...new Set(sel.map(x => (x.idioma || "?").toUpperCase()))];
+    lines.push(`${condLabel(sel[0]) || "Mismo arte"}, ${sel.length} versiones: ${andList(langs)}`); }
   if(c.falta && !n.group) lines.push("Esta me falta.");
   if(sh.note && c.note) lines.push(c.note);
   if(sh.illustrator && real(c.illustrator)) lines.push("Ilustró " + c.illustrator);
@@ -1192,6 +1203,7 @@ function drawHeld(t, h, live, decor){
   drawCardAt(c, h.cx + dx, h.cy + dy, h.w, h.h, rot, {big:lift > .05, noShadow:true, zoom:{s:h.zs ?? 1, x:h.zx ?? .5, y:h.zy ?? .5}, gloss:n, proxy:!!c.falta});
   ctx.restore();
 }
+const condLabel = c => variantLabel(c).replace(/\s*©.*$/, "").replace(/\s+Normal$/i, "").trim();
 function variantLabel(c){
   const v = String(c.variants || "").replace(/["“”]/g, "").replace(/Holofoil/gi, "Holo").replace(/,?\s*Code:.*$/i, "").replace(/\s+[-–—]\s+/g, " · ").trim();
   return /^normal$/i.test(v) ? "" : v;
@@ -1957,15 +1969,17 @@ function zoomVideo(){
   if(s.tipo === "carta"){ if(VM.z.s > 1.01) tweenZoom({s:1, x:.5, y:.5}); else { const c = cards()[findCard(s.carta)], z = (c && c.zooms && c.zooms[0]) || {s:2.4, x:.5, y:.5}; tweenZoom(z); } }
 }
 // What one more → will do, with the card it brings when there is one: the stage, the transport and the prompter all show it.
+// The card the next → brings, and how many come with it.
+function tapLabel(i, limit){ const c = cards()[i], [a, b] = groupAt(i, limit); return `<b>${esc(c.set || "Carta " + (i + 1))}</b> ${esc(c.num)}${b > a ? ` y ${b - a} más` : ""}`; }
 function nextHint(){
   const list = scenes(), s = list[VM.i], n = list[VM.i + 1];
   const nextScene = n ? {html:`<b>${esc(sceneLabel(n))}</b>${n.capitulo ? " · " + esc(n.capitulo) : ""}`, card:n.tipo === "carta" ? cards()[findCard(n.carta)] : n.tipo === "binder" ? cards()[parseRange(n.cartas)[0]] : null} : {html:"Termina el video", card:null};
   if(!s) return list.length ? {html:`<b>${esc(sceneLabel(list[0]))}</b> · empieza el video`, card:null} : {html:"No hay escenas", card:null};
   if(s.tipo === "binder"){
     const end = VM.range[1];
-    if(held && held.group){ const nc = cards()[held.end + 1]; return held.end < end && nc ? {html:`Se guardan las ${held.end - held.i + 1} y sigue <b>${esc(nc.set)}</b> ${esc(nc.num)}`, card:nc} : {html:`Se guardan las ${held.end - held.i + 1}`, card:null}; }
-    if(held){ const c = cards()[held.i], zs = (c || {}).zooms || []; if($("hold").value === "tap" && held.step < zs.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${zs.length}</b>`, card:c}; const nc = cards()[held.i + 1]; return held.i < end && nc ? {html:`Se ubica y sigue <b>${esc(nc.set)}</b> ${esc(nc.num)}`, card:nc} : {html:"Se ubica la carta", card:null}; }
-    if(idx < end){ const nc = cards()[idx + 1]; return {html:`<b>${esc(nc.set)}</b> ${esc(nc.num)}`, card:nc}; }
+    if(held && held.group){ const nc = cards()[held.end + 1]; return held.end < end && nc ? {html:`Se guardan las ${held.end - held.i + 1} y sigue ${tapLabel(held.end + 1, end)}`, card:nc} : {html:`Se guardan las ${held.end - held.i + 1}`, card:null}; }
+    if(held){ const c = cards()[held.i], zs = (c || {}).zooms || []; if($("hold").value === "tap" && held.step < zs.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${zs.length}</b>`, card:c}; const nc = cards()[held.i + 1]; return held.i < end && nc ? {html:`Se ubica y sigue ${tapLabel(held.i + 1, end)}`, card:nc} : {html:"Se ubica la carta", card:null}; }
+    if(idx < end){ const nc = cards()[idx + 1]; return {html:tapLabel(idx + 1, end), card:nc}; }
     return nextScene;
   }
   if(s.tipo === "carta"){ const c = cards()[findCard(s.carta)], zs = (c && c.zooms) || []; if(VM.step < zs.length) return {html:`<b>Zoom ${VM.step + 1} de ${zs.length}</b>`, card:c}; }
@@ -1974,7 +1988,7 @@ function nextHint(){
 }
 function nextBinder(){
   const list = cards(), c = list[held ? held.i : idx], nextI = held ? (held.end ?? held.i) + 1 : idx + 1, nc = list[nextI];
-  const name = x => `<b>${esc(x.set || "Carta " + (nextI + 1))}</b> ${esc(x.num)}`;
+  const name = () => tapLabel(nextI, list.length - 1);
   if(!list.length) return {html:"Todavía no hay cartas", card:null};
   if(held && held.group) return nc ? {html:`Se guardan las ${held.end - held.i + 1} y sigue ${name(nc)}`, card:nc} : {html:`Se guardan las ${held.end - held.i + 1}`, card:null};
   if(held){ const zs = (c && c.zooms) || []; if($("hold").value === "tap" && held.step < zs.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${zs.length}</b>`, card:c}; return nc ? {html:`Se ubica y sigue ${name(nc)}`, card:nc} : {html:"Se ubica la última carta", card:null}; }
@@ -2145,7 +2159,7 @@ function estSecs(s){
   const words = t => String(t || "").split(/\s+/).filter(Boolean).length;
   let sec = words(s.guion)/2.5;
   if(s.tipo === "rafaga") sec = Math.max(sec, sceneItems(s).length*clamp(parseFloat(String(s.ritmo).replace(",", ".")) || .28, .08, 3) + .4);
-  if(s.tipo === "binder"){ const [a, b] = parseRange(s.cartas); for(let k = a; k <= b; k++){ const c = cards()[k]; if(!c) continue; const g = groupSize(k); if(g.n > 1 && k !== g.a) continue; sec += Math.max(3, words(c.script)/2.5); } }
+  if(s.tipo === "binder"){ const [a, b] = parseRange(s.cartas); for(let k = a; k <= b;){ const c = cards()[k]; if(!c){ k++; continue; } sec += Math.max(3, words(c.script)/2.5); k = groupAt(k, b)[1] + 1; } }
   if(s.tipo === "cartel") sec = Math.max(sec, kinDuration(s.texto || "", s.estilo)/1000 + 1);
   if(s.tipo === "lista") sec = Math.max(sec, (s.items || []).filter(x => String(x).trim()).length*2.5);
   return Math.max(2, sec);
@@ -2341,7 +2355,7 @@ function updPrompter(){
     $("pText").innerHTML = `<span class="muted">Presentá la especie. Tocá → para la primera carta.</span>`;
   } else {
     const zs = c.zooms || [];
-    $("pCount").textContent = (held && held.group ? `Cartas ${held.i+1}–${held.end+1} de ${list.length} · mismo arte en ${held.end - held.i + 1} idiomas` : `Carta ${cur+1} de ${list.length}`) + (c.set ? ` · ${c.set}` : "") + (held && !held.group && zs.length ? ` · zoom ${Math.max(0, held.step+1)} de ${zs.length}` : "");
+    $("pCount").textContent = (held && held.group ? `Cartas ${held.i+1}–${held.end+1} de ${list.length} · ${condLabel(list[held.i]) || "mismo arte"}, ${held.end - held.i + 1} versiones` : `Carta ${cur+1} de ${list.length}`) + (c.set ? ` · ${c.set}` : "") + (held && !held.group && zs.length ? ` · zoom ${Math.max(0, held.step+1)} de ${zs.length}` : "");
     const txt = held && held.group ? list.slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note : c.script || c.note;
     $("pText").innerHTML = txt ? esc(txt) : `<span class="muted">Sin guion para esta carta.</span>`;
   }
@@ -2830,7 +2844,7 @@ function cardInspHTML(c, i){
       <button class="btn sm" data-act="zoom" ${src ? "" : "disabled"} title="Marcar zooms para recorrer la carta">${ICON("zoom")}Zooms${zs ? ` ${zs}` : ""}</button>
       ${src ? `<button class="btn sm" data-act="replace" title="Cambiar la imagen de la carta">${ICON("image")}Cambiar<span class="long">imagen</span></button>` : ""}
     </div>
-    <label class="toggle"><span>Me falta esta carta<small>Sale en gris, con la X roja.</small></span><input type="checkbox" data-k="falta"${c.falta ? " checked" : ""}></label>
+    <label class="toggle"><span>Me falta esta carta<small>Su bolsillo queda vacío y el checklist dice “falta”.</small></span><input type="checkbox" data-k="falta"${c.falta ? " checked" : ""}></label>
     ${i > 0 ? `<button class="toggle" data-act="join" style="border:0;width:100%;text-align:left;color:inherit;font:inherit"><span>${joined ? "Mismo arte que la de arriba" : "Unir con la de arriba"}<small>${joined ? "Tocá para separarla del grupo." : "Mismo arte en otro idioma: salen juntas en grande."}</small></span>${ICON(joined ? "x" : "link")}</button>` : ""}
     ${F("set", "Set")}
     <div class="pair">${F("num", "Número")}${F("year", "Año")}</div>

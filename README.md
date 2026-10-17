@@ -26,7 +26,7 @@ Tipos de escena: ráfaga, portada, cartel cinético (golpe, barrido, máquina de
 
 ## Mismo arte en varios idiomas
 
-Si una carta tiene el mismo arte en varios idiomas, tocá **Unir con la de arriba** en la ficha de cada versión (o completá el campo **Grupo** con el mismo nombre) y poné el **Idioma** de cada una. En el video aparecen todas juntas en grande, cada una con su idioma, y con un solo → se guardan todas en el binder y el contador las suma.
+Si una carta tiene el mismo arte en varios idiomas, tocá **Unir con la de arriba** en la ficha de cada versión (o completá el campo **Grupo** con el mismo nombre) y poné el **Idioma** de cada una. En el video, cada → muestra juntas las versiones seguidas de ese arte que comparten condición (por ejemplo, la Unlimited en todos los idiomas; la 1st Edition, la Shadowless, las Reverse y cada sello van aparte), cada una con su idioma, y nunca más de las que entran en lo que queda de la hoja. Con el próximo → se guardan y el contador las suma. Para que se junten, ordená cada arte por condición y dentro de cada condición por idioma.
 
 ## Nombres de las imágenes
 

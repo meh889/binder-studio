@@ -94,7 +94,9 @@ Referencias: Casey Neistat "Do What You Can't" (energía, tipografía cinética,
 
 Cada carta tiene, entre otros: `set`, `year`, `num`, `label`, `rarity`, `variants`, `illustrator`, `note` (dato en pantalla: va escrito a mano en un post-it, así que conviene que no pase de unos 110 caracteres), `script` (lo que dice en el teleprompter), `falta` (true si no la tiene: el bolsillo queda vacío y el checklist la anota como "falta"), `idioma` (`EN`, `JP`, `KO`, `ZH-T`, `ZH-S`, `FR`, `DE`, `IT`, `ES`, `PT`, `TH`, `ID`…) y `grupo`.
 
-**Mismo arte en varios idiomas:** las cartas seguidas con el mismo `grupo` (por ejemplo `"base-44"`) aparecen todas juntas en grande, cada una con su idioma, y se guardan juntas en el binder con un solo →; el contador suma todas. Al armar una lista multi-idioma, ordená cada grupo seguido (EN, JP, KO, ZH, FR, DE, IT, ES, PT…) y poné el `script` solo en la primera carta del grupo.
+**Mismo arte en varios idiomas:** las cartas seguidas con el mismo `grupo` (por ejemplo `"base-44"`) y la misma condición aparecen juntas en grande, cada una con su idioma, y se guardan juntas con un solo →; el contador suma todas. La condición sale de `variants`: Normal, Unlimited (con cualquier línea de ©) y los códigos son la impresión común; 1st Edition, Shadowless, Reverse, Holo y cada sello o promo van cada uno aparte. Un → nunca muestra más cartas de las que entran en lo que queda de la hoja (9 bolsillos): si no entran, siguen en el próximo →.
+
+Al armar una lista multi-idioma, ordená cada arte **por condición y dentro de cada condición por idioma** (EN, JP, KO, ZH, FR, DE, IT, ES, PT…): primero todas las 1st Edition, después Shadowless (o la tirada sin símbolo de rareza), la común (Unlimited/Normal) de todos los idiomas, Holo, Reverse, y al final cada sello o promo. Poné el `script` en la primera carta de cada condición, que es la que abre cada →.
 
 ## Notas técnicas
 
