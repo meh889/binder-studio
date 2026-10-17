@@ -46,7 +46,7 @@ The video is performed, not edited: the creator advances the binder card by card
 
 - Real collections: `~/Desktop/Bulbasaur/` (409 cards) and `~/Desktop/Bulbasaur Cameos/` (47 cards), each with `binder.json` and card scans.
 - Example plan: `ejemplos/Ponyta/binder.json` and `ejemplos/Ponyta/video.json`.
-- No channel logo, music or media files are in the repo.
+- The channel brand (Mafia TCG: logo, avatar, banner, stickers) is in `marca/`; the app uses it by default. No music or media files are in the repo.
 
 ## Product Principles
 

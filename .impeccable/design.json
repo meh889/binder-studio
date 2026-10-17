@@ -232,16 +232,16 @@
       "video-mat": {
         "role": "neutral",
         "displayName": "Playmat",
-        "canonical": "#1f1d1c",
+        "canonical": "#231c2b",
         "tonalRamp": [
-          "#0c0b0a",
-          "#272523",
-          "#444140",
-          "#63615f",
-          "#848280",
-          "#a7a4a3",
-          "#cbc8c7",
-          "#f1eeec"
+          "#0e0815",
+          "#292231",
+          "#463e4f",
+          "#655d6f",
+          "#877e91",
+          "#a9a0b4",
+          "#cdc4d9",
+          "#f3eafe"
         ]
       },
       "video-binder-negro": {
@@ -532,31 +532,31 @@
       "video-accent": {
         "role": "primary",
         "displayName": "Acento del canal",
-        "canonical": "#ffb347",
+        "canonical": "#fdca0d",
         "tonalRamp": [
-          "#130900",
-          "#352000",
-          "#5c3a01",
-          "#855604",
-          "#b0740a",
-          "#dd9319",
-          "#ffba5e",
-          "#ffebd4"
+          "#110a00",
+          "#2f2300",
+          "#524002",
+          "#775e05",
+          "#9f7e0b",
+          "#c7a019",
+          "#f3c31e",
+          "#ffeebf"
         ]
       },
       "video-accent-2": {
         "role": "primary",
         "displayName": "Acento 2",
-        "canonical": "#ff6a3d",
+        "canonical": "#3a5aa6",
         "tonalRamp": [
-          "#1c0300",
-          "#470e00",
-          "#742205",
-          "#aa3100",
-          "#dc4917",
-          "#fd7750",
-          "#fdb5a0",
-          "#fee9e3"
+          "#010039",
+          "#061a62",
+          "#1f3c85",
+          "#3d5da9",
+          "#5c7fce",
+          "#7da2f5",
+          "#afc9fe",
+          "#e6eeff"
         ]
       },
       "video-cream": {
@@ -1007,7 +1007,7 @@
       "fuego": {
         "accent": "#ffb347",
         "accent2": "#ff6a3d",
-        "bg": "#1f1d1c"
+        "bg": "#231c2b"
       },
       "psiquico": {
         "accent": "#ff9ad5",
@@ -1155,7 +1155,7 @@
       "refersTo": "video-subscribe-end",
       "description": "Canvas: botón Suscribite de la escena de cierre, sobre el playmat.",
       "html": "<div class=\"ds-vend\"><span class=\"ds-vsub\"><svg viewBox=\"0 0 60 44\" width=\"30\" height=\"22\"><rect width=\"60\" height=\"44\" rx=\"12\" fill=\"#fff\"/><path d=\"M24 12l18 10-18 10z\" fill=\"#e62117\"/></svg>Suscribite</span><small>@tucanal</small></div>",
-      "css": ".ds-vend{background:#1f1d1c;padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px}.ds-vsub{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 15px 0 19px;border-radius:11px;background:#e62117;color:#fff;font:600 25px \"Libre Franklin\",\"Helvetica Neue\",Arial,sans-serif;box-shadow:0 0 15px rgba(0,0,0,.5)}.ds-vend small{font:600 17px \"Libre Franklin\",Arial,sans-serif;color:rgba(240,236,228,.78)}"
+      "css": ".ds-vend{background:#231c2b;padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px}.ds-vsub{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 15px 0 19px;border-radius:11px;background:#e62117;color:#fff;font:600 25px \"Libre Franklin\",\"Helvetica Neue\",Arial,sans-serif;box-shadow:0 0 15px rgba(0,0,0,.5)}.ds-vend small{font:600 17px \"Libre Franklin\",Arial,sans-serif;color:rgba(240,236,228,.78)}"
     }
   ],
   "narrative": {

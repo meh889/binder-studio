@@ -580,6 +580,7 @@ const CARD_FIELDS = [
   ["script","Guion (solo teleprompter)","w2 area"]
 ];
 const THEMES = {
+  mafia:{name:"Mafia TCG",accent:"#fdca0d",accent2:"#3a5aa6",bg:"#231c2b"},
   fuego:{name:"Fuego",accent:"#ffb347",accent2:"#ff6a3d",bg:"#1f1d1c"},
   psiquico:{name:"Psíquico",accent:"#ff9ad5",accent2:"#b98cff",bg:"#1f1c24"},
   agua:{name:"Agua",accent:"#6cc7ff",accent2:"#3d7bff",bg:"#18202a"},
@@ -601,8 +602,8 @@ let view = "cards", flt = "all", query = "", selCard = null, selScene = null;
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false,idioma:"",grupo:""}; }
 function newProject(name){ return {id:uid("p"),name,eyebrow:"Master list",title1:name,title2:"Master List",introLine:"Una especie, todas sus cartas",footer:"",cards:[]}; }
-function defaultBrand(){ return {theme:"fuego",accent:"#ffb347",accent2:"#ff6a3d",bg:"#1f1d1c",binder:"negro",font:"Big Shoulders Display",bgImage:null,bgDim:20,
-  logo:{url:null,pos:"tr",size:10,opacity:100}, handle:{show:false,text:"@tucanal",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
+function defaultBrand(){ return {marca:1,theme:"mafia",accent:"#fdca0d",accent2:"#3a5aa6",bg:"#231c2b",binder:"lila",font:"Big Shoulders Display",bgImage:null,bgDim:20,
+  logo:{url:null,pos:"tr",size:6,opacity:100,builtin:true}, handle:{show:false,text:"@tucanal",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
   show:{counter:true,strip:true,note:true,illustrator:true,variants:true,ghost:false,page:true,footer:true},
   audio:{mic:true, micId:"", sfx:true, sfxVol:70, musicVol:35, duck:true, listen:false}}; }
 function fixCard(c){ const n = {...newCard(), ...c}; if(!Array.isArray(n.zooms)) n.zooms = []; return n; }
@@ -621,6 +622,8 @@ let S = migrate(null);
 const P = () => S.projects.find(p => p.id === S.active) || S.projects[0];
 const cards = () => P().cards;
 const tempUrls = new Map();
+const BUILTIN_LOGO = "marca/logo-sticker.png";
+const logoSrc = () => tempUrls.get("logo") || (S.brand.logo.builtin === false ? null : BUILTIN_LOGO);
 const busy = new Set();
 let canSave = true;
 
@@ -1041,7 +1044,7 @@ function drawCoverLabel(t, p){
 function drawCoverFace(t, p){
   ctx.drawImage(coverShadowTex(), BX - 20, BY - 20, BW + 80, BH + 80);
   drawCoverLabel(t, p);
-  const logo = getImg(tempUrls.get("logo") || S.brand.logo.url);
+  const logo = getImg(logoSrc());
   // the channel logo goes on like a sticker its owner put there: full colour, a little crooked, off to one side
   if(logo){ const lw = 240, lh = lw*logo.height/logo.width; ctx.save(); ctx.translate(BX + BW*.68, BY + BH - lh/2 - 78); ctx.rotate(-.07);
     ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 6; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 3; ctx.drawImage(logo, -lw/2, -lh/2, lw, lh); ctx.restore(); }
@@ -1272,7 +1275,7 @@ function draw(){
     else { drawScene(s, el); ctx.globalAlpha = 1; ctx.filter = "none"; ctx.globalCompositeOperation = "source-over"; ls(0); lens(live, .6); }
     ctx.restore();
     ctx.globalAlpha = 1; ctx.filter = "none"; ls(0); ctx.textAlign = "left";
-    drawOverlay(t);
+    drawOverlay(t, s.tipo === "cierre");   // the closing already shows the logo big
     if(VM.flash > .01){ ctx.fillStyle = `rgba(255,255,255,${VM.flash*.8})`; ctx.fillRect(0,0,W,H); }
     return;
   }
@@ -1280,14 +1283,14 @@ function draw(){
   drawOverlay(t);
 }
 
-function drawOverlay(t){
+function drawOverlay(t, noLogo){
   const b = S.brand, M = 40, stack = {tl:0, tr:0, bl:0, br:0};
   const place = (pos, w, h) => {
     pos = stack[pos] === undefined ? "tr" : pos;
     const off = stack[pos]; stack[pos] += h + 16;
     return {x: pos[1] === "l" ? M : W - M - w, y: pos[0] === "t" ? M + off : H - M - h - off};
   };
-  const logo = getImg(tempUrls.get("logo") || b.logo.url);
+  const logo = noLogo ? null : getImg(logoSrc());
   if(logo){
     const w = W*(b.logo.size/100), h = w*logo.height/logo.width, at = place(b.logo.pos, w, h);
     ctx.save(); ctx.globalAlpha = b.logo.opacity/100; ctx.shadowColor = "rgba(0,0,0,.4)"; ctx.shadowBlur = 18;
@@ -1883,7 +1886,7 @@ function drawLista(s, el, T){
 }
 function drawCierre(s, el, T){
   drawBg(T); lampLight();
-  const logo = getImg(tempUrls.get("logo") || S.brand.logo.url);
+  const logo = getImg(logoSrc());
   if(logo){ const p = clamp(el/600, 0, 1), w = Math.min(560, 420*logo.width/Math.max(1, logo.height)), h = w*logo.height/logo.width; ctx.save(); ctx.globalAlpha = p; ctx.translate(W/2, 250); ctx.scale(.8 + .2*backOut(p), .8 + .2*backOut(p)); ctx.drawImage(logo, -w/2, -h/2, w, h); ctx.restore(); }
   drawKin(s.texto || "¡GRACIAS POR VER!", el - 200, {x:160, y:logo ? 420 : 250, w:W - 320, h:logo ? 300 : 420}, 200, "dark", "golpe", "ci");
   const b = S.brand, p = clamp((el - 1200)/500, 0, 1);
@@ -2572,6 +2575,8 @@ function fromFile(raw, name){
   if(brand.theme && THEMES[brand.theme]) brand.bg = THEMES[brand.theme].bg;
   // brands saved before the filmed look: empty pockets go back to being empty
   if(rb.binder === undefined) brand.show = {...brand.show, ghost:false};
+  // brands saved before the channel's own look: put on Mafia TCG once, keeping everything else the creator set
+  if(rb.marca !== 1) Object.assign(brand, {marca:1, theme:"mafia", accent:THEMES.mafia.accent, accent2:THEMES.mafia.accent2, bg:THEMES.mafia.bg, binder:"lila", logo:{...brand.logo, size:6, builtin:true}});
   return {version:3, brand, projects:[p], active:p.id};
 }
 function loadBrand(){ try{ return JSON.parse(localStorage.getItem("binder.brand") || "null"); }catch(e){ return null; } }
@@ -3259,7 +3264,7 @@ function renderBrand(){
     const v = getPath(b, el.dataset.b);
     if(el.type === "checkbox") el.checked = !!v; else el.value = v ?? "";
   });
-  const lu = tempUrls.get("logo") || b.logo.url, bu = tempUrls.get("bg") || b.bgImage;
+  const lu = logoSrc(), bu = tempUrls.get("bg") || b.bgImage;
   $("logoPv").style.backgroundImage = lu ? `url("${lu}")` : "none"; $("logoDel").hidden = !lu;
   $("bgPv").style.backgroundImage = bu ? `url("${bu}")` : "none"; $("bgDel").hidden = !bu;
 }
@@ -3278,7 +3283,9 @@ for(const box of [$("paneBrand"), $("brandRight")]){
 $("themes").addEventListener("click", e => {
   const b = e.target.closest("[data-theme]"); if(!b) return;
   const t = THEMES[b.dataset.theme]; checkpoint();
-  Object.assign(S.brand, {theme:b.dataset.theme, accent:t.accent, accent2:t.accent2, bg:t.bg}); focusSnap = null; renderBrand(); requestDraw(); dirty();
+  Object.assign(S.brand, {theme:b.dataset.theme, accent:t.accent, accent2:t.accent2, bg:t.bg});
+  if(b.dataset.theme === "mafia"){ S.brand.binder = "lila"; S.brand.logo = {...S.brand.logo, builtin:true}; }   // the whole channel look, not just its colours
+  focusSnap = null; renderBrand(); requestDraw(); dirty();
 });
 // Logo and desk photo live in the browser (IndexedDB), not in the folder.
 let brandTarget = null;
@@ -3293,7 +3300,8 @@ $("brandFile").onchange = async e => {
   if(key === "bg") focusSnap = null;
   renderBrand(); requestDraw(); dirty();
 };
-$("logoDel").onclick = async () => { await kvDel("img:logo"); tempUrls.delete("logo"); renderBrand(); requestDraw(); dirty(); };
+// Quitar drops an uploaded logo (back to the channel's); on the channel's own logo it switches the logo off.
+$("logoDel").onclick = async () => { checkpoint(); if(tempUrls.has("logo")){ await kvDel("img:logo"); tempUrls.delete("logo"); } else S.brand.logo.builtin = false; renderBrand(); requestDraw(); dirty(); };
 $("bgDel").onclick = async () => { await kvDel("img:bg"); tempUrls.delete("bg"); focusSnap = null; renderBrand(); requestDraw(); dirty(); };
 function setView(which){
   if(!["cards","video","brand"].includes(which)) which = "cards";

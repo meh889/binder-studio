@@ -101,3 +101,4 @@ Cada carta tiene, entre otros: `set`, `year`, `num`, `label`, `rarity`, `variant
 - Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080; la grabación usa `captureStream` + `MediaRecorder`, con el micrófono, la música y efectos sintetizados mezclados por Web Audio.
 - `binder.json` = cartas y marca; `video.json` = escenas. La herramienta guarda ambos.
 - Los datos de cartas salen de TCGdex (repo `tcgdex/cards-database`, se puede clonar desde la sesión).
+- La marca del canal (Mafia TCG) está en `marca/` y la app la usa por defecto. Reglas del creador: la tipografía del logo es tributo a Pokémon y no se cambia; si aparecen cartas en piezas de marca, van dadas vuelta y con dorso fan art; nada de fondos negros ni grises en la marca.

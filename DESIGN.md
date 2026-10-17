@@ -17,7 +17,7 @@ colors:
   tag-ink: "#1d1a14"
   price: "#c8281f"
   rec: "#d42a22"
-  video-mat: "#1f1d1c"
+  video-mat: "#231c2b"
   video-binder-negro: "#161719"
   video-binder-gris: "#3a3c40"
   video-binder-azul: "#1c2a47"
@@ -37,8 +37,8 @@ colors:
   video-lamp: "rgba(255,234,204,.16)"
   video-notebook-rule: "rgba(70,110,180,.3)"
   video-notebook-margin: "rgba(205,60,60,.38)"
-  video-accent: "#ffb347"
-  video-accent-2: "#ff6a3d"
+  video-accent: "#fdca0d"
+  video-accent-2: "#3a5aa6"
   video-cream: "#fbefe2"
   video-dust: "#a8949e"
   video-kin-ink: "#121014"
@@ -554,7 +554,7 @@ Las escenas de edición (carteles cinéticos, ráfagas, la carta en grande, la l
 Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un solo acento: el del tema del canal.
 
 #### Primary
-- **Acento del canal** (`video-accent`, tema Fuego por defecto) y **acento 2** (`video-accent-2`): palabras `*grandes*` de los carteles, barras del barrido (alternan acento y acento 2 por renglón), cartulina de fondo, número del contador, segunda línea del título impresa en la hoja y la portada, punto de la etiqueta de usuario. El tema se elige en Marca (`THEMES`: Fuego, Psíquico, Agua, Planta, Eléctrico, Fantasma, Neutro); cada uno trae `accent`, `accent2` y `bg`.
+- **Acento del canal** (`video-accent`, tema Mafia TCG por defecto: el amarillo y el azul del logo) y **acento 2** (`video-accent-2`): palabras `*grandes*` de los carteles, barras del barrido (alternan acento y acento 2 por renglón), cartulina de fondo, número del contador, segunda línea del título impresa en la hoja y la portada, punto de la etiqueta de usuario. El tema se elige en Marca (`THEMES`: Mafia TCG, Fuego, Psíquico, Agua, Planta, Eléctrico, Fantasma, Neutro); cada uno trae `accent`, `accent2` y `bg`.
 
 #### Secondary
 - **Birome** (`video-pen`): tildes del checklist, contador escrito a mano, idioma en la etiquetita de la carta, "me falta" en la ficha, los puntos de la lista en el cuaderno.
@@ -567,7 +567,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 
 #### Neutral
 - **Playmat** (`video-mat`): el fondo; sigue el `bg` del tema y puede reemplazarse por una foto del escritorio del creador, oscurecida con `bgDim`.
-- **Tapas del binder** (`video-binder-negro` por defecto; `gris`, `azul`, `rojo`, `verde`, `violeta`, `lila` elegibles).
+- **Tapas del binder** (`video-binder-lila` por defecto, la tapa de la marca; `negro`, `gris`, `azul`, `rojo`, `verde`, `violeta` elegibles).
 - **Página del binder** (`video-page`): el negro de las hojas con bolsillos.
 - **Papel** (`video-paper`): checklist, ficha de la carta, etiqueta de la tapa, cuaderno, carteles sobre papel. **Papel de copia** (`video-proxy-paper`): el margen de la impresión casera que ocupa el lugar de una carta que falta.
 - **Tinta impresa** (`video-ink`) y **gris impreso** (`video-grey`): texto principal y secundario en papel.
@@ -616,7 +616,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 - **Carta en la mano:** 900px de alto, centrada en (BCX + 6, 548), girada −0.034 rad, tapando la página. En grupo (mismo arte), hasta 12 cartas repartidas en hasta 4 filas sobre el área del binder, con 18px de separación, giro alternado de 0.05–0.09 rad y una etiquetita de papel con el idioma a mano.
 - **Escena carta:** carta de 880px de alto en x 488 y la ficha impresa en el lugar de la hoja.
 - **Lista:** cuaderno de 1420×1016 en (250, 64), girado −0.008 rad; renglones desde y 222 cada 74px y margen rojo en x 150.
-- **Postproducción:** logo, usuario y Suscribite apilados en las esquinas con 40px de margen y 16px entre elementos.
+- **Postproducción:** logo, usuario y Suscribite apilados en las esquinas con 40px de margen y 16px entre elementos. El logo del canal viene con la app (`marca/logo-sticker.png`, 6% del ancho) y un logo subido lo reemplaza; en el cierre no se repite en la esquina.
 
 ### Elevation & Depth
 

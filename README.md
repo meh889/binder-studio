@@ -54,7 +54,7 @@ Ponyta/
 └── videos/               los videos que guardes desde la herramienta
 ```
 
-El logo, el color del binder, el playmat (o una foto de tu escritorio tomada desde arriba) y los colores del canal (vista **Marca**) se guardan en el navegador y se usan en todas las especies.
+La app viene con la marca de Mafia TCG puesta: el logo (como sticker en la tapa, en la esquina y en el cierre), el binder lila y los colores del logo. Todo se cambia en la vista **Marca** (el tema **Mafia TCG** la vuelve a poner con un clic) y se guarda en el navegador para todas las especies. Los archivos de la marca en alta (avatar, banner, logo y stickers) están en [`marca/`](marca/).
 
 ## Atajos mientras grabás
 
