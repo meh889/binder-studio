@@ -2724,7 +2724,9 @@ $("importFile").onchange = async e => {
 
 /* ================= Cards: the shelf and the inspector ================= */
 // A card's tags say what it still needs; the same colours drive the filter chips.
-const isGroupTail = i => { const g = groupSize(i); return g.n > 1 && i !== g.a; };
+// Inside a run of one art, only the card that opens each → needs a script; the rest ride along.
+const isGroupTail = i => { const g = groupSize(i); if(!(g.n > 1) || i === g.a) return false;
+  for(let k = g.a; k <= g.b;){ if(k === i) return false; const e = groupAt(k, cards().length - 1)[1]; if(i <= e) return true; k = e + 1; } return true; };
 const FPRED = {
   all: () => true,
   noimg: c => !cardSrc(c),
