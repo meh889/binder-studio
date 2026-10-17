@@ -393,7 +393,7 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
               <label class="check"><input type="color" id="b-bg" data-b="bg"> Playmat</label>
             </div>
             <div class="fld"><label for="b-binder">Color del binder</label>
-              <select id="b-binder" data-b="binder"><option value="negro">Negro</option><option value="gris">Gris</option><option value="azul">Azul</option><option value="rojo">Rojo</option><option value="verde">Verde</option><option value="violeta">Violeta</option></select></div>
+              <select id="b-binder" data-b="binder"><option value="negro">Negro</option><option value="gris">Gris</option><option value="azul">Azul</option><option value="rojo">Rojo</option><option value="verde">Verde</option><option value="violeta">Violeta</option><option value="lila">Lila</option></select></div>
             <div class="fld"><label for="b-font">Tipografía de los títulos</label>
               <select id="b-font" data-b="font"><option>Big Shoulders Display</option><option>Bebas Neue</option><option>Anton</option><option>Archivo Black</option></select></div>
           </div>
@@ -777,7 +777,7 @@ function blotches(x, w, h, n, alpha, seed, tone){
     x.fillStyle = g; x.fillRect(cx - r, cy - r, r*2, r*2);
   }
 }
-const BINDER_COLORS = {negro:"#161719", gris:"#3a3c40", azul:"#1c2a47", rojo:"#5a1f1e", verde:"#1f3a2a", violeta:"#2d2340"};
+const BINDER_COLORS = {negro:"#161719", gris:"#3a3c40", azul:"#1c2a47", rojo:"#5a1f1e", verde:"#1f3a2a", violeta:"#2d2340", lila:"#8f6c9f"};
 const matColor = () => S.brand.bg || "#1c1d1f";
 const binderColor = () => BINDER_COLORS[S.brand.binder] || "#161719";
 // Neoprene playmat: fine grain and a little mottling, larger than the frame so the camera can sway.
@@ -1042,7 +1042,9 @@ function drawCoverFace(t, p){
   ctx.drawImage(coverShadowTex(), BX - 20, BY - 20, BW + 80, BH + 80);
   drawCoverLabel(t, p);
   const logo = getImg(tempUrls.get("logo") || S.brand.logo.url);
-  if(logo){ const lw = 170, lh = lw*logo.height/logo.width; ctx.save(); ctx.globalAlpha = .55; ctx.drawImage(logo, BX + (BW - lw)/2, BY + BH - lh - 90, lw, lh); ctx.restore(); }
+  // the channel logo goes on like a sticker its owner put there: full colour, a little crooked, off to one side
+  if(logo){ const lw = 240, lh = lw*logo.height/logo.width; ctx.save(); ctx.translate(BX + BW*.68, BY + BH - lh/2 - 78); ctx.rotate(-.07);
+    ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 6; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 3; ctx.drawImage(logo, -lw/2, -lh/2, lw, lh); ctx.restore(); }
 }
 let coverSnap = null;
 function drawBinderCover(t, p){
@@ -3273,6 +3275,26 @@ for(const box of [$("paneBrand"), $("brandRight")]){
   box.addEventListener("input", e => { const el = e.target.closest("[data-b]"); if(el && el.tagName !== "SELECT") brandInput(el); });
   box.addEventListener("change", e => { const el = e.target.closest("[data-b]"); if(el && (el.tagName === "SELECT" || el.type === "checkbox")) brandInput(el); });
 }
+$("themes").addEventListener("click", e => {
+  const b = e.target.closest("[data-theme]"); if(!b) return;
+  const t = THEMES[b.dataset.theme]; checkpoint();
+  Object.assign(S.brand, {theme:b.dataset.theme, accent:t.accent, accent2:t.accent2, bg:t.bg}); focusSnap = null; renderBrand(); requestDraw(); dirty();
+});
+// Logo and desk photo live in the browser (IndexedDB), not in the folder.
+let brandTarget = null;
+$("logoUp").onclick = () => { brandTarget = "logo"; $("brandFile").click(); };
+$("bgUp").onclick = () => { brandTarget = "bg"; $("brandFile").click(); };
+$("brandFile").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if(!f) return;
+  const key = brandTarget, blob = await shrink(f, key === "bg" ? 3000 : 1200);
+  await kvSet("img:" + key, blob);
+  const old = tempUrls.get(key); if(old) URL.revokeObjectURL(old);
+  tempUrls.set(key, URL.createObjectURL(blob));
+  if(key === "bg") focusSnap = null;
+  renderBrand(); requestDraw(); dirty();
+};
+$("logoDel").onclick = async () => { await kvDel("img:logo"); tempUrls.delete("logo"); renderBrand(); requestDraw(); dirty(); };
+$("bgDel").onclick = async () => { await kvDel("img:bg"); tempUrls.delete("bg"); focusSnap = null; renderBrand(); requestDraw(); dirty(); };
 function setView(which){
   if(!["cards","video","brand"].includes(which)) which = "cards";
   view = which; closeFloat();

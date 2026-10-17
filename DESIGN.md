@@ -24,6 +24,7 @@ colors:
   video-binder-rojo: "#5a1f1e"
   video-binder-verde: "#1f3a2a"
   video-binder-violeta: "#2d2340"
+  video-binder-lila: "#8f6c9f"
   video-page: "#101112"
   video-paper: "#efebe2"
   video-proxy-paper: "#f2efe8"
@@ -566,7 +567,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 
 #### Neutral
 - **Playmat** (`video-mat`): el fondo; sigue el `bg` del tema y puede reemplazarse por una foto del escritorio del creador, oscurecida con `bgDim`.
-- **Tapas del binder** (`video-binder-negro` por defecto; `gris`, `azul`, `rojo`, `verde`, `violeta` elegibles).
+- **Tapas del binder** (`video-binder-negro` por defecto; `gris`, `azul`, `rojo`, `verde`, `violeta`, `lila` elegibles).
 - **Página del binder** (`video-page`): el negro de las hojas con bolsillos.
 - **Papel** (`video-paper`): checklist, ficha de la carta, etiqueta de la tapa, cuaderno, carteles sobre papel. **Papel de copia** (`video-proxy-paper`): el margen de la impresión casera que ocupa el lugar de una carta que falta.
 - **Tinta impresa** (`video-ink`) y **gris impreso** (`video-grey`): texto principal y secundario en papel.
@@ -648,7 +649,7 @@ Formas de objeto real: la tapa con esquinas de 26px, cierre perimetral (riel de 
 ### Components
 
 #### Binder
-Tapa cerrada con etiqueta de papel (580×340: título, segunda línea en acento, línea de datos y "N cartas, de AAAA a AAAA" en gris) y el logo al 55%. La primera → abre la tapa sobre el lomo (760ms, con perspectiva de cámara a 2600px). Las páginas giran como papel (640ms) proyectando sombra sobre la siguiente.
+Tapa cerrada con etiqueta de papel (580×340: título, segunda línea en acento, línea de datos y "N cartas, de AAAA a AAAA" en gris) y el logo del canal pegado como sticker (240px, a color, girado −4°, abajo a la derecha de la tapa). La primera → abre la tapa sobre el lomo (760ms, con perspectiva de cámara a 2600px). Las páginas giran como papel (640ms) proyectando sombra sobre la siguiente.
 
 #### Carta en la mano y archivado
 La carta sube a la cámara con `LIFT`, el fondo se desenfoca (460ms), el post-it aparece (320ms, tras 220ms) y el resaltador marca su fila (420ms, tras 160ms). Al archivar baja junto a su bolsillo, entra desde el lado del lomo, toca fondo con `SNUG` y se tilda en birome (300ms). En la mano la carta se mece (giro de 0.0042 y 0.0024 rad, 2.4/3px).

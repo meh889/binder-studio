@@ -334,6 +334,21 @@
           "#f1ebff"
         ]
       },
+      "video-binder-lila": {
+        "role": "neutral",
+        "displayName": "Tapa lila",
+        "canonical": "#8f6c9f",
+        "tonalRamp": [
+          "#2a1636",
+          "#45304f",
+          "#614a6b",
+          "#7d6488",
+          "#9a80a6",
+          "#b89dc4",
+          "#d7bce3",
+          "#f6dcff"
+        ]
+      },
       "video-page": {
         "role": "neutral",
         "displayName": "Página del binder",
