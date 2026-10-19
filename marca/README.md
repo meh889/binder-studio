@@ -8,6 +8,7 @@ La identidad del canal es el binder del coleccionista: una tapa de cuerina lila 
 | `avatar-hd.png` | Lo mismo a 1600×1600 | Otras redes, impresiones |
 | `banner.jpg` | Tapa del binder con stickers, 2560×1440 (menos de 6 MB) | Banner de YouTube |
 | `banner.png` | El mismo banner sin compresión | Para editar o reexportar |
+| `tapa-sin-stickers.png` | La tapa del binder del banner sola (cuerina lila, lomo, costura y cierre), 2560×1440 | Fondo para miniaturas, separadores o un banner nuevo con otros stickers |
 | `logo-sticker.png` | El logo con borde blanco de sticker, fondo transparente | Lo usa Binder Studio (tapa del binder, marca de agua, cierre) |
 | `logo-original.png` | El logo tal cual, sin fondo | Miniaturas, piezas sobre fondos claros |
 | `m-sticker.png` | La M sola, con borde blanco | Miniaturas, avatar en otras redes |
