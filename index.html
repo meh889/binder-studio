@@ -1797,6 +1797,7 @@ function drawRafaga(s, el, T){
   if(it.kind === "media"){
     const md = getMedia(it.val);
     if(md){ pauseMedia(md); const [src, sw, sh] = mediaFrame(md, local); drawCover(src, sw, sh, -40, -40, W + 80, H + 80); }
+    else if(fileUrl(it.val)) cardstock(T.acc);
     else missingBox(it.val, it.pide);
   } else if(it.kind === "carta"){
     const c = cards()[findCard(it.val)], im = c && getImg(cardSrc(c));
@@ -1869,6 +1870,7 @@ function drawCartaScene(s, el, T){
 function drawMediaScene(s, el, T){
   const md = getMedia(s.media);
   if(md){ pauseMedia(md); const [src, sw, sh] = mediaFrame(md, el); drawCover(src, sw, sh, 0, 0, W, H, 1 + .1*Math.min(1, el/10000)); }
+  else if(fileUrl(s.media)) drawBg(T);
   else missingBox(s.media, s.pide);
   if(s.texto){
     const g = ctx.createLinearGradient(0, H*.5, 0, H); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.75)"); ctx.fillStyle = g; ctx.fillRect(0, H*.5, W, H*.5);
@@ -1921,13 +1923,23 @@ function enterBinder(s){
   const [a, b] = parseRange(s.cartas); VM.range = [a, b];
   drawAt(a - 1); sc.intro = a <= 0 ? 1 : 0; sc.page = Math.floor(Math.max(a, 0)/PER); requestDraw();
 }
+// Ask for a scene's pictures before it is on screen: a burst shows each one for a quarter of a second, too short to load.
+function warmScene(s){
+  if(!s) return;
+  const card = ref => { const c = cards()[findCard(ref)]; if(c) getImg(cardSrc(c)); };
+  if(s.tipo === "rafaga") sceneItems(s).forEach(it => { if(it.kind === "media") getMedia(it.val); else if(it.kind === "carta") card(it.val); });
+  if(s.tipo === "media") getMedia(s.media);
+  if(s.tipo === "carta") card(s.carta);
+  const f = String(s.fondo || "").trim(), m = f.match(/^carta\s+(.+)$/i);
+  if(m) card(m[1]); else if(/\.\w{2,4}$/.test(f)) getMedia(f);
+}
 function goScene(i, opts={}){
   const list = scenes(); if(!list.length) return;
   if(i >= list.length){ VM.ended = true; updPrompter(); return; }
   i = clamp(i, 0, list.length - 1);
   cancelAnim(); pauseMedia();
   Object.assign(VM, {i, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false});
-  const s = list[i];
+  const s = list[i]; warmScene(s); warmScene(list[i + 1]);
   if(s.tipo === "binder") enterBinder(s);
   else if(s.tipo === "titulo"){ drawAt(-1); }
   else { sc.hero = null; sc.focus = 0; }
@@ -2293,6 +2305,7 @@ async function openStudio(record){
     if(!ok){ notice("No pude usar el micrófono. Revisá el permiso del navegador, o desactivá \"Grabar mi voz\" en la pestaña Video para grabar sin voz."); return; }
   }
   closeFloat(); studioOpen = true; chapters = []; document.body.classList.add("in-studio");
+  if(VM.on){ const l = scenes(); warmScene(l[Math.max(0, VM.i)]); warmScene(l[Math.max(0, VM.i) + 1]); }
   $("sHost").appendChild(cv); $("studio").hidden = false;
   document.documentElement.style.setProperty("--pf", pfSize + "px");
   if(document.activeElement) document.activeElement.blur();
