@@ -59,7 +59,7 @@ Tipos:
 | `cartel` | `estilo` (`golpe`, `barrido`, `maquina`, `contador`), `texto`, `valor` (contador), `fondo` | Tipografía cinética a pantalla completa, sobre papel, el playmat o cartulina de color. |
 | `binder` | `cartas` (posiciones, `"1-9"`) | El binder sobre el playmat: cada → sube la carta a la cámara y después la mete en su bolsillo y la tilda en el checklist. Si el tramo empieza en la carta 1, arranca con el binder cerrado y el primer → lo abre. Usa el guion de cada carta (`script` en binder.json). |
 | `carta` | `carta` (número `"SH11/99"` o posición `"#13"`), `texto` | La carta en la mano, en grande, con su ficha impresa en una hoja al lado. Los zooms marcados en la carta se recorren con →. |
-| `media` | `media` (`"media/archivo.ext"`), `pide`, `texto` | Imagen, GIF o clip a pantalla completa con texto encima. |
+| `media` | `media` (`"media/archivo.ext"`), `pide`, `texto`, `sonido` | Imagen, GIF o clip a pantalla completa con texto encima. Con `"sonido": "si"` el clip suena una vez desde el principio (la música de fondo se corre mientras tanto y queda en el último cuadro); si no, va mudo y en loop. |
 | `lista` | `titulo`, `items` (lista) | Una hoja de cuaderno: cada → escribe a mano el punto siguiente. |
 | `cierre` | `texto` | Cierre con logo, texto y botón de suscripción. |
 
@@ -103,4 +103,5 @@ Al armar una lista multi-idioma, ordená cada arte **por condición y dentro de 
 - Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080; la grabación usa `captureStream` + `MediaRecorder`, con el micrófono, la música y efectos sintetizados mezclados por Web Audio.
 - `binder.json` = cartas y marca; `video.json` = escenas. La herramienta guarda ambos.
 - Los datos de cartas salen de TCGdex (repo `tcgdex/cards-database`, se puede clonar desde la sesión).
+- La intro del canal es un clip con su propia música y textos (`intro-mafia-tcg.webm`, ~21 s): en cada video va como escena `media` con `"sonido": "si"`, después del gancho y antes de la portada, con el archivo copiado en `media/` de la especie. El guion de esa escena es la bienvenida que dice el creador cuando se pega el logo ("Bienvenidos a la Mafia. Hoy le toca a …").
 - La marca del canal (Mafia TCG) está en `marca/` y la app la usa por defecto. Reglas del creador: la tipografía del logo es tributo a Pokémon y no se cambia; si aparecen cartas en piezas de marca, van dadas vuelta y con dorso fan art; nada de fondos negros ni grises en la marca.

@@ -1287,7 +1287,7 @@ function draw(){
     else { drawScene(s, el); ctx.globalAlpha = 1; ctx.filter = "none"; ctx.globalCompositeOperation = "source-over"; ls(0); lens(live, .6); }
     ctx.restore();
     ctx.globalAlpha = 1; ctx.filter = "none"; ls(0); ctx.textAlign = "left";
-    drawOverlay(t, s.tipo === "cierre");   // the closing already shows the logo big
+    drawOverlay(t, s.tipo === "cierre" || (s.tipo === "media" && s.sonido === "si"));   // the closing and a finished clip (like the channel intro) carry their own logo
     if(VM.flash > .01){ ctx.fillStyle = `rgba(255,255,255,${VM.flash*.8})`; ctx.fillRect(0,0,W,H); }
     return;
   }
@@ -1529,14 +1529,14 @@ const SCENE_TYPES = {
   cartel:{name:"Cartel cinético", fields:[["estilo","Estilo","select",[["golpe","Golpe, palabra por palabra"],["barrido","Barrido"],["maquina","Máquina de escribir"],["contador","Contador"]]],["texto","Texto (*grande*, _chico_, ~tachado~)","area"],["valor","Número (contador)","text"],["fondo","Fondo (blanco, negro, acento, marca, carta X, media/archivo)","text"]]},
   binder:{name:"Binder", fields:[["cartas","Cartas (posiciones, ej. 1-9)","text"]]},
   carta:{name:"Carta en grande", fields:[["carta","Carta (número o #posición)","text"],["texto","Texto al costado","area"]]},
-  media:{name:"Imagen o clip", fields:[["media","Archivo (media/…)","text"],["pide","Qué conseguir","text"],["texto","Texto","area"]]},
+  media:{name:"Imagen o clip", fields:[["media","Archivo (media/…)","text"],["pide","Qué conseguir","text"],["texto","Texto","area"],["sonido","Sonido del clip","select",[["no","Sin sonido, en loop"],["si","Con su sonido, una vez (baja la música)"]]]]},
   lista:{name:"Lista", fields:[["titulo","Título","text"],["items","Puntos, uno por línea","area"]]},
   cierre:{name:"Cierre", fields:[["texto","Texto","area"]]}
 };
 const ARRAY_FIELDS = new Set(["items"]);
 function newScene(tipo){
   const base = {id:uid("s"), tipo, capitulo:"", guion:""};
-  const d = {rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:""}, media:{media:"", pide:"", texto:""}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
+  const d = {rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:""}, media:{media:"", pide:"", texto:"", sonido:"no"}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
   return {...base, ...d};
 }
 function itemToLine(it){
@@ -1623,10 +1623,27 @@ function loadMedia(path, url){
 }
 function mediaFrame(m, tms){
   if(m.kind === "gif" && m.frames){ let t = (tms % m.total + m.total) % m.total, k = 0; while(k < m.durs.length-1 && t >= m.durs[k]){ t -= m.durs[k]; k++; } const f = m.frames[k]; return [f, f.width, f.height]; }
-  if(m.kind === "video"){ const v = m.el; if(v.paused) v.play().catch(() => {}); return [v, v.videoWidth || 16, v.videoHeight || 9]; }
+  if(m.kind === "video"){ const v = m.el; if(v.paused && !(m.once && v.ended)) v.play().catch(() => {}); return [v, v.videoWidth || 16, v.videoHeight || 9]; }
   return [m.el, m.el.naturalWidth || m.el.width || 16, m.el.naturalHeight || m.el.height || 9];
 }
-function pauseMedia(except){ for(const m of media.values()) if(m.kind === "video" && m.el && m !== except && !m.el.paused) m.el.pause(); }
+function pauseMedia(except){ for(const m of media.values()) if(m.kind === "video" && m.el && m !== except && !m.el.paused) m.el.pause(); if(VM.clip && VM.clip !== except) stopClipSound(); }
+// A media scene marked "con su sonido": the clip plays once from the start through its own bus, and the music steps aside.
+function startClipSound(s){
+  const path = s.media; if(!path || mediaKind(path) !== "video" || !fileUrl(path)) return;
+  getMedia(path); const m = media.get(path); if(!m || !m.el) return;
+  const ax = audio(); if(!ax) return; if(ax.state !== "running") ax.resume().catch(() => {});
+  const v = m.el; v.loop = false; v.muted = false; m.once = true;
+  if(!m.node){ try{ m.node = ax.createMediaElementSource(v); m.node.connect(AB.clip); }catch(e){} }
+  VM.clip = m; AB.clip.gain.value = 1; AB.music.gain.setTargetAtTime(0, ax.currentTime, .15);
+  // if the browser refuses sound without a click, the picture still runs, muted
+  const go = () => { if(VM.clip !== m) return; try{ v.currentTime = 0; }catch(e){} v.play().catch(() => { v.muted = true; v.play().catch(() => {}); }); };
+  if(v.readyState >= 2) go(); else v.addEventListener("loadeddata", go, {once:true});
+}
+function stopClipSound(){
+  const m = VM.clip; VM.clip = null; if(!m || !m.el) return;
+  m.el.pause(); m.el.muted = true; m.el.loop = true; m.once = false;
+  if(AX) AB.music.gain.setTargetAtTime(S.brand.audio.musicVol/100, AX.currentTime, .3);
+}
 function drawCover(src, sw, sh, x, y, w, h, scale=1){ const s = Math.max(w/sw, h/sh)*scale, dw = sw*s, dh = sh*s; ctx.drawImage(src, x + (w-dw)/2, y + (h-dh)/2, dw, dh); }
 const blurCache = new WeakMap();
 function blurred(img){
@@ -1940,6 +1957,7 @@ function goScene(i, opts={}){
   cancelAnim(); pauseMedia();
   Object.assign(VM, {i, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false});
   const s = list[i]; warmScene(s); warmScene(list[i + 1]);
+  if(s.tipo === "media" && s.sonido === "si") startClipSound(s);
   if(s.tipo === "binder") enterBinder(s);
   else if(s.tipo === "titulo"){ drawAt(-1); }
   else { sc.hero = null; sc.focus = 0; }
@@ -2079,8 +2097,8 @@ function audio(){
   if(AX) return AX;
   try{ AX = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
   const g = () => AX.createGain();
-  AB = {sfx:g(), music:g(), mic:g(), monitor:g(), master:g(), lim:AX.createDynamicsCompressor(), rec:AX.createMediaStreamDestination()};
-  AB.sfx.connect(AB.monitor); AB.music.connect(AB.monitor); AB.monitor.connect(AX.destination);
+  AB = {sfx:g(), music:g(), clip:g(), mic:g(), monitor:g(), master:g(), lim:AX.createDynamicsCompressor(), rec:AX.createMediaStreamDestination()};
+  AB.sfx.connect(AB.monitor); AB.music.connect(AB.monitor); AB.clip.connect(AB.monitor); AB.clip.connect(AB.master); AB.monitor.connect(AX.destination);
   AB.master.gain.value = .9; Object.assign(AB.lim, {}); AB.lim.threshold.value = -8; AB.lim.knee.value = 4; AB.lim.ratio.value = 14; AB.lim.attack.value = .003; AB.lim.release.value = .2;
   AB.sfx.connect(AB.master); AB.music.connect(AB.master); AB.mic.connect(AB.master); AB.master.connect(AB.lim); AB.lim.connect(AB.rec);
   const n = AX.createBuffer(1, AX.sampleRate, AX.sampleRate), d = n.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2 - 1; AB.noise = n;
@@ -2089,7 +2107,7 @@ function audio(){
 function applyAudio(){
   if(!AX) return; const a = S.brand.audio;
   AB.sfx.gain.value = a.sfx ? a.sfxVol/100 : 0;
-  AB.music.gain.value = a.musicVol/100;
+  AB.music.gain.value = VM.clip ? 0 : a.musicVol/100;
   AB.monitor.gain.value = recording && !a.listen ? 0 : 1;
 }
 function playSfx(kind){
@@ -2135,7 +2153,9 @@ async function startMic(){
   micTimer = setInterval(() => {
     an.getFloatTimeDomainData(buf); let s = 0; for(const v of buf) s += v*v; const rms = Math.sqrt(s/buf.length);
     $("micLvl").style.width = Math.min(100, rms*420) + "%";
-    if(a.duck && musicSrc){ const talking = rms > .018, target = (a.musicVol/100)*(talking ? .28 : 1); AB.music.gain.setTargetAtTime(target, AX.currentTime, talking ? .06 : .5); }
+    const talking = rms > .018;
+    if(VM.clip){ if(a.duck) AB.clip.gain.setTargetAtTime(talking ? .55 : 1, AX.currentTime, talking ? .06 : .5); }
+    else if(a.duck && musicSrc){ const target = (a.musicVol/100)*(talking ? .28 : 1); AB.music.gain.setTargetAtTime(target, AX.currentTime, talking ? .06 : .5); }
   }, 50);
   listMics();
   return true;
@@ -2339,7 +2359,7 @@ function startRec(){
 }
 async function finishStudio(){
   if(!studioOpen) return;
-  studioOpen = false; document.body.classList.remove("in-studio");
+  studioOpen = false; document.body.classList.remove("in-studio"); stopClipSound();
   $("countdown").hidden = true;
   let blob = null, type = "", hasAudio = false;
   if(rec && rec.state !== "inactive"){
