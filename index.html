@@ -2053,7 +2053,7 @@ function promptVideo(){
   let title = `Escena ${VM.i + 1} de ${list.length} · ${sceneLabel(s)}` + (s.capitulo ? ` · ${s.capitulo}` : ""), txt = s.guion;
   if(s.tipo === "binder" && (held || idx >= VM.range[0])){
     const c = cards()[held ? held.i : idx];
-    if(c && held && held.group){ title += ` · ${c.set} · mismo arte en ${held.end - held.i + 1} idiomas`; txt = cards().slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note || ""; }
+    if(c && held && held.group){ title += ` · ${c.set} · ${condLabel(c) || "mismo arte"}, ${held.end - held.i + 1} versiones`; txt = cards().slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note || ""; }
     else if(c){ title += ` · ${c.set} ${c.num}`; txt = (held ? (c.script || c.note) : "") || (held ? "" : s.guion); if(!txt) txt = held ? "" : "(seguí con la próxima carta)"; }
   }
   $("pCount").textContent = title;
