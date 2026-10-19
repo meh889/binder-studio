@@ -63,7 +63,16 @@ La app viene con la marca de Mafia TCG puesta: el logo (como sticker en la tapa,
 | → / Espacio / clic | Siguiente paso: próxima escena, próxima carta, zoom o punto de la lista |
 | ← | Volver un paso |
 | Z | Zoom rápido |
+| P | Pausar y retomar (no corta el archivo: lo que pasa en la pausa no queda en el video; al retomar hay una cuenta 3-2-1) |
 | Esc | Terminar la grabación |
+
+## Grabar por partes
+
+No hace falta grabar todo de un tirón ni pasar por un editor:
+
+- **Pausa:** en el estudio, **P** pausa y retoma. Mientras está en pausa podés moverte con ← y → para volver a la carta que querías rehacer.
+- **Grabar desde acá:** en **Plan del video**, elegí una escena y tocá **Grabar desde acá**. En un tramo de binder elegí también la carta ("Grabar desde la carta"): las anteriores ya aparecen guardadas y tildadas. En **Cartas** está el mismo botón en la ficha de cada carta.
+- **Unir partes:** guardá cada parte con **Guardar en la carpeta** (se guarda con sus capítulos en `videos/`). Después, en **Plan del video → El video → Unir partes…**, marcalas, ordenalas y tocá **Unir**: queda un solo video con los capítulos corridos. Tarda lo mismo que dura el video y la pestaña tiene que quedar al frente.
 
 Fuera de la grabación también funcionan → y ← sobre el escenario, **Inicio** para volver al principio, **/** para buscar cartas, **↑ ↓** para moverte por la lista y **Ctrl+Z** para deshacer.
 

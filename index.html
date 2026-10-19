@@ -250,6 +250,12 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .recline .dot{width:12px;height:12px;border-radius:50%;background:var(--faint)}
 .recline.on .dot{background:var(--rec);animation:blink 1.2s infinite}
 .recline.on #recLbl{color:#ff8a80}
+.recline.paused .dot{background:var(--yel);animation:none}.recline.paused #recLbl{color:var(--yel)}
+.takes{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto}
+.take{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--glass)}
+.take b{display:block;font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.take small{color:var(--dim);font-size:12px}
+.take .btn.sm.icon{min-width:30px;padding:0}
+.jprog{height:8px;border-radius:4px;background:var(--glass);overflow:hidden}.jprog i{display:block;height:100%;width:0;background:var(--yel);transition:width .3s linear}
 #recTime{font-variant-numeric:tabular-nums;font-weight:700}
 @keyframes blink{50%{opacity:.35}}
 .pstrip{display:flex;gap:3px;height:8px}
@@ -483,10 +489,21 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
     <div class="ptext" id="pText"></div>
     <div class="pnext" id="pNext"></div>
     <div><div class="lbl" style="margin-bottom:6px">Micrófono</div><div class="meter"><i id="micLvl"></i></div></div>
-    <div class="pkeys"><kbd>→</kbd> <kbd>Espacio</kbd> o clic: siguiente · <kbd>←</kbd> atrás · <kbd>Z</kbd> zoom · <kbd>Esc</kbd> terminar<br>Esta columna no sale en el video. No cambies de pestaña mientras grabás.</div>
+    <div class="pkeys"><kbd>→</kbd> <kbd>Espacio</kbd> o clic: siguiente · <kbd>←</kbd> atrás · <kbd>Z</kbd> zoom · <kbd>P</kbd> pausa · <kbd>Esc</kbd> terminar<br>Esta columna no sale en el video. No cambies de pestaña mientras grabás.</div>
     <div style="display:flex;gap:6px;align-items:center"><button class="btn sm" id="aMinus" aria-label="Achicar letra">A−</button><button class="btn sm" id="aPlus" aria-label="Agrandar letra">A+</button><span class="grow"></span><button class="btn primary" id="finish">Terminar</button></div>
     <div class="countdown" id="countdown" hidden></div>
   </aside>
+</div>
+
+<div class="modal" id="mJoin" role="dialog" aria-modal="true" aria-labelledby="mJoinT" hidden>
+  <div class="dialog" style="max-width:640px">
+    <h3 id="mJoinT">Unir partes</h3>
+    <p>Marcá las partes y ordenalas como van en el video. Se unen en uno solo, con los capítulos corridos. Tarda lo mismo que dura el video: dejá esta pestaña al frente hasta que termine.</p>
+    <div class="takes" id="jList"></div>
+    <div><button class="btn sm" id="jAdd"><svg class="ic"><use href="#i-plus"/></svg>Agregar un video…</button><input type="file" id="jFile" accept="video/*" multiple hidden></div>
+    <div id="jRun" hidden><div class="jprog"><i id="jBar"></i></div><p id="jMsg" style="margin-top:8px"></p></div>
+    <div class="dlgfoot"><button class="btn ghost" id="jClose">Cancelar</button><button class="btn primary" id="jGo">Unir</button></div>
+  </div>
 </div>
 
 <div class="modal" id="mVideo" role="dialog" aria-modal="true" aria-labelledby="mVideoT" hidden>
@@ -1966,7 +1983,7 @@ function goScene(i, opts={}){
     VM.punch = 1.07; tween(430, v => VM.punch = 1.07 - .07*v, easeOut);
     playSfx("whoosh");
   } else { VM.flash = 0; VM.punch = 1; }
-  if(recording && s.capitulo) chapters.push({t:(performance.now() - recT0)/1000, name:s.capitulo});
+  if(recording && s.capitulo) chapters.push({t:recElapsed(), name:s.capitulo});
   highlightScene(); updPrompter(); requestDraw();
 }
 function tweenZoom(z){ const f = {...VM.z}; return tween(700, v => { VM.z = {s:f.s + (z.s - f.s)*v, x:f.x + (z.x - f.x)*v, y:f.y + (z.y - f.y)*v}; }, easeInOut); }
@@ -2265,7 +2282,8 @@ function sceneInspHTML(s, i){
   const T = SCENE_TYPES[s.tipo], needs = sceneNeeds(s), n = scenes().length;
   return `<div><h2>${esc(sceneLabel(s))}</h2><span class="sub">Escena ${i+1} de ${n} · unos ${fmtDur(estSecs(s))}</span>
       <div class="fld" style="margin-top:12px"><label for="sk-tipo-${s.id}" class="lab">Tipo de escena</label><select id="sk-tipo-${s.id}" data-sk="tipo">${Object.entries(SCENE_TYPES).map(([k, v]) => `<option value="${k}"${k === s.tipo ? " selected" : ""}>${v.name}</option>`).join("")}</select></div></div>
-    <div class="iacts"><button class="btn sm" data-sa="show">${ICON("play","fill")}Ver desde acá</button><button class="btn sm icon" data-sa="up" ${i === 0 ? "disabled" : ""} aria-label="Subir escena" title="Subir">${ICON("up")}</button><button class="btn sm icon" data-sa="down" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar escena" title="Bajar">${ICON("down")}</button><button class="btn sm" data-sa="dup">${ICON("copy")}Duplicar</button></div>
+    <div class="iacts"><button class="btn sm" data-sa="show">${ICON("play","fill")}Ver desde acá</button><button class="btn sm" data-sa="rec" title="Grabar una parte que empieza en esta escena">Grabar desde acá</button><button class="btn sm icon" data-sa="up" ${i === 0 ? "disabled" : ""} aria-label="Subir escena" title="Subir">${ICON("up")}</button><button class="btn sm icon" data-sa="down" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar escena" title="Bajar">${ICON("down")}</button><button class="btn sm" data-sa="dup">${ICON("copy")}Duplicar</button></div>
+    ${s.tipo === "binder" ? (() => { const [a, b] = parseRange(s.cartas); return `<div class="fld"><label for="sfrom-${s.id}">Grabar desde la carta</label><input type="number" id="sfrom-${s.id}" data-from min="${a + 1}" max="${b + 1}" value="${a + 1}"></div>`; })() : ""}
     ${needs.length ? `<div class="needs" style="margin:0"><span class="tag pink">falta en la carpeta</span><ul>${needs.map(x => `<li><code>${esc(x.path)}</code>${x.pide ? " — " + esc(x.pide) : ""}</li>`).join("")}</ul></div>` : ""}
     <div class="fld"><label for="sf-${s.id}-capitulo">Capítulo de YouTube (opcional)</label><input type="text" id="sf-${s.id}-capitulo" data-sk="capitulo" value="${esc(s.capitulo)}" placeholder="Empieza un capítulo en esta escena"></div>
     ${sceneFieldHTML(s, "guion", "Guion para el teleprompter", "area")}
@@ -2279,7 +2297,8 @@ function videoInspHTML(){
   return `<h2>El video</h2>
     <p class="hint">${list.length ? `${list.length} escenas, ${chaps} ${chaps === 1 ? "capítulo" : "capítulos"} y unos <b>${fmtDur(total)}</b> de toma. Elegí una escena de la lista para retocarla: el escenario la muestra al lado.` : "Pasale el guion a Claude en el chat: arma las escenas y deja <code>video.json</code> en esta carpeta, que aparece acá solo."}</p>
     <div class="fld"><label for="v-musica">Música de fondo</label><select id="v-musica" data-vk="musica"><option value="">Sin música</option>${[...new Set(mus.concat(cur ? [cur] : []))].map(p => `<option value="${esc(p)}"${p === cur ? " selected" : ""}>${esc(p.replace(/^musica\//, ""))}${files.has(p) ? "" : " (falta)"}</option>`).join("")}</select><span class="lbl">La música va en una carpeta <code>musica/</code> dentro de la carpeta de la especie.</span></div>
-    ${chaps && chaps < 3 ? `<p class="hint"><span class="tag yel">pocos capítulos</span> YouTube pide al menos 3 para mostrarlos.</p>` : ""}`;
+    ${chaps && chaps < 3 ? `<p class="hint"><span class="tag yel">pocos capítulos</span> YouTube pide al menos 3 para mostrarlos.</p>` : ""}
+    <div class="fld"><span class="lab">Grabar por partes</span><p class="hint" style="margin:0">Elegí una escena y tocá <b>Grabar desde acá</b> para grabar desde ahí. En el estudio, <kbd>P</kbd> pausa y retoma sin cortar el archivo. Guardá cada parte en la carpeta y después juntalas acá.</p><div><button class="btn sm" id="joinOpen">${ICON("copy")}Unir partes…</button></div></div>`;
 }
 function addScene(tipo){
   checkpoint(); const list = scenes(), cur = list.findIndex(s => s.id === selScene), at = cur >= 0 ? cur + 1 : VM.on && VM.i >= 0 ? VM.i + 1 : list.length;
@@ -2289,7 +2308,7 @@ function addScene(tipo){
   const f = $("insp").querySelector("textarea"); if(f) f.focus();
 }
 $("sceneMenu").onclick = e => openMenu(e.currentTarget, Object.entries(SCENE_TYPES).map(([k, v]) => ({label:v.name, action:() => addScene(k)})));
-$("planMore").onclick = e => openMenu(e.currentTarget, [{label:"Importar video.json…", icon:"file", action:() => $("videoFile").click()}]);
+$("planMore").onclick = e => openMenu(e.currentTarget, [{label:"Unir partes…", icon:"copy", action:openJoin}, {label:"Importar video.json…", icon:"file", action:() => $("videoFile").click()}]);
 $("videoFile").onchange = async e => {
   const f = e.target.files[0]; e.target.value = ""; if(!f) return;
   let raw; try{ raw = JSON.parse(await f.text()); }catch(err){ notice("Ese archivo no es un video.json válido."); return; }
@@ -2310,13 +2329,36 @@ function renderAudio(){
 
 /* ================= Studio: rehearse / record ================= */
 let studioOpen = false, rec = null, chunks = [], recT0 = 0, recSecs = 0, recTimer = 0, pfSize = 26;
+// Pausing keeps one file: the time spent paused is left out of the clock, the chapters and the video.
+let recPaused = false, pauseT0 = 0, pausedMs = 0, recFrom = null, videoKind = "";
+const recElapsed = () => (performance.now() - recT0 - pausedMs - (recPaused ? performance.now() - pauseT0 : 0))/1000;
+const fmtClock = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
+async function togglePause(){
+  if(!rec || rec.state === "inactive" || $("countdown").hidden === false) return;
+  if(rec.state === "recording"){
+    rec.pause(); recPaused = true; pauseT0 = performance.now();
+    $("recline").classList.remove("on"); $("recline").classList.add("paused"); $("recLbl").textContent = "EN PAUSA · P para seguir";
+    if(VM.clip && VM.clip.el) VM.clip.el.pause();
+    if(AX) AB.music.gain.setTargetAtTime(0, AX.currentTime, .1);
+    return;
+  }
+  // back from a pause: a short count so the first word isn't clipped
+  const cd = $("countdown"); cd.hidden = false;
+  for(const n of [3, 2, 1]){ cd.textContent = n; await sleep(600); if(!studioOpen){ cd.hidden = true; return; } }
+  cd.hidden = true;
+  pausedMs += performance.now() - pauseT0; recPaused = false;
+  if(VM.clip && VM.clip.el && !VM.clip.el.ended) VM.clip.el.play().catch(() => {});
+  if(AX && !VM.clip) AB.music.gain.setTargetAtTime(S.brand.audio.musicVol/100, AX.currentTime, .2);
+  rec.resume(); $("recline").classList.remove("paused"); $("recline").classList.add("on"); $("recLbl").textContent = "GRABANDO";
+}
 try{ pfSize = +localStorage.getItem("binder.pf") || 26; }catch(e){}
 function pickMime(){
   if(!window.MediaRecorder || !cv.captureStream) return null;
   const list = ["video/mp4;codecs=avc1.640033,mp4a.40.2","video/mp4;codecs=avc1.4d0028,mp4a.40.2","video/mp4;codecs=avc1,mp4a.40.2","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
   return list.find(m => { try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } }) ?? "";
 }
-async function openStudio(record){
+// `from` starts the take part way: {scene} in the video, {card} in the binder (with the cards before it already filed).
+async function openStudio(record, from){
   if(!cards().length && !VM.on){ notice("Agregá al menos una carta antes de grabar."); return; }
   if(record && pickMime() === null){ notice("Este navegador no puede grabar video. Probá con Chrome o Edge en una computadora."); return; }
   const ax = audio(); if(ax) ax.resume().catch(() => {});
@@ -2329,7 +2371,8 @@ async function openStudio(record){
   $("sHost").appendChild(cv); $("studio").hidden = false;
   document.documentElement.style.setProperty("--pf", pfSize + "px");
   if(document.activeElement) document.activeElement.blur();
-  if(VM.on){ cancelAnim(); pauseMedia(); VM.i = -1; VM.ended = false; requestDraw(); } else drawAt(-1);
+  recFrom = from && (from.scene > 0 || from.card > 0) ? from : null; videoKind = "";
+  if(VM.on){ cancelAnim(); pauseMedia(); VM.i = -1; VM.ended = false; requestDraw(); } else drawAt(from && from.card ? from.card - 1 : -1);
   updPrompter();
   $("recline").classList.remove("on"); $("recLbl").textContent = record ? "PREPARANDO" : "ENSAYO"; $("recTime").textContent = "00:00";
   try{ await document.documentElement.requestFullscreen(); }catch(e){}
@@ -2340,7 +2383,13 @@ async function openStudio(record){
     startRec();
   } else applyAudio();
   startMusic();
-  if(VM.on) goScene(0);
+  if(VM.on){
+    const i = from && from.scene ? clamp(from.scene, 0, scenes().length - 1) : 0, s = scenes()[i];
+    goScene(i);
+    if(s && s.tipo === "binder" && from && from.card != null){ const [a, b] = VM.range; if(from.card > a && from.card <= b){ drawAt(from.card - 1); sc.intro = 0; } }
+    // a part that starts inside a chapter opens with that chapter's name, so joined parts keep their chapters
+    if(record && i > 0 && !(s && s.capitulo)){ for(let k = i - 1; k >= 0; k--) if(scenes()[k].capitulo){ chapters.push({t:0, name:scenes()[k].capitulo}); break; } }
+  }
 }
 function startRec(){
   setRes(+$("res").value);
@@ -2353,9 +2402,9 @@ function startRec(){
   catch(e){ try{ rec = new MediaRecorder(stream); }catch(err){ recording = false; notice("No se pudo iniciar la grabación."); return; } }
   chunks = []; rec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
   requestDraw();
-  rec.start(1000); recT0 = performance.now();
+  rec.start(1000); recT0 = performance.now(); recPaused = false; pausedMs = 0;
   $("recline").classList.add("on"); $("recLbl").textContent = "GRABANDO";
-  clearInterval(recTimer); recTimer = setInterval(() => { const s = Math.floor((performance.now()-recT0)/1000); $("recTime").textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); }, 250);
+  clearInterval(recTimer); recTimer = setInterval(() => { $("recTime").textContent = fmtClock(recElapsed()); }, 250);
 }
 async function finishStudio(){
   if(!studioOpen) return;
@@ -2363,13 +2412,13 @@ async function finishStudio(){
   $("countdown").hidden = true;
   let blob = null, type = "", hasAudio = false;
   if(rec && rec.state !== "inactive"){
-    recSecs = (performance.now() - recT0)/1000;
+    recSecs = recElapsed();
     hasAudio = rec.stream.getAudioTracks().length > 0 && (S.brand.audio.mic || S.brand.audio.sfx || !!(P().video || {}).musica);
     await new Promise(r => { rec.onstop = r; rec.stop(); });
     type = rec.mimeType || "video/webm"; blob = new Blob(chunks, {type});
   }
   const res4k = K === 2;
-  rec = null; recording = false; clearInterval(recTimer);
+  rec = null; recording = false; recPaused = false; clearInterval(recTimer); $("recline").classList.remove("paused");
   stopMusic(); stopMic(); pauseMedia(); applyAudio();
   $("studio").hidden = true; $("host").appendChild(cv);
   try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){}
@@ -2419,7 +2468,8 @@ function videoName(){
   const ext = videoType.includes("mp4") ? "mp4" : "webm";
   const slug = (P().name || "master-list").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "binder";
   const d = new Date(), pad = n => String(n).padStart(2,"0");
-  return `${slug}-master-list-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
+  const part = videoKind ? "-" + videoKind : recFrom ? (recFrom.scene > 0 ? `-parte-desde-escena-${pad(recFrom.scene + 1)}` : "") + (recFrom.card > 0 ? `-carta-${recFrom.card + 1}` : "") : "";
+  return `${slug}-master-list${part}-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
 }
 let videoSaved = false;
 $("vSave").onclick = () => {
@@ -2430,7 +2480,9 @@ $("vSave").onclick = () => {
 $("vFolder").onclick = async () => {
   if(!videoBlob || !dir) return;
   const b = $("vFolder"); b.disabled = true; b.textContent = "Guardando…";
-  try{ const name = videoName(); await writeFile("videos/" + name, videoBlob); videoSaved = true; b.textContent = "Guardado en videos/"; $("vInfo").textContent += ` Guardado como videos/${name}.`; }
+  try{ const name = videoName(); await writeFile("videos/" + name, videoBlob);
+    try{ await writeFile("videos/" + name.replace(/\.\w+$/, ".json"), JSON.stringify({app:"binder-studio-take", seconds:+recSecs.toFixed(2), chapters:takeChapters(), from:recFrom}, null, 1)); }catch(err){}
+    videoSaved = true; b.textContent = "Guardado en videos/"; $("vInfo").textContent += ` Guardado como videos/${name}.`; }
   catch(e){ b.disabled = false; b.textContent = "Guardar en la carpeta"; $("vInfo").textContent = "No se pudo guardar en la carpeta. Probá con Descargar video."; }
 };
 $("chapCopy").onclick = async () => { try{ await navigator.clipboard.writeText($("chapText").value); $("chapCopy").textContent = "Copiados"; }catch(e){ $("chapText").select(); } };
@@ -2440,6 +2492,91 @@ $("vDiscard").onclick = e => {
   closeModal("mVideo"); $("vPrev").removeAttribute("src"); $("vPrev").load(); if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = null; videoBlob = null;
 };
 
+/* ================= Joining takes ================= */
+// Parts recorded one after another are played back to back into one recorder: one file, the chapters shifted by
+// where each part starts. It runs in real time, so the tab has to stay in front.
+const takeChapters = () => chapters.map(c => ({t:+c.t.toFixed(2), name:c.name}));
+let jItems = [], joining = false;
+async function openJoin(){
+  if(joining){ openModal("mJoin"); return; }
+  jItems = [];
+  if(dir){
+    try{
+      const vd = await dir.getDirectoryHandle("videos"), found = [];
+      for await (const [n, h] of vd.entries()) if(h.kind === "file" && /\.(webm|mp4|mov|m4v)$/i.test(n)) found.push([n, h]);
+      found.sort((a, b) => a[0].localeCompare(b[0]));
+      for(const [n, h] of found){
+        let json = null; try{ json = JSON.parse(await (await (await vd.getFileHandle(n.replace(/\.\w+$/, ".json"))).getFile()).text()); }catch(e){}
+        jItems.push({name:n, handle:h, json, on:false});
+      }
+    }catch(e){}
+  }
+  renderJoin(); $("jRun").hidden = true; $("jGo").disabled = false; $("jGo").textContent = "Unir"; openModal("mJoin");
+}
+function renderJoin(){
+  const n = jItems.length;
+  $("jList").innerHTML = n ? jItems.map((it, k) => `<label class="take"><input type="checkbox" data-j="${k}"${it.on ? " checked" : ""}><span style="min-width:0"><b>${esc(it.name)}</b><small>${it.json ? fmtClock(it.json.seconds) + (it.json.chapters && it.json.chapters.length ? ` · ${it.json.chapters.length} ${it.json.chapters.length === 1 ? "capítulo" : "capítulos"}` : "") : "sin datos de capítulos"}</small></span><span style="display:flex;gap:4px"><button class="btn sm icon" data-jm="${k}:-1"${k === 0 ? " disabled" : ""} aria-label="Subir">${ICON("up")}</button><button class="btn sm icon" data-jm="${k}:1"${k === n - 1 ? " disabled" : ""} aria-label="Bajar">${ICON("down")}</button></span></label>`).join("")
+    : `<p class="hint" style="margin:0">${dir ? "Todavía no hay videos guardados en la carpeta <code>videos/</code>. Guardá cada parte con <b>Guardar en la carpeta</b>, o agregá los videos a mano." : "Abrí la carpeta de la especie para ver sus videos, o agregalos a mano."}</p>`;
+}
+$("jList").addEventListener("change", e => { const k = e.target.dataset.j; if(k != null) jItems[+k].on = e.target.checked; });
+$("jList").addEventListener("click", e => {
+  const b = e.target.closest("[data-jm]"); if(!b || joining) return; e.preventDefault();
+  const [k, d] = b.dataset.jm.split(":").map(Number), j = k + d; if(j < 0 || j >= jItems.length) return;
+  [jItems[k], jItems[j]] = [jItems[j], jItems[k]]; renderJoin();
+});
+$("jAdd").onclick = () => { if(!joining) $("jFile").click(); };
+$("jFile").onchange = e => { for(const f of e.target.files) jItems.push({name:f.name, file:f, json:null, on:true}); e.target.value = ""; renderJoin(); };
+$("jClose").onclick = () => { joining = false; closeModal("mJoin"); };
+$("jGo").onclick = runJoin;
+async function runJoin(){
+  const sel = jItems.filter(it => it.on);
+  if(sel.length < 2){ notice("Marcá al menos dos partes para unir."); return; }
+  if(pickMime() === null){ notice("Este navegador no puede grabar video. Probá con Chrome o Edge en una computadora."); return; }
+  joining = true; $("jGo").disabled = true; $("jGo").textContent = "Uniendo…"; $("jRun").hidden = false; $("jBar").style.width = "0%"; $("jMsg").textContent = "Preparando las partes…";
+  const urls = [];
+  try{
+    const vids = [];
+    for(const it of sel){ const f = it.file || await it.handle.getFile(), u = URL.createObjectURL(f); urls.push(u);
+      const v = document.createElement("video"); v.src = u; v.playsInline = true; v.preload = "auto"; vids.push(v); }
+    await Promise.all(vids.map((v, k) => new Promise((ok, no) => { v.onloadeddata = ok; v.onerror = () => no(new Error(sel[k].name)); })));
+    const w = vids[0].videoWidth || 1920, h = vids[0].videoHeight || 1080, c = document.createElement("canvas"); c.width = w; c.height = h;
+    const x = c.getContext("2d"), ax = audio(); await ax.resume().catch(() => {});
+    const dst = ax.createMediaStreamDestination(), mime = pickMime();
+    const stream = new MediaStream([...c.captureStream(60).getVideoTracks(), ...dst.stream.getAudioTracks()]);
+    const r = new MediaRecorder(stream, mime ? {mimeType:mime, videoBitsPerSecond:w > 2000 ? 40e6 : 14e6, audioBitsPerSecond:192000} : {}), out = [];
+    r.ondataavailable = e => { if(e.data && e.data.size) out.push(e.data); };
+    const known = sel.map((it, k) => it.json && it.json.seconds || (isFinite(vids[k].duration) ? vids[k].duration : 0)), total = known.reduce((a, b) => a + b, 0);
+    const chaps = []; x.fillStyle = "#000"; x.fillRect(0, 0, w, h);
+    r.start(1000); const r0 = performance.now();
+    for(let k = 0; k < vids.length && joining; k++){
+      const v = vids[k], src = ax.createMediaElementSource(v), at = (performance.now() - r0)/1000; src.connect(dst);
+      for(const ch of (sel[k].json && sel[k].json.chapters) || []) if(!chaps.length || chaps[chaps.length - 1].name !== ch.name) chaps.push({t:at + ch.t, name:ch.name});
+      const draw = () => { const sc = Math.min(w/(v.videoWidth || w), h/(v.videoHeight || h)), dw = (v.videoWidth || w)*sc, dh = (v.videoHeight || h)*sc; x.fillRect(0, 0, w, h); x.drawImage(v, (w - dw)/2, (h - dh)/2, dw, dh); };
+      let alive = true; const loop = () => { if(!alive) return; draw(); if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(loop); else requestAnimationFrame(loop); };
+      await v.play(); loop();
+      const before = known.slice(0, k).reduce((a, b) => a + b, 0);
+      await new Promise(res => {
+        const tick = setInterval(() => {
+          if(!joining){ v.pause(); clearInterval(tick); res(); return; }
+          const done = before + v.currentTime; $("jBar").style.width = (total ? Math.min(100, done/total*100) : 0) + "%";
+          $("jMsg").textContent = `Uniendo la parte ${k + 1} de ${vids.length} · ${fmtClock(done)}${total ? " de " + fmtClock(total) : ""}. Dejá esta pestaña al frente hasta que termine.`;
+        }, 250);
+        v.addEventListener("ended", () => { clearInterval(tick); res(); }, {once:true});
+      });
+      alive = false; draw(); src.disconnect();
+    }
+    const secs = (performance.now() - r0)/1000;
+    await new Promise(res => { r.onstop = res; r.stop(); });
+    if(!joining) return;
+    joining = false; closeModal("mJoin");
+    chapters = chaps; recFrom = null; videoKind = "completo"; recSecs = secs;
+    showVideo(new Blob(out, {type:r.mimeType || "video/webm"}), r.mimeType || "video/webm", secs, w > 2000, true);
+  }catch(err){
+    joining = false; $("jGo").disabled = false; $("jGo").textContent = "Unir";
+    $("jMsg").textContent = "No se pudo unir: " + (err && err.message ? `no pude abrir "${err.message}".` : "probá de nuevo.");
+  }finally{ setTimeout(() => urls.forEach(u => URL.revokeObjectURL(u)), 1000); }
+}
+
 /* ================= Keyboard ================= */
 document.addEventListener("keydown", e => {
   const tag = e.target.tagName, typing = tag === "INPUT" && !["checkbox","radio","range","color"].includes(e.target.type) || tag === "TEXTAREA";
@@ -2448,12 +2585,13 @@ document.addEventListener("keydown", e => {
     else if(["ArrowLeft","ArrowUp","PageUp"].includes(e.key)){ e.preventDefault(); back(); }
     else if(e.key === "Home"){ e.preventDefault(); toStart(); }
     else if(e.key.toLowerCase() === "z"){ e.preventDefault(); toggleZoom(); }
+    else if(e.key.toLowerCase() === "p"){ e.preventDefault(); togglePause(); }
     else if(e.key === "Escape"){ e.preventDefault(); finishStudio(); }
     return;
   }
   if(openFloat){ if(e.key === "Escape"){ e.preventDefault(); closeFloat(true); } else if(openFloat.kind === "menu" && ["ArrowDown","ArrowUp"].includes(e.key)){ e.preventDefault(); const its = [...openFloat.el.querySelectorAll("button:not(:disabled)")], k = its.indexOf(document.activeElement); its[(k + (e.key === "ArrowDown" ? 1 : its.length - 1)) % its.length].focus(); } return; }
   const open = [...document.querySelectorAll(".modal")].filter(m => !m.hidden);
-  if(open.length){ if(e.key === "Escape"){ const m = open[open.length-1]; if(m.id === "mAsk") $("askNo").click(); else if(m.id !== "mVideo") closeModal(m.id); } return; }
+  if(open.length){ if(e.key === "Escape"){ const m = open[open.length-1]; if(m.id === "mAsk") $("askNo").click(); else if(m.id === "mJoin") $("jClose").click(); else if(m.id !== "mVideo") closeModal(m.id); } return; }
   const mod = e.ctrlKey || e.metaKey;
   if(mod && !typing && e.key.toLowerCase() === "z"){ e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if(mod && !typing && e.key.toLowerCase() === "y"){ e.preventDefault(); redo(); return; }
@@ -2877,6 +3015,7 @@ function cardInspHTML(c, i){
     <div class="iacts">
       <button class="btn sm" data-act="img">${ICON(src ? "crop" : "image")}${src ? "Recortar" : "Elegir imagen"}</button>
       <button class="btn sm" data-act="zoom" ${src ? "" : "disabled"} title="Marcar zooms para recorrer la carta">${ICON("zoom")}Zooms${zs ? ` ${zs}` : ""}</button>
+      <button class="btn sm" data-act="recfrom" title="Grabar una parte que empieza en esta carta">Grabar desde acá</button>
       ${src ? `<button class="btn sm" data-act="replace" title="Cambiar la imagen de la carta">${ICON("image")}Cambiar<span class="long">imagen</span></button>` : ""}
     </div>
     <label class="toggle"><span>Me falta esta carta<small>Su bolsillo queda vacío y el checklist dice “falta”.</small></span><input type="checkbox" data-k="falta"${c.falta ? " checked" : ""}></label>
@@ -2938,6 +3077,7 @@ $("insp").addEventListener("change", e => {
   if(t.dataset.vk === "musica"){ checkpoint(); P().video.musica = t.value; dirty(); }
 });
 $("insp").addEventListener("click", e => {
+  if(e.target.closest("#joinOpen")){ openJoin(); return; }
   const b = e.target.closest("[data-act],[data-sa]"); if(!b || b.disabled) return;
   if(b.dataset.sa) return sceneAction(b);
   const list = cards(), i = list.findIndex(c => c.id === selCard), c = list[i]; if(!c) return;
@@ -2945,6 +3085,12 @@ $("insp").addEventListener("click", e => {
   if(act === "img"){ if(cardSrc(c)) openEditor(c); else { pickFor = c.id; $("one").click(); } return; }
   if(act === "replace"){ pickFor = c.id; $("one").click(); return; }
   if(act === "zoom"){ openZoom(c); return; }
+  if(act === "recfrom"){
+    if(!VM.on){ openStudio(true, {card:i}); return; }
+    const k = scenes().findIndex(s => { if(s.tipo !== "binder") return false; const [a, b] = parseRange(s.cartas); return i >= a && i <= b; });
+    if(k < 0){ notice("Esta carta no está en ningún tramo de binder del plan del video."); return; }
+    openStudio(true, {scene:k, card:i}); return;
+  }
   if(act === "join"){
     const prev = list[i - 1]; if(!prev) return; checkpoint();
     const pg = String(prev.grupo || "").trim();
@@ -2960,6 +3106,7 @@ $("insp").addEventListener("click", e => {
 function sceneAction(b){
   const list = scenes(), i = list.findIndex(s => s.id === selScene), act = b.dataset.sa; if(i < 0) return;
   if(act === "show"){ selectScene(i, true); return; }
+  if(act === "rec"){ const f = $("insp").querySelector("[data-from]"), card = f ? clamp((+f.value || 1) - 1, 0, cards().length - 1) : null; openStudio(true, {scene:i, card}); return; }
   if(act === "del" && !b.classList.contains("armed")){ arm(b, "¿Quitar? Tocá otra vez"); return; }
   checkpoint();
   if(act === "up" && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
