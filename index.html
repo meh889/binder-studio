@@ -64,10 +64,20 @@ button,select,input,textarea{font:inherit;color:inherit}
   .btn.primary:hover:not(:disabled){background:#fff}
   .btn.rec:hover:not(:disabled){background:#bb2219}
 }
+#record small{font-size:12.5px;font-weight:500;margin-left:-1px}
+.split.off .btn.rec{background:var(--glass);color:var(--dim)}
+.segpick{display:flex;gap:2px;padding:3px;border-radius:9px;background:var(--case)}
+.segpick button{flex:1 1 0;min-height:30px;border:0;border-radius:7px;background:transparent;color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}
+.segpick button[aria-pressed="true"]{background:var(--ink);color:var(--case)}
+.segpick button:disabled{opacity:.38;cursor:default}
+@media (hover:hover) and (pointer:fine){.segpick button:hover:not([aria-pressed="true"]):not(:disabled){color:var(--ink)}}
+.nextpart{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 14px;border-radius:var(--r);background:var(--glass);color:var(--dim);line-height:1.45}
+.nextpart span{flex:1 1 auto;min-width:0}.nextpart b{color:var(--ink)}
+.btn.brandbtn[aria-pressed="true"]{background:var(--ink);color:var(--case)}
 .split{display:inline-flex}.split .btn:first-child{border-radius:var(--r-sm) 0 0 var(--r-sm)}.split .btn:last-child{border-radius:0 var(--r-sm) var(--r-sm) 0;box-shadow:inset 1px 0 0 rgba(0,0,0,.25)}
-input[type=text],input[type=search],textarea,select{width:100%;min-width:0;background:var(--case);border:0;border-radius:var(--r-sm);padding:8px 10px;color:var(--ink);box-shadow:inset 0 0 0 1px transparent;transition:box-shadow 140ms ease}
+input[type=text],input[type=search],input[type=number],textarea,select{width:100%;min-width:0;background:var(--case);border:0;border-radius:var(--r-sm);padding:8px 10px;color:var(--ink);box-shadow:inset 0 0 0 1px transparent;transition:box-shadow 140ms ease}
 input::placeholder,textarea::placeholder{color:var(--faint)}
-input[type=text]:focus,input[type=search]:focus,textarea:focus,select:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--light)}
+input[type=text]:focus,input[type=search]:focus,input[type=number]:focus,textarea:focus,select:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--light)}
 select{appearance:none;padding-right:30px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none' stroke='%2397a1a6' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center}
 textarea{resize:vertical;min-height:64px;line-height:1.5}
 input[type=range]{width:100%;accent-color:var(--ink)}
@@ -91,14 +101,15 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .app{display:grid;grid-template-rows:56px minmax(0,1fr);height:100dvh}
 .top{display:flex;align-items:center;gap:10px;padding:0 14px 0 18px;background:var(--case);box-shadow:inset 0 -1px 0 var(--glass);min-width:0}
 .wordmark{font-weight:800;font-size:17px;letter-spacing:-.01em;white-space:nowrap;margin-right:6px}.wordmark span{color:var(--dim);font-weight:600}
-.folderbtn{max-width:300px}.folderbtn .name{overflow:hidden;text-overflow:ellipsis}.folderbtn .count{color:var(--dim);font-weight:500}
-.save{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--dim);white-space:nowrap}
-.save::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.folderbtn{max-width:300px;min-width:0;flex:0 1 auto}.folderbtn .name{overflow:hidden;text-overflow:ellipsis}.folderbtn .count{color:var(--dim);font-weight:500}
+.save{display:block;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;color:var(--dim);white-space:nowrap}
+.save::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--faint);vertical-align:1px}
 .save.ok::before{background:var(--mint)}.save.dirty::before{background:var(--yel)}
-.views{display:flex;gap:2px;margin-left:14px;background:var(--shelf);border-radius:9px;padding:3px}
-.views button{border:0;background:transparent;color:var(--dim);font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:background-color 140ms ease,color 140ms ease}
+.views{display:flex;flex:none;gap:2px;margin-left:14px;background:var(--shelf);border-radius:9px;padding:3px}
+.views button{border:0;background:transparent;color:var(--dim);font-weight:700;white-space:nowrap;padding:6px 14px;border-radius:7px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:background-color 140ms ease,color 140ms ease}
 .views button small{font-weight:500;color:var(--faint);font-size:12px}
 .views button[aria-selected="true"]{background:var(--ink);color:var(--case)}.views button[aria-selected="true"] small{color:#4b5459}
+.brandbtn .sw{width:11px;height:11px;border-radius:50%;background:var(--sw,var(--yel));box-shadow:0 0 0 2px rgba(233,238,240,.18)}
 @media (hover:hover) and (pointer:fine){.views button:hover:not([aria-selected="true"]){color:var(--ink)}}
 .grow{flex:1 1 auto}
 .work{display:grid;grid-template-columns:340px minmax(0,1fr) 360px;min-height:0}
@@ -117,7 +128,7 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:0;border-radius:999px;background:var(--glass);color:var(--dim);font-size:13px;font-weight:600;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}
 .chip i{width:8px;height:8px;border-radius:2px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--case)}
-.chip b{font-weight:600;color:inherit;opacity:.75}
+.chip b{font-weight:600;color:inherit}
 .list{list-style:none;margin:0;padding:2px 8px 24px}
 .item{position:relative;display:flex;align-items:stretch;border-radius:var(--r);content-visibility:auto;contain-intrinsic-size:auto 78px}
 .item .pick{flex:1;min-width:0;display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:8px 8px 8px 4px;border:0;background:transparent;text-align:left;border-radius:var(--r);cursor:pointer}
@@ -138,16 +149,22 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .toploader.over{box-shadow:inset 0 0 0 2px var(--ink)}
 .toploader .busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(16,19,21,.75);font-size:10px}
 .it-t{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.it-m{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.it-m{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:12.5px;color:var(--dim);overflow:hidden;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .it-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .item.intro .pick{grid-template-columns:44px minmax(0,1fr)}
+.item.vrow{margin-bottom:9px}.item.vrow::after{content:"";position:absolute;left:12px;right:12px;bottom:-5px;height:1px;background:var(--glass)}
+.gsp{width:22px;flex:none}
 .cover{width:44px;aspect-ratio:63/88;border-radius:5px;background:var(--glass);display:grid;place-items:center;color:var(--dim)}
 .listnote{padding:8px 16px 0;font-size:12.5px;color:var(--dim)}
 .drophint{margin:4px 16px 0;font-size:12.5px;color:var(--faint)}
 .side.over{box-shadow:inset 0 0 0 2px var(--light)}
 .scene-n{font-variant-numeric:tabular-nums;color:var(--dim);font-weight:600;font-size:13px}
 .sc-ic{width:44px;height:44px;border-radius:var(--r-sm);background:var(--glass);display:grid;place-items:center;color:var(--dim);font-weight:800;font-size:13px}
-.chap{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:var(--glass);color:var(--ink);font-size:12px;font-weight:600}
+.chap{display:inline-block;height:20px;line-height:20px;padding:0 8px;border-radius:999px;background:var(--glass);color:var(--ink);font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chaphead{list-style:none;display:flex;align-items:center;gap:8px;padding:12px 12px 5px 30px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.chaphead small{font-size:12px;font-weight:500;color:var(--dim)}
+.chaphead::after{content:"";flex:1 1 auto;height:1px;background:var(--glass)}
+.chap small{color:var(--dim);font-size:11.5px;font-weight:500}
 .needs{margin:0 16px 10px;padding:12px 14px;border-radius:var(--r);background:var(--glass);font-size:13px;line-height:1.55}
 .needs ul{margin:6px 0 0;padding-left:18px}
 .needs b{color:var(--ink)}
@@ -161,16 +178,20 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 
 /* ---------- stage column ---------- */
 .center{background:radial-gradient(90% 46% at 50% 0%,rgba(233,238,240,.05),transparent 72%);display:flex;flex-direction:column;gap:12px;padding:16px 20px 18px;min-width:0;min-height:0;overflow:auto}
-.canvasHost{position:relative;width:min(100%,calc((100dvh - 56px - 190px)*16/9));margin:0 auto;border-radius:var(--r);overflow:hidden;background:#000;box-shadow:0 0 0 1px var(--glass),0 22px 60px rgba(0,0,0,.55)}
+.center{--below:190px}.center.has-script{--below:310px}
+.canvasHost{position:relative;width:min(100%,calc((100dvh - 56px - var(--below))*16/9));margin:0 auto;border-radius:var(--r);overflow:hidden;background:#000;box-shadow:0 0 0 1px var(--glass),0 22px 60px rgba(0,0,0,.55)}
 .canvasHost canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;cursor:pointer}
-.transport{display:flex;align-items:center;gap:6px;width:min(100%,calc((100dvh - 56px - 190px)*16/9));margin:0 auto;min-width:0}
+.transport{display:flex;align-items:center;gap:6px;width:min(100%,calc((100dvh - 56px - var(--below))*16/9));margin:0 auto;min-width:0}
 .where{margin-left:8px;font-weight:700;white-space:nowrap}.where small{color:var(--dim);font-weight:500;font-size:13px;margin-left:4px}
 .nextup{display:flex;align-items:center;gap:10px;min-width:0;max-width:340px;padding:4px 12px 4px 4px;border-radius:var(--r);background:var(--shelf)}
 .nextup .toploader{width:26px;padding:2px}
 .nextup .lbl{display:block;font-size:12px}.nextup .nx{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nextup .nx b{font-weight:700}
-.modesel{width:auto;flex:none;background-color:var(--shelf);font-weight:600}
 .nextup{flex:0 1 auto}
-.strip{display:flex;gap:4px;width:min(100%,calc((100dvh - 56px - 190px)*16/9));margin:0 auto;min-height:58px;overflow-x:auto}
+.strip{display:flex;gap:4px;width:min(100%,calc((100dvh - 56px - var(--below))*16/9));margin:0 auto;min-height:58px;overflow-x:auto;flex:none}
+.scriptbox{display:flex;flex-direction:column;gap:6px;width:min(100%,calc((100dvh - 56px - var(--below))*16/9));margin:0 auto;flex:1 0 110px}
+.scriptbox label{font-size:12.5px;color:var(--dim)}.scriptbox label b{color:var(--ink);font-weight:700}
+.scriptbox textarea{flex:1 1 auto;min-height:84px;resize:none;background:var(--shelf);padding:10px 12px;font-size:16px;line-height:1.55}
+.scriptbox textarea:disabled{color:var(--faint)}
 .seg{flex:var(--w,1) 1 0;min-width:0;border:0;padding:8px 9px;border-radius:8px;background:var(--shelf);color:var(--dim);display:flex;flex-direction:column;justify-content:space-between;gap:6px;cursor:pointer;text-align:left;transition:background-color 140ms ease}
 .seg b{display:block;font-size:12.5px;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden}
 .seg.tight{justify-content:center;padding:8px 6px}
@@ -179,7 +200,7 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .seg.on{background:var(--rail);box-shadow:inset 0 2px 0 var(--light)}
 @media (hover:hover) and (pointer:fine){.seg:not(.on):hover{background:var(--glass)}}
 .pockets{display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden}
-.pockets i{width:7px;height:9px;border-radius:2px;background:#2d343a;flex:none}
+.pockets i{width:7px;height:9px;border-radius:2px;background:#5f6a72;flex:none}
 .pockets i.done{background:var(--mint)}.pockets i.miss{background:var(--rec)}.pockets i.now{background:var(--ink)}
 .seg .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--pink);margin-left:5px;vertical-align:middle}
 
@@ -202,11 +223,22 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:var(--r);background:var(--glass);cursor:pointer}
 .toggle span small{display:block;font-size:12.5px;color:var(--dim)}
 .ifoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.ihd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.fromrow{display:flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:var(--r);background:var(--glass)}.fromrow .lbl{flex:1 1 auto}
+.sfoot{display:flex;flex-direction:column;gap:10px;margin-top:6px;padding-top:14px;box-shadow:inset 0 1px 0 var(--glass)}
+.sfoot .iacts{align-items:center}
+.more{border-radius:var(--r);background:var(--glass)}
+.more summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;cursor:pointer;list-style:none;font-weight:700;border-radius:var(--r)}
+.more summary::-webkit-details-marker{display:none}
+.more summary small{display:block;font-size:12.5px;font-weight:500;color:var(--dim)}
+.more summary .ic{color:var(--dim);transition:transform 160ms var(--ease-out)}
+.more[open] summary .ic{transform:rotate(180deg)}
+.morebody{display:flex;flex-direction:column;gap:12px;padding:2px 12px 14px}
 .hint{color:var(--dim);line-height:1.55}
 .hint b{color:var(--ink)}
 .section{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:var(--r-lg);background:var(--glass)}
 .section h3{margin:0;font-size:15px;font-weight:800}
-.section input[type=text],.section select,.section textarea,.section input[type=color]{background-color:var(--case)}
+.section input[type=text],.section input[type=number],.section select,.section textarea,.section input[type=color]{background-color:var(--case)}
 .themes{display:flex;flex-wrap:wrap;gap:6px}
 .theme{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 11px 0 9px;border:0;border-radius:999px;background:var(--case);color:var(--ink);font-weight:600;font-size:13px;cursor:pointer}
 .theme i{width:12px;height:12px;border-radius:50%;margin-right:-4px;box-shadow:0 0 0 2px var(--case)}
@@ -290,8 +322,8 @@ code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:
 .zitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);background:var(--glass);cursor:pointer}
 .zitem.on{background:var(--ink);color:var(--case)}
 .zitem b{font-variant-numeric:tabular-nums}
-video.preview{width:100%;max-height:60vh;background:#000;border-radius:var(--r)}
-.chapbox textarea{min-height:120px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px}
+video.preview{width:100%;max-height:max(220px,calc(100dvh - 480px));background:#000;border-radius:var(--r)}
+.chapbox textarea{min-height:88px;height:88px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px}
 .tablewrap{overflow-x:auto;border-radius:var(--r-sm);background:var(--case)}
 table.map{border-collapse:collapse;font-size:12.5px;min-width:100%}
 table.map th,table.map td{padding:7px 9px;text-align:left;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;box-shadow:inset 0 -1px 0 var(--glass)}
@@ -341,14 +373,14 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
     <nav class="views" role="tablist" aria-label="Vistas">
       <button role="tab" id="tabCards" aria-selected="true" aria-controls="paneCards">Cartas <small id="tabCardsN"></small></button>
       <button role="tab" id="tabVideo" aria-selected="false" aria-controls="paneVideo">Plan del video <small id="tabVideoN"></small></button>
-      <button role="tab" id="tabBrand" aria-selected="false" aria-controls="paneBrand">Marca</button>
     </nav>
+    <button class="btn ghost brandbtn" id="tabBrand" aria-pressed="false" aria-controls="paneBrand" title="Colores, logo y lo que se ve en el video"><i class="sw" aria-hidden="true"></i>Marca</button>
     <span class="grow"></span>
     <button class="btn icon ghost" id="undo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer"><svg class="ic"><use href="#i-undo"/></svg></button>
     <button class="btn icon ghost" id="redo" title="Rehacer (Ctrl+Shift+Z)" aria-label="Rehacer"><svg class="ic"><use href="#i-redo"/></svg></button>
     <button class="btn" id="rehearse" title="Practicar la toma sin grabar"><svg class="ic fill"><use href="#i-play"/></svg>Ensayar</button>
-    <div class="split">
-      <button class="btn rec" id="record"><svg class="ic fill" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5"/></svg>Grabar</button>
+    <div class="split" id="recSplit">
+      <button class="btn rec" id="record"><svg class="ic fill" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5"/></svg>Grabar<small id="recWhat"></small></button>
       <button class="btn rec icon" id="recSettings" aria-haspopup="dialog" aria-expanded="false" title="Ajustes de grabación" aria-label="Ajustes de grabación"><svg class="ic"><use href="#i-sliders"/></svg></button>
     </div>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -384,12 +416,11 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
       </div>
       <div id="paneVideo" role="tabpanel" aria-labelledby="tabVideo" class="side" style="flex:1" hidden>
         <div class="panel-h"><h2>Escenas <small id="planMeta"></small></h2><span class="grow"></span>
-          <button class="btn sm" id="sceneMenu" aria-haspopup="menu"><svg class="ic"><use href="#i-plus"/></svg>Escena</button>
-          <button class="btn sm icon" id="planMore" aria-haspopup="menu" aria-label="Más opciones del plan"><svg class="ic"><use href="#i-more"/></svg></button></div>
+          <button class="btn sm" id="sceneMenu" aria-haspopup="menu"><svg class="ic"><use href="#i-plus"/></svg>Escena</button></div>
         <div class="needs" id="mediaNeeds" hidden></div>
         <div class="scroll"><ul class="list" id="scenes" aria-label="Escenas"></ul></div>
       </div>
-      <div id="paneBrand" role="tabpanel" aria-labelledby="tabBrand" class="side scroll" style="flex:1" hidden>
+      <div id="paneBrand" role="region" aria-label="Marca" class="side scroll" style="flex:1" hidden>
         <div class="panel-h"><h2>Marca</h2></div>
         <div class="insp" style="padding-top:0">
           <div class="section"><h3>Tema</h3><div class="themes" id="themes"></div>
@@ -419,7 +450,7 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
     </aside>
 
     <!-- centre: the stage -->
-    <main class="center" aria-label="Escenario">
+    <main class="center" id="stageCol" aria-label="Escenario">
       <div class="canvasHost" id="host"><canvas id="cv" width="1920" height="1080" aria-label="Escenario del video. Clic para avanzar."></canvas></div>
       <div class="transport">
         <button class="btn icon" id="home" title="Volver al principio (Inicio)" aria-label="Volver al principio"><svg class="ic"><use href="#i-first"/></svg></button>
@@ -429,9 +460,9 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
         <span class="where" id="where"></span>
         <span class="grow"></span>
         <div class="nextup" id="nextup" hidden></div>
-        <select id="modeSel" class="modesel" aria-label="Qué reproducir"><option value="video">Video completo</option><option value="binder">Solo binder</option></select>
       </div>
       <div class="strip" id="strip" aria-label="Recorrido"></div>
+      <div class="scriptbox" id="scriptBox" hidden><label for="scriptText" id="scriptLab">Guion</label><textarea id="scriptText" spellcheck="true"></textarea></div>
     </main>
 
     <!-- right: inspector -->
@@ -441,7 +472,7 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
         <h2>En pantalla</h2>
         <div class="section"><h3>Nombre del canal</h3>
           <label class="check"><input type="checkbox" id="b-handle-show" data-b="handle.show"> Mostrar</label>
-          <div class="fld"><label for="b-handle-text">Texto</label><input type="text" id="b-handle-text" data-b="handle.text"></div>
+          <div class="fld"><label for="b-handle-text">Texto</label><input type="text" id="b-handle-text" data-b="handle.text" placeholder="@mafiatcg"></div>
           <div class="fld"><label for="b-handle-pos">Posición</label><select id="b-handle-pos" data-b="handle.pos"></select></div>
         </div>
         <div class="section"><h3>Botón de suscripción</h3>
@@ -458,12 +489,16 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
 <!-- recording settings -->
 <div class="pop" id="recPop" role="dialog" aria-label="Ajustes de grabación" hidden>
   <h3>Grabación</h3>
+  <div class="fld"><span class="lab" id="rtLab">Qué graba</span><div class="segpick" role="group" aria-labelledby="rtLab"><button data-rt="video" aria-pressed="true">El video completo</button><button data-rt="binder" aria-pressed="false">Solo el binder</button></div></div>
+  <div class="fld"><span class="lab" id="rsLab">Desde dónde</span><div class="segpick" role="group" aria-labelledby="rsLab"><button data-rs="inicio" aria-pressed="true">Desde el principio</button><button data-rs="aca" aria-pressed="false">Desde acá</button></div><span class="lbl" id="rsHint"></span></div>
+  <div class="group">
   <div class="pair">
     <div class="fld"><label for="res">Calidad</label><select id="res"><option value="1" selected>1080p</option><option value="2">4K</option></select></div>
     <div class="fld"><label for="fps">Cuadros</label><select id="fps"><option value="60" selected>60 fps</option><option value="30">30 fps</option></select></div>
   </div>
   <div class="fld"><label for="hold">Al tocar → en el binder</label>
     <select id="hold"><option value="tap" selected>Queda en grande hasta el próximo toque</option><option value="1500">1,5 s en grande y se ubica sola</option><option value="2500">2,5 s en grande y se ubica sola</option><option value="4000">4 s en grande y se ubica sola</option></select></div>
+  </div>
   <div class="group">
     <label class="check"><input type="checkbox" data-au="mic"> Grabar mi voz</label>
     <div class="fld"><label for="a-micId">Micrófono</label><select id="a-micId" data-au="micId"><option value="">Micrófono predeterminado</option></select></div>
@@ -489,8 +524,8 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
     <div class="ptext" id="pText"></div>
     <div class="pnext" id="pNext"></div>
     <div><div class="lbl" style="margin-bottom:6px">Micrófono</div><div class="meter"><i id="micLvl"></i></div></div>
-    <div class="pkeys"><kbd>→</kbd> <kbd>Espacio</kbd> o clic: siguiente · <kbd>←</kbd> atrás · <kbd>Z</kbd> zoom · <kbd>P</kbd> pausa · <kbd>Esc</kbd> terminar<br>Esta columna no sale en el video. No cambies de pestaña mientras grabás.</div>
-    <div style="display:flex;gap:6px;align-items:center"><button class="btn sm" id="aMinus" aria-label="Achicar letra">A−</button><button class="btn sm" id="aPlus" aria-label="Agrandar letra">A+</button><span class="grow"></span><button class="btn primary" id="finish">Terminar</button></div>
+    <div class="pkeys"><kbd>→</kbd> <kbd>Espacio</kbd> o clic: siguiente · <kbd>←</kbd> atrás · <kbd>Z</kbd> zoom · <kbd>P</kbd> pausa · <kbd>Esc</kbd> terminar (grabando, primero pausa)<span id="rKey"> · <kbd>R</kbd> grabar desde acá</span><br>Esta columna no sale en el video. No cambies de pestaña mientras grabás.</div>
+    <div style="display:flex;gap:6px;align-items:center"><button class="btn sm" id="aMinus" aria-label="Achicar letra">A−</button><button class="btn sm" id="aPlus" aria-label="Agrandar letra">A+</button><span class="grow"></span><button class="btn rec" id="recHere" title="Grabar desde este punto (R)">Grabar desde acá</button><button class="btn primary" id="finish">Terminar</button></div>
     <div class="countdown" id="countdown" hidden></div>
   </aside>
 </div>
@@ -513,6 +548,7 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
     <p id="vInfo"></p>
     <div class="fld chapbox" id="chapBox" hidden><label for="chapText">Capítulos para la descripción de YouTube</label><textarea id="chapText" readonly></textarea>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn sm" id="chapCopy"><svg class="ic"><use href="#i-copy"/></svg>Copiar capítulos</button><span class="lbl">YouTube pide que el primero sea 0:00, al menos 3 capítulos y de 10 segundos o más.</span></div></div>
+    <div class="nextpart" id="nextPart" hidden><span id="nextPartT"></span><button class="btn rec sm" id="vNext">Grabar la siguiente</button></div>
     <div class="dlgfoot"><button class="btn ghost danger" id="vDiscard">Descartar</button><button class="btn" id="vSave">Descargar video</button><button class="btn primary" id="vFolder">Guardar en la carpeta</button></div>
   </div>
 </div>
@@ -620,7 +656,7 @@ const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(
 function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false,idioma:"",grupo:""}; }
 function newProject(name){ return {id:uid("p"),name,eyebrow:"Master list",title1:name,title2:"Master List",introLine:"Una especie, todas sus cartas",footer:"",cards:[]}; }
 function defaultBrand(){ return {marca:1,theme:"mafia",accent:"#fdca0d",accent2:"#3a5aa6",bg:"#231c2b",binder:"lila",font:"Big Shoulders Display",bgImage:null,bgDim:20,
-  logo:{url:null,pos:"tr",size:6,opacity:100,builtin:true}, handle:{show:false,text:"@tucanal",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
+  logo:{url:null,pos:"tr",size:6,opacity:100,builtin:true}, handle:{show:false,text:"",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
   show:{counter:true,strip:true,note:true,illustrator:true,variants:true,ghost:false,page:true,footer:true},
   audio:{mic:true, micId:"", sfx:true, sfxVol:70, musicVol:35, duck:true, listen:false}}; }
 function fixCard(c){ const n = {...newCard(), ...c}; if(!Array.isArray(n.zooms)) n.zooms = []; return n; }
@@ -1983,7 +2019,7 @@ function goScene(i, opts={}){
     VM.punch = 1.07; tween(430, v => VM.punch = 1.07 - .07*v, easeOut);
     playSfx("whoosh");
   } else { VM.flash = 0; VM.punch = 1; }
-  if(recording && s.capitulo) chapters.push({t:recElapsed(), name:s.capitulo});
+  if(recording){ sceneRecT = recElapsed(); if(s.capitulo) chapters.push({t:sceneRecT, name:s.capitulo}); }
   highlightScene(); updPrompter(); requestDraw();
 }
 function tweenZoom(z){ const f = {...VM.z}; return tween(700, v => { VM.z = {s:f.s + (z.s - f.s)*v, x:f.x + (z.x - f.x)*v, y:f.y + (z.y - f.y)*v}; }, easeInOut); }
@@ -2046,14 +2082,52 @@ function thumbHTML(c, eager){
   return `<span class="toploader">${src ? `<img src="${esc(src)}" alt=""${eager ? "" : ` loading="lazy"`} decoding="async">` : `<span class="none">${c && c.file ? "falta" : "sin imagen"}</span>`}${c && busy.has(c.id) ? `<span class="busy">…</span>` : ""}</span>`;
 }
 const nextHTML = nx => `${nx.card ? thumbHTML(nx.card, true) : ""}<span style="min-width:0"><span class="lbl">A un toque</span><span class="nx">${nx.html}</span></span>`;
+// The box under the stage edits what the teleprompter says at this point: the script of the card on stage
+// (the first one of a same-art group), or the guion of the scene.
+let scriptKey = "", scriptT = null;
+function snapGroup(cur, a, b){ for(let k = Math.max(0, a); k <= b;){ const [g0, g1] = groupAt(k, b); if(cur <= g1) return g0; k = g1 + 1; } return cur; }
+function scriptTarget(){
+  const cur = held ? held.i : idx, cardT = (a, b) => {
+    const i = held ? held.i : snapGroup(cur, a, b), c = cards()[i]; if(!c) return null;
+    const e = held && held.group ? held.end : groupAt(i, b)[1];
+    return {kind:"card", c, key:"c:" + c.id, label:e > i ? `Guion · <b>cartas ${i + 1}–${e + 1}</b> · ${esc(c.set || "")}, mismo arte` : `Guion · <b>carta ${i + 1}</b> · ${esc((c.set || "") + " " + (c.num || ""))}`,
+      ph:"Lo que decís cuando aparece esta carta. Sale en el teleprompter; si queda vacío, sale el dato en pantalla."};
+  };
+  if(VM.on){
+    const s = scenes()[VM.i]; if(!s) return null;
+    if(s.tipo === "binder" && cur >= VM.range[0]) return cardT(VM.range[0], VM.range[1]);
+    return {kind:"scene", s, key:"s:" + s.id, label:`Guion · <b>escena ${VM.i + 1}</b> · ${esc(sceneLabel(s))}`, ph:s.tipo === "binder" ? "Lo que decís antes de la primera carta del tramo. Con → en el escenario pasás al guion de cada carta." : "Lo que decís en esta escena. Sale en el teleprompter."};
+  }
+  return cur >= 0 ? cardT(0, cards().length - 1) : {kind:"none", key:"none", label:"Guion · <b>portada</b>", ph:"La portada no lleva guion: en el teleprompter dice que presentes la especie. Tocá → para ir a la primera carta."};
+}
+function syncScript(){
+  const t = (cards().length || scenes().length) ? scriptTarget() : null, ta = $("scriptText");
+  $("scriptBox").hidden = !t; $("stageCol").classList.toggle("has-script", !!t);
+  scriptT = t; if(!t){ scriptKey = ""; return; }
+  const val = t.kind === "card" ? t.c.script || "" : t.kind === "scene" ? t.s.guion || "" : "";
+  $("scriptLab").innerHTML = t.label; ta.placeholder = t.ph; ta.disabled = t.kind === "none";
+  if(t.key !== scriptKey || (document.activeElement !== ta && ta.value !== val)) ta.value = val;
+  scriptKey = t.key;
+}
+$("scriptText").addEventListener("input", e => {
+  const t = scriptT, v = e.target.value; if(!t || t.kind === "none") return;
+  if(t.kind === "card"){ checkpoint("f:" + t.c.id + ":script"); t.c.script = v; dirty(); refreshCard(cards().indexOf(t.c)); return; }
+  checkpoint("s:" + t.s.id + ":guion"); t.s.guion = v; dirty(); refreshSceneRow(scenes().indexOf(t.s)); renderStrip();
+});
+function refreshSceneRow(i){
+  const s = scenes()[i], row = document.querySelector(`#scenes .item[data-i="${i}"]`); if(!s || !row) return;
+  const tmp = document.createElement("ul"); tmp.innerHTML = sceneItemHTML(s, i); row.replaceWith(tmp.firstElementChild);
+}
 function updStage(){
   const w = $("where"), n = cards().length, nothing = !n && !(VM.on && scenes().length);
-  for(const id of ["home", "prev", "next", "zoomBtn", "rehearse", "record"]) $(id).disabled = nothing;
+  for(const id of ["home", "prev", "next", "zoomBtn"]) $(id).disabled = nothing;
+  const none = !n && !scenes().length; $("rehearse").disabled = $("record").disabled = none; $("recSplit").classList.toggle("off", none);
+  updRecUI();
   if(VM.on){ const list = scenes(), s = list[VM.i]; w.innerHTML = s ? `Escena ${VM.i + 1}<small>de ${list.length} · ${esc(sceneLabel(s))}</small>` : `<small>${list.length} escenas</small>`; }
   else { const cur = held ? held.i : idx; w.innerHTML = !n ? "" : cur < 0 ? `Portada<small>${n} cartas</small>` : `Carta ${cur + 1}<small>de ${n} · página ${Math.floor(cur/PER) + 1} de ${Math.ceil(n/PER)}</small>`; }
   const box = $("nextup"); box.hidden = VM.on ? !scenes().length : !n;
   if(!box.hidden) box.innerHTML = nextHTML(VM.on ? nextHint() : nextBinder());
-  renderStrip();
+  renderStrip(); syncScript();
 }
 // The strip under the stage: scenes sized by their estimated time, or binder pages sized by how many cards they hold.
 function renderStrip(){
@@ -2062,8 +2136,8 @@ function renderStrip(){
     const list = scenes();
     const secs = list.map(estSecs), total = secs.reduce((a, b) => a + b, 0) || 1, room = Math.max(1, el.clientWidth - 4*(list.length - 1));
     el.innerHTML = list.map((s, i) => {
-      const w = room*secs[i]/total, wide = w >= 118, name = s.capitulo || (wide ? sceneLabel(s) : SCENE_WORD[s.tipo] || sceneLabel(s));
-      return `<button class="seg${i === VM.i ? " on" : ""}${wide ? "" : " tight"}" style="--w:${secs[i].toFixed(1)}" data-scene="${i}" title="Escena ${i + 1}: ${esc(sceneLabel(s))}${s.capitulo ? " · " + esc(s.capitulo) : ""} · unos ${fmtDur(secs[i])}"><b>${esc(name)}${sceneNeeds(s).length ? `<span class="dot" title="Falta un archivo"></span>` : ""}</b>${wide ? `<small>${fmtDur(secs[i])}</small>` : ""}</button>`;
+      const w = room*secs[i]/total, wide = w >= 118, name = s.capitulo || (wide ? sceneLabel(s) : stripWord(s));
+      return `<button class="seg${i === VM.i ? " on" : ""}${wide ? "" : " tight"}" style="--w:${secs[i].toFixed(1)}" data-scene="${i}" title="Escena ${i + 1}: ${esc(sceneLabel(s))}${s.capitulo ? " · " + esc(s.capitulo) : ""} · ${aboutDur(secs[i])}"><b>${esc(name)}${sceneNeeds(s).length ? `<span class="dot" title="Falta un archivo"></span>` : ""}</b>${wide ? `<small>${fmtDur(secs[i])}</small>` : ""}</button>`;
     }).join("");
     return;
   }
@@ -2086,7 +2160,7 @@ function renderStrip(){
 $("strip").addEventListener("click", e => {
   const b = e.target.closest(".seg"); if(!b) return;
   if(b.dataset.scene != null) return selectScene(+b.dataset.scene);
-  if(b.dataset.page != null){ if(VM.on){ $("modeSel").value = "binder"; setMode("binder"); } drawAt(Math.min(cards().length - 1, +b.dataset.page*PER)); }
+  if(b.dataset.page != null){ if(VM.on) setMode("binder"); drawAt(Math.min(cards().length - 1, +b.dataset.page*PER)); }
 });
 function renderPStrip(){
   let h = "";
@@ -2188,6 +2262,11 @@ async function listMics(){
 
 /* ---------- scene list + scene inspector ---------- */
 // Short names for narrow strip segments: whole words, never cut.
+// A short name for a narrow strip segment: a cartel goes by its first real word, so two carteles side by side differ.
+function stripWord(s){
+  if(s.tipo === "cartel"){ const w = String(s.texto || "").replace(/[*_~¿¡?!.,:;"“”]/g, " ").split(/\s+/).find(x => x.length >= 3); if(w) return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }
+  return SCENE_WORD[s.tipo] || sceneLabel(s);
+}
 const SCENE_WORD = {rafaga:"Ráfaga", titulo:"Portada", cartel:"Cartel", binder:"Binder", carta:"Carta", media:"Clip", lista:"Lista", cierre:"Cierre"};
 function sceneSummary(s){
   const items = (s.items || []).filter(x => String(x).trim());
@@ -2214,6 +2293,7 @@ function estSecs(s){
   return Math.max(2, sec);
 }
 const fmtDur = s => s < 60 ? `${Math.round(s)} s` : `${Math.round(s/60)} min`;
+const aboutDur = s => s >= 60 && Math.round(s/60) === 1 ? "un minuto" : "unos " + fmtDur(s);
 function sceneTags(s){
   const t = [];
   if(sceneNeeds(s).length) t.push(["pink", "falta archivo"]);
@@ -2226,21 +2306,33 @@ function sceneItemHTML(s, i){
   return `<li class="item${on ? " sel" : ""}${cur ? " cur" : ""}" data-i="${i}" data-id="${s.id}">
     <button class="grip" data-drag aria-label="Arrastrar para reordenar la escena ${i+1}" title="Arrastrar para reordenar">${ICON("grip","fill")}</button>
     <button class="pick" data-pick><span class="sc-ic" aria-hidden="true">${String(i+1).padStart(2, "0")}</span><span style="min-width:0">
-      <span class="it-t">${esc(sceneLabel(s))}${s.capitulo ? ` <span class="chap">${esc(s.capitulo)}</span>` : ""}</span>
+      <span class="it-t">${esc(sceneLabel(s))}</span>
       <span class="it-m">${esc(sceneSummary(s))}</span>
       ${tags.length ? `<span class="it-tags">${tags.map(([c, x]) => `<span class="tag ${c}">${x}</span>`).join("")}</span>` : ""}</span></button></li>`;
 }
+// The first row of the plan is the video itself: music, chapters and joining parts, always one click away.
+function videoRowHTML(){
+  const list = scenes(), total = list.reduce((a, s) => a + estSecs(s), 0), mus = (P().video || {}).musica || "";
+  return `<li class="item vrow${selScene ? "" : " sel"}"><span class="gsp" aria-hidden="true"></span><button class="pick" data-pick data-video><span class="sc-ic" aria-hidden="true">${ICON("play","fill")}</span><span style="min-width:0">
+    <span class="it-t">El video</span><span class="it-m">${list.length ? `${list.length} escenas · ${fmtDur(total)}` : "Sin escenas todavía"} · ${mus ? esc(mus.replace(/^musica\//, "")) : "sin música"}</span></span></button></li>`;
+}
+function selectVideo(){
+  selScene = null;
+  document.querySelectorAll("#scenes .item.sel").forEach(r => r.classList.remove("sel"));
+  const row = document.querySelector("#scenes .vrow"); if(row) row.classList.add("sel");
+  renderInspector(); syncScript(); $("right").scrollTop = 0;
+}
 function renderScenes(){
   const list = scenes(), total = list.reduce((a, s) => a + estSecs(s), 0);
-  $("scenes").innerHTML = list.length ? list.map(sceneItemHTML).join("") : `<li class="onboard" style="list-style:none;margin:8px"><h3>Todavía no hay plan</h3><ol><li>Escribí el guion del video y pasáselo a Claude en el chat.</li><li>Claude arma las escenas y deja <code>video.json</code> en tu carpeta: aparece acá solo.</li><li>También podés sumar escenas a mano con <b>+ Escena</b>.</li></ol></li>`;
+  // a chapter is a heading over the scene where it starts, so the plan reads in the same sections as the YouTube chapters
+  $("scenes").innerHTML = videoRowHTML() + (list.length ? list.map((s, i) => (String(s.capitulo || "").trim() ? `<li class="chaphead"><small>Capítulo</small>${esc(s.capitulo)}</li>` : "") + sceneItemHTML(s, i)).join("") : `<li class="onboard" style="list-style:none;margin:8px"><h3>Todavía no hay plan</h3><ol><li>Escribí el guion del video y pasáselo a Claude en el chat.</li><li>Claude arma las escenas y deja <code>video.json</code> en tu carpeta: aparece acá solo.</li><li>También podés sumar escenas a mano con <b>+ Escena</b>.</li></ol></li>`);
   $("planMeta").textContent = list.length ? `${list.length} · ${fmtDur(total)}` : "";
   $("tabVideoN").textContent = list.length || "";
   const needs = list.flatMap(sceneNeeds), uniq = [...new Map(needs.map(x => [x.path, x])).values()];
   const box = $("mediaNeeds");
   box.hidden = !uniq.length;
   if(uniq.length) box.innerHTML = `<span class="tag pink">${uniq.length === 1 ? "falta 1 archivo" : `faltan ${uniq.length} archivos`}</span> Guardalos con este nombre dentro de la carpeta y aparecen solos:<ul>${uniq.map(x => `<li><code>${esc(x.path)}</code>${x.pide ? " — " + esc(x.pide) : ""}</li>`).join("")}</ul>`;
-  $("modeSel").disabled = !list.length;
-  if(!list.length && $("modeSel").value === "video"){ $("modeSel").value = "binder"; setMode("binder"); }
+  syncStage();
   if(view === "video") renderInspector();
   updStage();
 }
@@ -2254,20 +2346,30 @@ function selectScene(i, play){
   selScene = s.id;
   document.querySelectorAll("#scenes .item.sel").forEach(r => r.classList.remove("sel"));
   const row = document.querySelector(`#scenes .item[data-i="${i}"]`); if(row){ row.classList.add("sel"); row.scrollIntoView({block:"nearest"}); }
-  if($("modeSel").value !== "video"){ $("modeSel").value = "video"; setMode("video", true); }
+  if(!VM.on) binderAt = held ? held.i : idx;
   VM.on = true; goScene(i, {silent:!play});
   renderInspector(); $("right").scrollTop = 0;
 }
+// The stage plays the video plan or only the binder. `keep` comes back to where each one was: the scene, or the card.
+let binderAt = -1;
 function setMode(m, keep){
-  const on = m === "video" && scenes().length > 0;
+  const on = m === "video" && scenes().length > 0, n = scenes().length;
+  if(on && !VM.on) binderAt = held ? held.i : idx;
   VM.on = on;
-  if(on){ if(!keep) goScene(0, {silent:true}); }
-  else { cancelAnim(); pauseMedia(); drawAt(-1); }
+  if(on){ const k = scenes().findIndex(s => s.id === selScene); goScene(keep && VM.i >= 0 && VM.i < n ? VM.i : k >= 0 && keep ? k : 0, {silent:true}); }
+  else { cancelAnim(); pauseMedia(); drawAt(keep ? binderAt : -1); }
   highlightScene(); requestDraw();
 }
-$("modeSel").onchange = e => { try{ localStorage.setItem("binder.mode", e.target.value); }catch(err){} setMode(e.target.value); e.target.blur(); };
+// The stage follows the open tab: the plan plays the video, the cards show the binder. Marca leaves it as it was.
+function syncStage(){
+  if(studioOpen) return;
+  const n = scenes().length, want = !n || view === "cards" ? "binder" : view === "video" ? "video" : null;
+  if(want === null || (want === "video") === VM.on) return;
+  setMode(want, true);
+}
 $("scenes").addEventListener("click", e => {
   const b = e.target.closest("[data-pick]"); if(!b) return;
+  if(b.hasAttribute("data-video")) return selectVideo();
   selectScene(+b.closest(".item").dataset.i);
 });
 function sceneFieldHTML(s, k, l, kind, opts){
@@ -2278,27 +2380,58 @@ function sceneFieldHTML(s, k, l, kind, opts){
   else ctl = `<input type="text" id="${id}" data-sk="${k}" value="${esc(val)}">`;
   return `<div class="fld"><label for="${id}">${esc(l)}</label>${ctl}</div>`;
 }
+// What the scene shows comes first; its type and its place in the plan go at the bottom. The guion is under the stage.
+const FONDOS = [["blanco", "Papel blanco"], ["marca", "Playmat"], ["acento", "Cartulina del color principal"], ["acento2", "Cartulina del color secundario"], ["carta", "Una carta del binder, desenfocada"], ["archivo", "Una imagen o clip de media/"]];
+function fondoMode(s){
+  const f = String(s.fondo || "").trim(), low = f.toLowerCase();
+  if(!f) return s.estilo === "golpe" ? "blanco" : "marca";
+  if(low === "negro") return "marca";
+  if(low === "secundario") return "acento2";
+  if(/^carta\s/i.test(f)) return "carta";
+  if(/\.\w{2,4}$/.test(f)) return "archivo";
+  return FONDOS.some(x => x[0] === low) ? low : "marca";
+}
+function sceneFieldsHTML(s){
+  if(s.tipo === "titulo") return `<p class="hint" style="margin:0">La portada usa el título de la especie y la cantidad de cartas. Es la misma portada que abre el binder.</p>${portadaFields()}`;
+  return SCENE_TYPES[s.tipo].fields.map(([k, l, kind, opts]) => {
+    if(k === "valor" && s.estilo !== "contador") return "";
+    if(k === "pide" && s.media && files.has(s.media)) return "";
+    if(k === "items" && s.tipo === "rafaga") return sceneFieldHTML(s, k, "Elementos, uno por línea", kind) + `<span class="lbl" style="margin-top:-8px">Un archivo con lo que es (<code>media/fuego.gif | llamas</code>), <code>carta SH11/99</code>, <code>texto 29 CARTAS</code> o <code>color</code>.</span>`;
+    if(k === "fondo"){
+      const m = fondoMode(s), f = String(s.fondo || "").trim(), val = m === "carta" ? f.replace(/^carta\s+/i, "") : m === "archivo" ? f : "";
+      return `<div class="fld"><label for="sf-${s.id}-fondo">Fondo</label><select id="sf-${s.id}-fondo" data-fondo>${FONDOS.map(([v, t]) => `<option value="${v}"${v === m ? " selected" : ""}>${t}</option>`).join("")}</select>
+        ${m === "carta" || m === "archivo" ? `<input type="text" id="sf-${s.id}-fondov" data-fondov value="${esc(val)}" placeholder="${m === "carta" ? "SH11/99 o #13" : "media/archivo.jpg"}" aria-label="${m === "carta" ? "Qué carta" : "Qué archivo"}">` : ""}</div>`;
+    }
+    if(k === "cartas"){
+      const [a, b] = parseRange(s.cartas), n = cards().length;
+      return `<div class="pair"><div class="fld"><label for="sf-${s.id}-ca">Desde la carta</label><input type="number" id="sf-${s.id}-ca" data-rng="a" min="1" max="${n}" value="${a + 1}"></div><div class="fld"><label for="sf-${s.id}-cb">Hasta la carta</label><input type="number" id="sf-${s.id}-cb" data-rng="b" min="1" max="${n}" value="${b + 1}"></div></div>
+        <span class="lbl" style="margin-top:-8px">Cada → muestra una carta del tramo (o todas las del mismo arte juntas). Para grabar desde una carta, llegá a ella con → en el escenario y tocá <b>Grabar desde acá</b>.</span>`;
+    }
+    return sceneFieldHTML(s, k, l, kind, opts);
+  }).join("");
+}
 function sceneInspHTML(s, i){
-  const T = SCENE_TYPES[s.tipo], needs = sceneNeeds(s), n = scenes().length;
-  return `<div><h2>${esc(sceneLabel(s))}</h2><span class="sub">Escena ${i+1} de ${n} · unos ${fmtDur(estSecs(s))}</span>
-      <div class="fld" style="margin-top:12px"><label for="sk-tipo-${s.id}" class="lab">Tipo de escena</label><select id="sk-tipo-${s.id}" data-sk="tipo">${Object.entries(SCENE_TYPES).map(([k, v]) => `<option value="${k}"${k === s.tipo ? " selected" : ""}>${v.name}</option>`).join("")}</select></div></div>
-    <div class="iacts"><button class="btn sm" data-sa="show">${ICON("play","fill")}Ver desde acá</button><button class="btn sm" data-sa="rec" title="Grabar una parte que empieza en esta escena">Grabar desde acá</button><button class="btn sm icon" data-sa="up" ${i === 0 ? "disabled" : ""} aria-label="Subir escena" title="Subir">${ICON("up")}</button><button class="btn sm icon" data-sa="down" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar escena" title="Bajar">${ICON("down")}</button><button class="btn sm" data-sa="dup">${ICON("copy")}Duplicar</button></div>
-    ${s.tipo === "binder" ? (() => { const [a, b] = parseRange(s.cartas); return `<div class="fld"><label for="sfrom-${s.id}">Grabar desde la carta</label><input type="number" id="sfrom-${s.id}" data-from min="${a + 1}" max="${b + 1}" value="${a + 1}"></div>`; })() : ""}
+  const needs = sceneNeeds(s), n = scenes().length;
+  return `<div class="ihd"><div style="min-width:0"><h2>${esc(sceneLabel(s))}</h2><span class="sub">Escena ${i+1} de ${n} · ${aboutDur(estSecs(s))}</span></div><button class="btn sm icon" data-sa="show" title="Ver la escena de nuevo en el escenario" aria-label="Ver la escena de nuevo">${ICON("refresh")}</button></div>
+    <div class="fromrow"><span class="lbl">Desde acá</span><button class="btn sm" data-sa="try" title="Ensayar desde esta escena, o desde la carta que muestra el escenario">${ICON("play","fill")}Ensayar</button><button class="btn sm rec" data-sa="rec" title="Grabar una parte que empieza en esta escena, o en la carta que muestra el escenario"><svg class="ic fill" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5"/></svg>Grabar</button></div>
     ${needs.length ? `<div class="needs" style="margin:0"><span class="tag pink">falta en la carpeta</span><ul>${needs.map(x => `<li><code>${esc(x.path)}</code>${x.pide ? " — " + esc(x.pide) : ""}</li>`).join("")}</ul></div>` : ""}
+    ${sceneFieldsHTML(s)}
+    ${s.tipo === "lista" ? `<span class="lbl" style="margin-top:-8px">Cada → suma un punto.</span>` : ""}
     <div class="fld"><label for="sf-${s.id}-capitulo">Capítulo de YouTube (opcional)</label><input type="text" id="sf-${s.id}-capitulo" data-sk="capitulo" value="${esc(s.capitulo)}" placeholder="Empieza un capítulo en esta escena"></div>
-    ${sceneFieldHTML(s, "guion", "Guion para el teleprompter", "area")}
-    ${T.fields.map(([k, l, kind, opts]) => sceneFieldHTML(s, k, l, kind, opts)).join("")}
-    <div class="ifoot"><span class="lbl">${s.tipo === "binder" ? "Cada → muestra una carta del tramo." : s.tipo === "lista" ? "Cada → suma un punto." : ""}</span><button class="btn sm ghost danger" data-sa="del">${ICON("trash")}Quitar escena</button></div>`;
+    <div class="sfoot">
+      <div class="fld"><label for="sk-tipo-${s.id}">Tipo de escena</label><select id="sk-tipo-${s.id}" data-sk="tipo">${Object.entries(SCENE_TYPES).map(([k, v]) => `<option value="${k}"${k === s.tipo ? " selected" : ""}>${v.name}</option>`).join("")}</select></div>
+      <div class="iacts"><button class="btn sm icon" data-sa="up" ${i === 0 ? "disabled" : ""} aria-label="Subir escena" title="Subir">${ICON("up")}</button><button class="btn sm icon" data-sa="down" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar escena" title="Bajar">${ICON("down")}</button><button class="btn sm" data-sa="dup">${ICON("copy")}Duplicar</button><span class="grow"></span><button class="btn sm ghost danger" data-sa="del">${ICON("trash")}Quitar escena</button></div>
+    </div>`;
 }
 function videoInspHTML(){
   const list = scenes(), v = P().video || normVideo(null), total = list.reduce((a, s) => a + estSecs(s), 0);
   const mus = [...files.keys()].filter(p => p.startsWith("musica/")), cur = v.musica || "";
   const chaps = list.filter(s => s.capitulo).length;
   return `<h2>El video</h2>
-    <p class="hint">${list.length ? `${list.length} escenas, ${chaps} ${chaps === 1 ? "capítulo" : "capítulos"} y unos <b>${fmtDur(total)}</b> de toma. Elegí una escena de la lista para retocarla: el escenario la muestra al lado.` : "Pasale el guion a Claude en el chat: arma las escenas y deja <code>video.json</code> en esta carpeta, que aparece acá solo."}</p>
+    <p class="hint">${list.length ? `${list.length} escenas, ${chaps} ${chaps === 1 ? "capítulo" : "capítulos"} y ${aboutDur(total)} de toma. Elegí una escena de la lista para retocarla: el escenario la muestra al lado.` : "Pasale el guion a Claude en el chat: arma las escenas y deja <code>video.json</code> en esta carpeta, que aparece acá solo."}</p>
     <div class="fld"><label for="v-musica">Música de fondo</label><select id="v-musica" data-vk="musica"><option value="">Sin música</option>${[...new Set(mus.concat(cur ? [cur] : []))].map(p => `<option value="${esc(p)}"${p === cur ? " selected" : ""}>${esc(p.replace(/^musica\//, ""))}${files.has(p) ? "" : " (falta)"}</option>`).join("")}</select><span class="lbl">La música va en una carpeta <code>musica/</code> dentro de la carpeta de la especie.</span></div>
     ${chaps && chaps < 3 ? `<p class="hint"><span class="tag yel">pocos capítulos</span> YouTube pide al menos 3 para mostrarlos.</p>` : ""}
-    <div class="fld"><span class="lab">Grabar por partes</span><p class="hint" style="margin:0">Elegí una escena y tocá <b>Grabar desde acá</b> para grabar desde ahí. En el estudio, <kbd>P</kbd> pausa y retoma sin cortar el archivo. Guardá cada parte en la carpeta y después juntalas acá.</p><div><button class="btn sm" id="joinOpen">${ICON("copy")}Unir partes…</button></div></div>`;
+    <div class="fld"><span class="lab">Grabar por partes</span><p class="hint" style="margin:0">Elegí una escena y tocá <b>Grabar desde acá</b>, o prendé <b>Desde acá</b> en los ajustes de Grabar. En el estudio, <b>P</b> pausa y retoma sin cortar el archivo. Al terminar cada parte, <b>Grabar la siguiente</b> la guarda en la carpeta y sigue; después las juntás acá.</p><div><button class="btn sm" id="joinOpen">${ICON("copy")}Unir partes…</button></div></div>`;
 }
 function addScene(tipo){
   checkpoint(); const list = scenes(), cur = list.findIndex(s => s.id === selScene), at = cur >= 0 ? cur + 1 : VM.on && VM.i >= 0 ? VM.i + 1 : list.length;
@@ -2308,11 +2441,10 @@ function addScene(tipo){
   const f = $("insp").querySelector("textarea"); if(f) f.focus();
 }
 $("sceneMenu").onclick = e => openMenu(e.currentTarget, Object.entries(SCENE_TYPES).map(([k, v]) => ({label:v.name, action:() => addScene(k)})));
-$("planMore").onclick = e => openMenu(e.currentTarget, [{label:"Unir partes…", icon:"copy", action:openJoin}, {label:"Importar video.json…", icon:"file", action:() => $("videoFile").click()}]);
 $("videoFile").onchange = async e => {
   const f = e.target.files[0]; e.target.value = ""; if(!f) return;
   let raw; try{ raw = JSON.parse(await f.text()); }catch(err){ notice("Ese archivo no es un video.json válido."); return; }
-  checkpoint(); P().video = normVideo(raw.escenas ? raw : raw.video || raw); selScene = null; renderScenes(); setMode("video"); $("modeSel").value = "video"; dirty();
+  checkpoint(); P().video = normVideo(raw.escenas ? raw : raw.video || raw); selScene = null; if(view !== "video") setView("video"); renderScenes(); setMode("video"); dirty();
   notice(`Cargué ${scenes().length} escenas.`);
 };
 
@@ -2331,13 +2463,58 @@ function renderAudio(){
 let studioOpen = false, rec = null, chunks = [], recT0 = 0, recSecs = 0, recTimer = 0, pfSize = 26;
 // Pausing keeps one file: the time spent paused is left out of the clock, the chapters and the video.
 let recPaused = false, pauseT0 = 0, pausedMs = 0, recFrom = null, videoKind = "";
+// Grabar and Ensayar play the video plan or only the binder (a choice in the recording settings, not the open tab),
+// from the beginning or from where the stage is. `lastEnd` is where the next part starts after a take.
+let recTarget = "video", startHere = false, takeTarget = "video", lastEnd = null, sceneRecT = 0;
+try{ recTarget = localStorage.getItem("binder.recTarget") === "binder" ? "binder" : "video"; }catch(e){}
+const target = () => recTarget === "video" && scenes().length ? "video" : "binder";
+// Where the stage is now, as the start of a take: {scene, card}. The card is the first one the take shows, at the start of its group.
+function stagePos(){
+  const snap = (cur, a, b) => { for(let k = Math.max(0, a); k <= b;){ const [g0, g1] = groupAt(k, b); if(cur <= g1) return g0; k = g1 + 1; } return cur; };
+  const cur = held ? held.i : idx;
+  if(VM.on){
+    const s = scenes()[VM.i]; if(!s) return {scene:0};
+    return s.tipo === "binder" && cur >= VM.range[0] ? {scene:VM.i, card:snap(cur, VM.range[0], VM.range[1])} : {scene:VM.i};
+  }
+  return cur >= 0 ? {card:snap(cur, 0, cards().length - 1)} : {};
+}
+// A stage position as a start in the given target: a card goes to the binder stretch that holds it, a scene to its first card.
+function resolveFrom(t, pos){
+  if(!pos) return null;
+  if(t === "video"){
+    if(pos.scene != null) return pos;
+    if(pos.card == null) return {scene:0};
+    const k = scenes().findIndex(s => { if(s.tipo !== "binder") return false; const [a, b] = parseRange(s.cartas); return pos.card >= a && pos.card <= b; });
+    return k < 0 ? null : {scene:k, card:pos.card};
+  }
+  if(pos.card != null) return {card:pos.card};
+  const s = scenes()[pos.scene];
+  return s && s.tipo === "binder" ? {card:Math.max(0, parseRange(s.cartas)[0])} : {};
+}
+function posText(t, f){
+  if(!f || !(f.scene > 0 || f.card > 0)) return "el principio";
+  if(t === "binder") return `la carta ${f.card + 1} de ${cards().length}`;
+  const s = scenes()[f.scene];
+  return `la escena ${f.scene + 1}${s ? " · " + sceneLabel(s) : ""}${f.card != null && s && s.tipo === "binder" && f.card > parseRange(s.cartas)[0] ? `, carta ${f.card + 1}` : ""}`;
+}
+function updRecUI(){
+  const t = target(), has = scenes().length > 0;
+  $("recWhat").textContent = (t === "video" ? "video" : "binder") + (startHere ? " · desde acá" : "");
+  $("record").title = `Grabar ${t === "video" ? "el video completo" : "solo el binder"} ${startHere ? "desde acá" : "desde el principio"}. Se cambia en los ajustes de al lado.`;
+  document.querySelectorAll("[data-rt]").forEach(b => { b.setAttribute("aria-pressed", b.dataset.rt === t); b.disabled = b.dataset.rt === "video" && !has; });
+  document.querySelectorAll("[data-rs]").forEach(b => b.setAttribute("aria-pressed", (b.dataset.rs === "aca") === startHere));
+  const pos = stagePos(), f = resolveFrom(t, pos);
+  $("rsHint").textContent = t === "video" && !f ? `La carta ${pos.card + 1} no está en ningún tramo del plan, así que arrancaría desde el principio.` : posText(t, f) === "el principio" ? "El escenario está al comienzo, así que arranca desde el principio." : startHere ? `Arranca en ${posText(t, f)}, donde está el escenario. Vale para Ensayar y Grabar.` : `Desde acá arrancaría en ${posText(t, f)}, donde está el escenario.`;
+}
+document.querySelectorAll("[data-rt]").forEach(b => b.onclick = () => { recTarget = b.dataset.rt; try{ localStorage.setItem("binder.recTarget", recTarget); }catch(e){} updRecUI(); });
+document.querySelectorAll("[data-rs]").forEach(b => b.onclick = () => { startHere = b.dataset.rs === "aca"; updRecUI(); });
 const recElapsed = () => (performance.now() - recT0 - pausedMs - (recPaused ? performance.now() - pauseT0 : 0))/1000;
 const fmtClock = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
 async function togglePause(){
   if(!rec || rec.state === "inactive" || $("countdown").hidden === false) return;
   if(rec.state === "recording"){
     rec.pause(); recPaused = true; pauseT0 = performance.now();
-    $("recline").classList.remove("on"); $("recline").classList.add("paused"); $("recLbl").textContent = "EN PAUSA · P para seguir";
+    $("recline").classList.remove("on"); $("recline").classList.add("paused"); $("recLbl").textContent = "EN PAUSA · P sigue · Esc termina";
     if(VM.clip && VM.clip.el) VM.clip.el.pause();
     if(AX) AB.music.gain.setTargetAtTime(0, AX.currentTime, .1);
     return;
@@ -2358,15 +2535,21 @@ function pickMime(){
   return list.find(m => { try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } }) ?? "";
 }
 // `from` starts the take part way: {scene} in the video, {card} in the binder (with the cards before it already filed).
-async function openStudio(record, from){
-  if(!cards().length && !VM.on){ notice("Agregá al menos una carta antes de grabar."); return; }
+// Without `from`, the take starts at the beginning or, with "Desde acá" on, where the stage is. `t` forces the video or the binder.
+const MIC_ERR = "No pude usar el micrófono. Revisá el permiso del navegador, o apagá \"Grabar mi voz\" en los ajustes de grabación (al lado de Grabar) para grabar sin voz.";
+async function openStudio(record, from, t){
+  t = !t ? target() : t === "video" && !scenes().length ? "binder" : t;
+  if(from === undefined) from = startHere ? resolveFrom(t, stagePos()) : null;
+  if(t === "binder" && !cards().length){ notice("Agregá al menos una carta antes de grabar."); return; }
   if(record && pickMime() === null){ notice("Este navegador no puede grabar video. Probá con Chrome o Edge en una computadora."); return; }
   const ax = audio(); if(ax) ax.resume().catch(() => {});
   if(record && S.brand.audio.mic){
     const ok = await startMic();
-    if(!ok){ notice("No pude usar el micrófono. Revisá el permiso del navegador, o desactivá \"Grabar mi voz\" en la pestaña Video para grabar sin voz."); return; }
+    if(!ok){ notice(MIC_ERR); return; }
   }
   closeFloat(); studioOpen = true; chapters = []; document.body.classList.add("in-studio");
+  takeTarget = t; if((t === "video") !== VM.on) setMode(t, true);
+  $("recHere").hidden = $("rKey").hidden = record;
   if(VM.on){ const l = scenes(); warmScene(l[Math.max(0, VM.i)]); warmScene(l[Math.max(0, VM.i) + 1]); }
   $("sHost").appendChild(cv); $("studio").hidden = false;
   document.documentElement.style.setProperty("--pf", pfSize + "px");
@@ -2381,15 +2564,47 @@ async function openStudio(record, from){
     for(const n of [3,2,1]){ cd.textContent = n; await sleep(800); if(!studioOpen){ cd.hidden = true; stopMic(); return; } }
     cd.hidden = true;
     startRec();
-  } else applyAudio();
+  } else { applyAudio(); runClock(); }
   startMusic();
-  if(VM.on){
-    const i = from && from.scene ? clamp(from.scene, 0, scenes().length - 1) : 0, s = scenes()[i];
-    goScene(i);
-    if(s && s.tipo === "binder" && from && from.card != null){ const [a, b] = VM.range; if(from.card > a && from.card <= b){ drawAt(from.card - 1); sc.intro = 0; } }
-    // a part that starts inside a chapter opens with that chapter's name, so joined parts keep their chapters
-    if(record && i > 0 && !(s && s.capitulo)){ for(let k = i - 1; k >= 0; k--) if(scenes()[k].capitulo){ chapters.push({t:0, name:scenes()[k].capitulo}); break; } }
-  }
+  if(VM.on) startAt(from, record);
+}
+// The rehearsal clock runs too, so a rehearsal tells how long the take will be.
+function runClock(){
+  recT0 = performance.now(); recPaused = false; pausedMs = 0;
+  clearInterval(recTimer); recTimer = setInterval(() => { $("recTime").textContent = fmtClock(recElapsed()); }, 250);
+}
+function startAt(from, record){
+  const i = from && from.scene ? clamp(from.scene, 0, scenes().length - 1) : 0, s = scenes()[i];
+  goScene(i);
+  if(s && s.tipo === "binder" && from && from.card != null){ const [a, b] = VM.range; if(from.card > a && from.card <= b){ drawAt(from.card - 1); sc.intro = 0; } }
+  // a part that starts inside a chapter opens with that chapter's name, so joined parts keep their chapters
+  if(record && i > 0 && !(s && s.capitulo)){ for(let k = i - 1; k >= 0; k--) if(scenes()[k].capitulo){ chapters.push({t:0, name:scenes()[k].capitulo}); break; } }
+}
+// From a rehearsal straight into a take, starting where the rehearsal is.
+async function recordFromHere(){
+  if(!studioOpen || rec || !$("countdown").hidden) return;
+  if(pickMime() === null){ await finishStudio(); notice("Este navegador no puede grabar video. Probá con Chrome o Edge en una computadora."); return; }
+  const pos = stagePos();
+  if(S.brand.audio.mic && !micStream){ const ok = await startMic(); if(!ok){ await finishStudio(); notice(MIC_ERR); return; } }
+  clearInterval(recTimer); stopMusic(); cancelAnim(); pauseMedia();
+  recFrom = pos.scene > 0 || pos.card > 0 ? pos : null; chapters = []; videoKind = "";
+  $("recHere").hidden = $("rKey").hidden = true; $("recLbl").textContent = "PREPARANDO"; $("recTime").textContent = "00:00";
+  if(!VM.on) drawAt(pos.card ? pos.card - 1 : -1);
+  const cd = $("countdown"); cd.hidden = false;
+  for(const n of [3,2,1]){ cd.textContent = n; await sleep(800); if(!studioOpen){ cd.hidden = true; stopMic(); return; } }
+  cd.hidden = true;
+  startRec(); startMusic();
+  if(VM.on) startAt(pos, true);
+}
+// Where the next part starts once a take ends: after the last card shown, or at the next scene
+// (the scene on screen counts as recorded once it has been up for two seconds).
+function nextFrom(){
+  const last = held ? (held.group ? held.end : held.i) : idx;
+  if(!VM.on) return last + 1 < cards().length ? {card:last + 1} : null;
+  const list = scenes(), s = list[VM.i]; if(!s || VM.ended) return null;
+  if(s.tipo === "binder" && last < VM.range[1]) return last >= VM.range[0] ? {scene:VM.i, card:last + 1} : {scene:VM.i};
+  const k = s.tipo !== "binder" && recElapsed() - sceneRecT < 2 ? VM.i : VM.i + 1;
+  return k < list.length ? {scene:k} : null;
 }
 function startRec(){
   setRes(+$("res").value);
@@ -2412,7 +2627,7 @@ async function finishStudio(){
   $("countdown").hidden = true;
   let blob = null, type = "", hasAudio = false;
   if(rec && rec.state !== "inactive"){
-    recSecs = recElapsed();
+    recSecs = recElapsed(); lastEnd = nextFrom();
     hasAudio = rec.stream.getAudioTracks().length > 0 && (S.brand.audio.mic || S.brand.audio.sfx || !!(P().video || {}).musica);
     await new Promise(r => { rec.onstop = r; rec.stop(); });
     type = rec.mimeType || "video/webm"; blob = new Blob(chunks, {type});
@@ -2424,6 +2639,7 @@ async function finishStudio(){
   try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){}
   setRes(1);
   if(VM.on) goScene(Math.max(0, VM.i), {silent:true}); else drawAt(idx);
+  syncStage();
   if(blob && blob.size) showVideo(blob, type, recSecs, res4k, hasAudio);
 }
 function updPrompter(){
@@ -2446,6 +2662,7 @@ function updPrompter(){
 $("rehearse").onclick = () => openStudio(false);
 $("record").onclick = () => openStudio(true);
 $("finish").onclick = finishStudio;
+$("recHere").onclick = recordFromHere;
 $("aMinus").onclick = () => setPf(-2); $("aPlus").onclick = () => setPf(2);
 function setPf(d){ pfSize = clamp(pfSize + d, 16, 54); document.documentElement.style.setProperty("--pf", pfSize + "px"); try{ localStorage.setItem("binder.pf", pfSize); }catch(e){} }
 
@@ -2454,14 +2671,17 @@ function showVideo(blob, type, secs, is4k, hasAudio){
   videoBlob = blob; videoType = type; if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = URL.createObjectURL(blob);
   $("vPrev").src = videoUrl;
   const mb = (blob.size/1048576).toFixed(1), ext = type.includes("mp4") ? "MP4" : "WebM";
-  $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${Math.round(secs)} s · ${mb} MB. ${hasAudio ? "Con audio." : "Sin audio, listo para sumar tu voz en el editor."}`;
+  $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${fmtClock(secs)} · ${mb} MB. ${hasAudio ? "Con sonido." : "Sin sonido: la voz, la música y los efectos estaban apagados."}`;
   const fmt = t => { t = Math.max(0, Math.floor(t)); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
   const ch = chapters.slice(); if(ch.length && ch[0].t > 1) ch.unshift({t:0, name:"Intro"}); if(ch.length) ch[0].t = 0;
   $("chapBox").hidden = !ch.length; $("chapText").value = ch.map(c => fmt(c.t) + " " + c.name).join("\n");
   videoSaved = false; $("vSave").textContent = "Descargar video";
   $("vFolder").hidden = !dir; $("vFolder").disabled = false; $("vFolder").textContent = "Guardar en la carpeta";
-  $("vSave").className = dir ? "" : "primary";
-  $("vDiscard").textContent = "Descartar"; $("vDiscard").classList.remove("armed");
+  $("vSave").className = "btn" + (dir ? "" : " primary");
+  $("vDiscard").textContent = "Descartar"; $("vDiscard").classList.remove("armed"); $("vDiscard").classList.add("danger");
+  $("nextPart").hidden = !lastEnd;
+  if(lastEnd) $("nextPartT").innerHTML = `La parte siguiente arranca en <b>${esc(posText(takeTarget, lastEnd))}</b>.`;
+  updNext();
   openModal("mVideo");
 }
 function videoName(){
@@ -2472,24 +2692,35 @@ function videoName(){
   return `${slug}-master-list${part}-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
 }
 let videoSaved = false;
+// Once the take is kept, the way out is a plain Cerrar, and the next part can start right away.
+function markSaved(){ videoSaved = true; const d = $("vDiscard"); d.textContent = "Cerrar"; d.classList.remove("danger", "armed"); updNext(); }
+function updNext(){ const b = $("vNext"); b.classList.remove("armed"); b.textContent = dir && !videoSaved ? "Guardar y grabar la siguiente" : "Grabar la siguiente"; }
 $("vSave").onclick = () => {
   if(!videoBlob) return;
   const a = document.createElement("a"); a.href = videoUrl; a.download = videoName(); document.body.appendChild(a); a.click(); a.remove();
-  videoSaved = true; $("vSave").textContent = "Descargado";
+  $("vSave").textContent = "Descargado"; markSaved();
 };
-$("vFolder").onclick = async () => {
-  if(!videoBlob || !dir) return;
+async function saveToFolder(){
+  if(!videoBlob || !dir || videoSaved) return;
   const b = $("vFolder"); b.disabled = true; b.textContent = "Guardando…";
   try{ const name = videoName(); await writeFile("videos/" + name, videoBlob);
     try{ await writeFile("videos/" + name.replace(/\.\w+$/, ".json"), JSON.stringify({app:"binder-studio-take", seconds:+recSecs.toFixed(2), chapters:takeChapters(), from:recFrom}, null, 1)); }catch(err){}
-    videoSaved = true; b.textContent = "Guardado en videos/"; $("vInfo").textContent += ` Guardado como videos/${name}.`; }
+    b.textContent = "Guardado en videos/"; $("vInfo").textContent += ` Guardado como videos/${name}.`; markSaved(); }
   catch(e){ b.disabled = false; b.textContent = "Guardar en la carpeta"; $("vInfo").textContent = "No se pudo guardar en la carpeta. Probá con Descargar video."; }
+}
+$("vFolder").onclick = saveToFolder;
+$("vNext").onclick = async () => {
+  const b = $("vNext"), f = lastEnd; if(!f) return;
+  if(!videoSaved && dir){ await saveToFolder(); if(!videoSaved) return; }
+  if(!videoSaved && !b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "Sin guardar: tocá otra vez"; return; }
+  dropVideo(); openStudio(true, f, takeTarget);
 };
+function dropVideo(){ closeModal("mVideo"); $("vPrev").removeAttribute("src"); $("vPrev").load(); if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = null; videoBlob = null; }
 $("chapCopy").onclick = async () => { try{ await navigator.clipboard.writeText($("chapText").value); $("chapCopy").textContent = "Copiados"; }catch(e){ $("chapText").select(); } };
 $("vDiscard").onclick = e => {
   const b = e.currentTarget;
   if(!b.classList.contains("armed") && !videoSaved){ b.classList.add("armed"); b.textContent = "¿Descartar sin guardar?"; return; }
-  closeModal("mVideo"); $("vPrev").removeAttribute("src"); $("vPrev").load(); if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = null; videoBlob = null;
+  dropVideo();
 };
 
 /* ================= Joining takes ================= */
@@ -2569,7 +2800,7 @@ async function runJoin(){
     await new Promise(res => { r.onstop = res; r.stop(); });
     if(!joining) return;
     joining = false; closeModal("mJoin");
-    chapters = chaps; recFrom = null; videoKind = "completo"; recSecs = secs;
+    chapters = chaps; recFrom = null; videoKind = "completo"; recSecs = secs; lastEnd = null;
     showVideo(new Blob(out, {type:r.mimeType || "video/webm"}), r.mimeType || "video/webm", secs, w > 2000, true);
   }catch(err){
     joining = false; $("jGo").disabled = false; $("jGo").textContent = "Unir";
@@ -2586,12 +2817,14 @@ document.addEventListener("keydown", e => {
     else if(e.key === "Home"){ e.preventDefault(); toStart(); }
     else if(e.key.toLowerCase() === "z"){ e.preventDefault(); toggleZoom(); }
     else if(e.key.toLowerCase() === "p"){ e.preventDefault(); togglePause(); }
-    else if(e.key === "Escape"){ e.preventDefault(); finishStudio(); }
+    else if(e.key.toLowerCase() === "r" && !rec){ e.preventDefault(); recordFromHere(); }
+    // while recording, Esc pauses first: a stray key never ends a take
+    else if(e.key === "Escape"){ e.preventDefault(); if(rec && rec.state === "recording" && $("countdown").hidden) togglePause(); else finishStudio(); }
     return;
   }
   if(openFloat){ if(e.key === "Escape"){ e.preventDefault(); closeFloat(true); } else if(openFloat.kind === "menu" && ["ArrowDown","ArrowUp"].includes(e.key)){ e.preventDefault(); const its = [...openFloat.el.querySelectorAll("button:not(:disabled)")], k = its.indexOf(document.activeElement); its[(k + (e.key === "ArrowDown" ? 1 : its.length - 1)) % its.length].focus(); } return; }
   const open = [...document.querySelectorAll(".modal")].filter(m => !m.hidden);
-  if(open.length){ if(e.key === "Escape"){ const m = open[open.length-1]; if(m.id === "mAsk") $("askNo").click(); else if(m.id === "mJoin") $("jClose").click(); else if(m.id !== "mVideo") closeModal(m.id); } return; }
+  if(open.length){ if(e.key === "Escape"){ const m = open[open.length-1]; if(m.id === "mAsk") $("askNo").click(); else if(m.id === "mJoin") $("jClose").click(); else if(m.id === "mVideo"){ if(videoSaved) $("vDiscard").click(); } else closeModal(m.id); } return; }
   const mod = e.ctrlKey || e.metaKey;
   if(mod && !typing && e.key.toLowerCase() === "z"){ e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if(mod && !typing && e.key.toLowerCase() === "y"){ e.preventDefault(); redo(); return; }
@@ -2761,6 +2994,7 @@ function fromFile(raw, name){
   // brands saved before the filmed look: empty pockets go back to being empty
   if(rb.binder === undefined) brand.show = {...brand.show, ghost:false};
   // brands saved before the channel's own look: put on Mafia TCG once, keeping everything else the creator set
+  if(brand.handle.text === "@tucanal") brand.handle.text = "";
   if(rb.marca !== 1) Object.assign(brand, {marca:1, theme:"mafia", accent:THEMES.mafia.accent, accent2:THEMES.mafia.accent2, bg:THEMES.mafia.bg, binder:"lila", logo:{...brand.logo, size:6, builtin:true}});
   return {version:3, brand, projects:[p], active:p.id};
 }
@@ -2799,7 +3033,7 @@ async function rescan(quiet){
   const r = assignNew();
   const vchanged = await loadVideoFile(false);
   renderRows(); renderScenes(); requestDraw(); report(r, quiet);
-  if(vchanged){ notice(`Cargué el plan nuevo del video (video.json): ${scenes().length} escenas.`); if(VM.on) goScene(0, {silent:true}); else { $("modeSel").value = "video"; setMode("video"); } }
+  if(vchanged){ notice(`Cargué el plan nuevo del video (video.json): ${scenes().length} escenas.`); if(VM.on) goScene(0, {silent:true}); else syncStage(); }
   if(r.byNum || r.byOrder || r.added) dirty();
 }
 let videoMod = 0;
@@ -2814,11 +3048,7 @@ async function loadVideoFile(first){
     return true;
   }catch(e){ if(e && e.name === "SyntaxError") notice("El video.json de la carpeta tiene un error de formato; no lo pude leer."); if(first) videoMod = 0; return false; }
 }
-function restoreMode(){
-  let m = "video"; try{ m = localStorage.getItem("binder.mode") || "video"; }catch(e){}
-  if(!scenes().length) m = "binder";
-  $("modeSel").value = m; setMode(m);
-}
+function restoreMode(){ setMode(view === "video" && scenes().length ? "video" : "binder"); }
 async function getRecents(){ return (await kvGet("recents")) || []; }
 async function remember(h){
   const out = [{name:h.name, handle:h, at:Date.now()}];
@@ -2840,7 +3070,10 @@ $("folderBtn").onclick = e => {
     ...(others.length ? ["sep", {head:"Abiertas hace poco"}, ...others.map(x => ({label:x.name, icon:"folder", action:() => openFolder(x.handle)}))] : []),
     "sep",
     {label:"Exportar binder.json", icon:"file", action:exportData},
-    {label:"Importar binder.json…", icon:"upload", action:() => $("importFile").click()}
+    {label:"Importar binder.json…", icon:"upload", action:() => $("importFile").click()},
+    {label:"Importar video.json…", icon:"upload", action:() => $("videoFile").click()},
+    "sep",
+    {label:"Unir partes grabadas…", icon:"copy", hint:"de videos/", action:openJoin}
   ]);
 };
 async function pickFolder(){
@@ -2985,7 +3218,7 @@ function highlightRow(){
   }
 }
 function selectCard(i){
-  if(VM.on){ $("modeSel").value = "binder"; setMode("binder"); }
+  if(VM.on) setMode("binder");
   drawAt(i);
 }
 $("rows").addEventListener("click", e => {
@@ -2996,12 +3229,16 @@ $("filters").addEventListener("click", e => { const b = e.target.closest("[data-
 let qT = 0;
 $("q").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); clearTimeout(qT); qT = setTimeout(renderRows, 120); });
 
+function portadaFields(){
+  const p = P(), F = (k, l, ph) => `<div class="fld"><label for="p-${k}">${l}</label><input type="text" id="p-${k}" data-p="${k}" value="${esc(p[k])}" placeholder="${ph}"></div>`;
+  return `${F("title1", "Título", "Bulbasaur")}${F("title2", "Subtítulo", "Master List")}${F("eyebrow", "Etiqueta superior", "Master list · #001")}${F("introLine", "Frase de la intro", "Una especie, todas sus cartas")}${F("footer", "Pie", "Todos los idiomas")}`;
+}
 function introInspHTML(){
-  const p = P(), list = cards(), F = (k, l, ph) => `<div class="fld"><label for="p-${k}">${l}</label><input type="text" id="p-${k}" data-p="${k}" value="${esc(p[k])}" placeholder="${ph}"></div>`;
+  const list = cards();
   const n = k => list.reduce((a, c, i) => a + (FPRED[k](c, i) ? 1 : 0), 0);
   return `<h2>Portada e intro</h2>
     <p class="hint">Así arranca el binder: la frase, el título grande y la cantidad de cartas. Lo ves en el escenario mientras escribís.</p>
-    ${F("title1", "Título", "Bulbasaur")}${F("title2", "Subtítulo", "Master List")}${F("eyebrow", "Etiqueta superior", "Master list · #001")}${F("introLine", "Frase de la intro", "Una especie, todas sus cartas")}${F("footer", "Pie", "Todos los idiomas")}
+    ${portadaFields()}
     ${list.length ? `<div class="section"><h3>El estante</h3><p class="hint" style="margin:0">${list.length} cartas en ${Math.ceil(list.length/PER)} páginas.</p><div class="it-tags">${[["noimg", "pink", "sin imagen"], ["noscript", "yel", "sin guion"], ["zoom", "mint", "con zoom"], ["falta", "out", "me faltan"]].map(([k, c, l]) => n(k) ? `<span class="tag ${c}">${n(k)} ${l}</span>` : "").join("")}</div></div>` : ""}`;
 }
 function cardInspHTML(c, i){
@@ -3015,28 +3252,29 @@ function cardInspHTML(c, i){
     <div class="iacts">
       <button class="btn sm" data-act="img">${ICON(src ? "crop" : "image")}${src ? "Recortar" : "Elegir imagen"}</button>
       <button class="btn sm" data-act="zoom" ${src ? "" : "disabled"} title="Marcar zooms para recorrer la carta">${ICON("zoom")}Zooms${zs ? ` ${zs}` : ""}</button>
-      <button class="btn sm" data-act="recfrom" title="Grabar una parte que empieza en esta carta">Grabar desde acá</button>
       ${src ? `<button class="btn sm" data-act="replace" title="Cambiar la imagen de la carta">${ICON("image")}Cambiar<span class="long">imagen</span></button>` : ""}
     </div>
     <label class="toggle"><span>Me falta esta carta<small>Su bolsillo queda vacío y el checklist dice “falta”.</small></span><input type="checkbox" data-k="falta"${c.falta ? " checked" : ""}></label>
     ${i > 0 ? `<button class="toggle" data-act="join" style="border:0;width:100%;text-align:left;color:inherit;font:inherit"><span>${joined ? "Mismo arte que la de arriba" : "Unir con la de arriba"}<small>${joined ? "Tocá para separarla del grupo." : "Mismo arte en otro idioma: salen juntas en grande."}</small></span>${ICON(joined ? "x" : "link")}</button>` : ""}
+    ${F("note", "Dato en pantalla", true)}
+    <details class="more"${moreOpen || !c.set || !c.num ? " open" : ""}><summary><span>Datos de la carta<small>Set, número, año, rareza, idioma y grupo</small></span>${ICON("chev")}</summary><div class="morebody">
     ${F("set", "Set")}
     <div class="pair">${F("num", "Número")}${F("year", "Año")}</div>
     ${F("label", "Etiqueta (serie)")}
     <div class="pair">${F("rarity", "Rareza")}${F("variants", "Variantes")}</div>
     ${F("illustrator", "Ilustrador")}
-    <div class="pair">${F("idioma", "Idioma")}${F("grupo", "Grupo (mismo arte)")}</div>
-    ${F("note", "Dato en pantalla", true)}
-    ${F("script", "Guion para el teleprompter", true)}
+    <div class="pair">${F("idioma", "Idioma")}${F("grupo", "Grupo (mismo arte)")}</div></div></details>
     <div class="ifoot"><span class="lbl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Carta ${i + 1} de ${list.length}${c.editFile || c.file ? " · " + esc(c.editFile || c.file) : ""}</span><button class="btn sm ghost danger" data-act="del">${ICON("trash")}Quitar carta</button></div>`;
 }
+let moreOpen = false;
+document.addEventListener("toggle", e => { if(e.target.matches && e.target.matches("#insp .more")) moreOpen = e.target.open; }, true);
 function renderInspector(){
   const box = $("insp");
   $("brandRight").hidden = view !== "brand"; box.hidden = view === "brand";
   if(view === "brand") return;
   if(view === "video"){ const i = scenes().findIndex(s => s.id === selScene); box.innerHTML = i >= 0 ? sceneInspHTML(scenes()[i], i) : videoInspHTML(); return; }
   const list = cards();
-  if(!list.length && !dirLabel){ box.innerHTML = `<h2>Empezá por una carpeta</h2><p class="hint">Abrí la carpeta de una especie con <b>Abrir carpeta</b>. Las cartas aparecen en el estante de la izquierda; tocá una y acá ves y corregís todos sus datos mientras el escenario la muestra.</p><p class="hint">Después armás el plan del video con Claude y grabás la toma con <b>Grabar</b>.</p>`; return; }
+  if(!list.length && !dirLabel){ box.innerHTML = `<p class="hint">Acá vas a ver los datos de la carta o de la escena que elijas.</p>`; return; }
   const i = list.findIndex(c => c.id === selCard);
   box.innerHTML = i >= 0 ? cardInspHTML(list[i], i) : introInspHTML();
 }
@@ -3056,6 +3294,15 @@ $("insp").addEventListener("input", e => {
     else refreshCard(i);
     return;
   }
+  if(t.dataset.fondov != null || t.dataset.rng){
+    const i = scenes().findIndex(x => x.id === selScene), s = scenes()[i]; if(!s) return;
+    if(t.dataset.rng){
+      const n = cards().length, f = $("insp").querySelector("[data-rng=a]"), g = $("insp").querySelector("[data-rng=b]"), a = clamp(Math.round(+f.value) || 1, 1, n), b = clamp(Math.round(+g.value) || a, 1, n);
+      checkpoint("s:" + s.id + ":cartas"); s.cartas = `${Math.min(a, b)}-${Math.max(a, b)}`;
+      if(VM.on && VM.i === i) goScene(i, {silent:true});
+    } else { checkpoint("s:" + s.id + ":fondo"); s.fondo = fondoMode(s) === "carta" ? "carta " + t.value.trim() : t.value.trim(); kinCache.clear(); if(VM.on && VM.i === i) VM.t0 = performance.now(); }
+    requestDraw(); dirty(); refreshSceneRow(i); renderStrip(); return;
+  }
   if(t.dataset.sk && t.dataset.sk !== "tipo"){
     const i = scenes().findIndex(x => x.id === selScene), s = scenes()[i]; if(!s) return;
     const k = t.dataset.sk;
@@ -3063,7 +3310,8 @@ $("insp").addEventListener("input", e => {
     s[k] = ARRAY_FIELDS.has(k) ? t.value.split("\n") : t.value;
     kinCache.clear(); if(VM.on && VM.i === i && ["texto","fondo","estilo","valor","titulo","items","ritmo"].includes(k)){ VM.t0 = performance.now(); VM.played = {}; VM.lastItem = -1; }
     requestDraw(); dirty();
-    const row = document.querySelector(`#scenes .item[data-i="${i}"]`); if(row){ const tmp = document.createElement("ul"); tmp.innerHTML = sceneItemHTML(s, i); row.replaceWith(tmp.firstElementChild); }
+    refreshSceneRow(i);
+    if(k === "estilo") keepFocus(renderInspector);
     clearTimeout(sceneRender); sceneRender = setTimeout(() => keepFocus(renderScenes), 900);
   }
 });
@@ -3074,7 +3322,14 @@ $("insp").addEventListener("change", e => {
     scenes()[i] = {...newScene(t.value), id:s.id, capitulo:s.capitulo, guion:s.guion};
     renderScenes(); if(VM.on && VM.i === i) goScene(i, {silent:true}); dirty(); return;
   }
-  if(t.dataset.vk === "musica"){ checkpoint(); P().video.musica = t.value; dirty(); }
+  if(t.dataset.fondo != null){
+    const i = scenes().findIndex(x => x.id === selScene), s = scenes()[i]; if(!s) return; checkpoint();
+    const m = t.value, old = String(s.fondo || "").trim();
+    s.fondo = m === "carta" ? (/^carta\s/i.test(old) ? old : "carta #1") : m === "archivo" ? (/\.\w{2,4}$/.test(old) ? old : "") : m;
+    kinCache.clear(); if(VM.on && VM.i === i){ VM.t0 = performance.now(); warmScene(s); }
+    requestDraw(); dirty(); keepFocus(renderInspector); refreshSceneRow(i); return;
+  }
+  if(t.dataset.vk === "musica"){ checkpoint(); P().video.musica = t.value; dirty(); const row = document.querySelector("#scenes .vrow"); if(row){ const tmp = document.createElement("ul"); tmp.innerHTML = videoRowHTML(); row.replaceWith(tmp.firstElementChild); } }
 });
 $("insp").addEventListener("click", e => {
   if(e.target.closest("#joinOpen")){ openJoin(); return; }
@@ -3085,12 +3340,6 @@ $("insp").addEventListener("click", e => {
   if(act === "img"){ if(cardSrc(c)) openEditor(c); else { pickFor = c.id; $("one").click(); } return; }
   if(act === "replace"){ pickFor = c.id; $("one").click(); return; }
   if(act === "zoom"){ openZoom(c); return; }
-  if(act === "recfrom"){
-    if(!VM.on){ openStudio(true, {card:i}); return; }
-    const k = scenes().findIndex(s => { if(s.tipo !== "binder") return false; const [a, b] = parseRange(s.cartas); return i >= a && i <= b; });
-    if(k < 0){ notice("Esta carta no está en ningún tramo de binder del plan del video."); return; }
-    openStudio(true, {scene:k, card:i}); return;
-  }
   if(act === "join"){
     const prev = list[i - 1]; if(!prev) return; checkpoint();
     const pg = String(prev.grupo || "").trim();
@@ -3106,7 +3355,7 @@ $("insp").addEventListener("click", e => {
 function sceneAction(b){
   const list = scenes(), i = list.findIndex(s => s.id === selScene), act = b.dataset.sa; if(i < 0) return;
   if(act === "show"){ selectScene(i, true); return; }
-  if(act === "rec"){ const f = $("insp").querySelector("[data-from]"), card = f ? clamp((+f.value || 1) - 1, 0, cards().length - 1) : null; openStudio(true, {scene:i, card}); return; }
+  if(act === "rec" || act === "try"){ openStudio(act === "rec", VM.on && VM.i === i ? stagePos() : {scene:i}, "video"); return; }
   if(act === "del" && !b.classList.contains("armed")){ arm(b, "¿Quitar? Tocá otra vez"); return; }
   checkpoint();
   if(act === "up" && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
@@ -3453,6 +3702,7 @@ const getPath = (o, p) => p.split(".").reduce((a,k) => a && a[k], o);
 function setPath(o, p, v){ const ks = p.split("."), last = ks.pop(); ks.reduce((a,k) => a[k], o)[last] = v; }
 function renderBrand(){
   const b = S.brand;
+  $("tabBrand").style.setProperty("--sw", b.accent);
   $("themes").innerHTML = Object.entries(THEMES).map(([k,t]) => `<button class="theme${b.theme === k ? " on" : ""}" data-theme="${k}"><i style="background:${t.accent}"></i><i style="background:${t.accent2}"></i>${t.name}</button>`).join("");
   ["b-logo-pos","b-handle-pos","b-sub-pos"].forEach(id => { $(id).innerHTML = POS.map(([v,l]) => `<option value="${v}">${l}</option>`).join(""); });
   $("showChecks").innerHTML = SHOW.map(([k,l]) => `<label class="check"><input type="checkbox" id="s-${k}" data-b="show.${k}"> ${l}</label>`).join("");
@@ -3499,16 +3749,20 @@ $("brandFile").onchange = async e => {
 // Quitar drops an uploaded logo (back to the channel's); on the channel's own logo it switches the logo off.
 $("logoDel").onclick = async () => { checkpoint(); if(tempUrls.has("logo")){ await kvDel("img:logo"); tempUrls.delete("logo"); } else S.brand.logo.builtin = false; renderBrand(); requestDraw(); dirty(); };
 $("bgDel").onclick = async () => { await kvDel("img:bg"); tempUrls.delete("bg"); focusSnap = null; renderBrand(); requestDraw(); dirty(); };
+// Two tabs (the cards, the plan) and Marca as a button that opens over either and goes back to it.
+let lastView = "cards";
 function setView(which){
   if(!["cards","video","brand"].includes(which)) which = "cards";
+  if(which !== "brand") lastView = which;
   view = which; closeFloat();
-  for(const [k, tab, pane] of [["cards","tabCards","paneCards"],["video","tabVideo","paneVideo"],["brand","tabBrand","paneBrand"]]){ $(tab).setAttribute("aria-selected", k === which); $(tab).tabIndex = k === which ? 0 : -1; $(pane).hidden = k !== which; }
-  renderInspector();
+  for(const [k, tab, pane] of [["cards","tabCards","paneCards"],["video","tabVideo","paneVideo"]]){ $(tab).setAttribute("aria-selected", k === which); $(tab).tabIndex = k === lastView ? 0 : -1; $(pane).hidden = k !== which; }
+  $("tabBrand").setAttribute("aria-pressed", which === "brand"); $("paneBrand").hidden = which !== "brand";
+  renderInspector(); syncStage(); syncScript();
   try{ localStorage.setItem("binder.tab", which); }catch(e){}
 }
 $("tabCards").onclick = () => setView("cards");
 $("tabVideo").onclick = () => setView("video");
-$("tabBrand").onclick = () => setView("brand");
+$("tabBrand").onclick = () => setView(view === "brand" ? lastView : "brand");
 document.querySelector(".views").addEventListener("keydown", e => {
   if(e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
   e.preventDefault(); e.stopPropagation();

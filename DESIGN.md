@@ -17,6 +17,7 @@ colors:
   tag-ink: "#1d1a14"
   price: "#c8281f"
   rec: "#d42a22"
+  pocket-empty: "#5f6a72"
   video-mat: "#231c2b"
   video-binder-negro: "#161719"
   video-binder-gris: "#3a3c40"
@@ -76,6 +77,11 @@ typography:
     fontSize: "26px"
     fontWeight: 500
     lineHeight: 1.45
+  script:
+    fontFamily: "\"M PLUS 2\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontSize: "16px"
+    fontWeight: 500
+    lineHeight: 1.55
   tag:
     fontFamily: "\"Klee One\", \"M PLUS 2\", system-ui, sans-serif"
     fontSize: "12px"
@@ -403,9 +409,10 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 - **Tenue** (`dim`): texto secundario, etiquetas de campo, metadatos.
 - **Apagado** (`faint`): placeholders, íconos de búsqueda, asas de arrastre, punto de guardado neutro.
 - **Luz** (`light`): anillo de foco de campos, borde iluminado del segmento activo, zona de soltar.
+- **Bolsillo vacío** (`pocket-empty`): los bolsillos que todavía no se llenaron en la tira de páginas (3:1 contra el estante, para que se cuenten de un vistazo).
 
 ### Named Rules
-**La Regla del Color que Informa.** Fuera del escenario, un color solo aparece si reporta un estado de una carta, del guardado o de la grabación. El acento del canal no tiñe la herramienta: vive en el escenario y en la vista Marca.
+**La Regla del Color que Informa.** Fuera del escenario, un color solo aparece si reporta un estado de una carta, del guardado o de la grabación. El acento del canal no tiñe la herramienta: vive en el escenario y en la vista Marca. La única muestra afuera es el punto de 11px del botón Marca, que es la puerta a esa vista.
 
 **La Regla de la Tinta Roja.** `rec` significa grabar y nada más. Un botón destructivo usa texto rosado claro (#ff9d93) sobre vidrio, nunca el fondo rojo.
 
@@ -424,6 +431,7 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 - **Body** (500, 14px, 1.45): todo el texto operativo. Botones y chips en 600; títulos de fila en 700.
 - **Label** (500, 12.5px, `dim`): etiquetas de campo, metadatos de fila, notas, atajos.
 - **Teleprompter** (500, 26px por defecto, 1.45; ajustable con A− / A+ vía `--pf`): el guion en el estudio.
+- **Guion** (500, 16px, 1.55): el campo de guion debajo del escenario. Es texto para decir en voz alta, por eso sale de la regla de una sola lectura, igual que el teleprompter.
 - **Tag** (Klee One 600, 12px, 1): etiquetas de estado.
 - **Price** (Klee One 600, 24px, 1, cifras tabulares): número de carta en la etiqueta de precio.
 
@@ -436,9 +444,10 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 
 Una sola pantalla de trabajo de alto completo (`100dvh`), sin scroll de página en escritorio:
 
-- **Barra superior** de 56px: marca, carpeta y estado de guardado, selector de vista segmentado (Cartas / Plan del video / Marca), deshacer/rehacer, Ensayar, Grabar con su split de ajustes.
+- **Barra superior** de 56px: marca, carpeta y estado de guardado (se recorta con puntos suspensivos antes que nada), selector de vista segmentado (Cartas / Plan del video), el botón Marca aparte (se presiona y vuelve a la pestaña de antes), deshacer/rehacer, Ensayar y Grabar con su split de ajustes. Grabar dice en chico qué graba ("video" o "binder", y "desde acá" si está prendido); eso se elige en los ajustes, no depende de la pestaña.
 - **Tres columnas**: estante 340px · escenario flexible · inspector 360px. Desde 1800px: 380 / 400. Hasta 1560px: 316 / 340. Hasta 1180px: 300 / 320 y la marca pierde "Studio". Hasta 980px: una columna, la página scrollea y la barra superior envuelve.
-- **Columna central**: escenario 16:9 cuyo ancho es `min(100%, (100dvh − 56px − 190px) × 16/9)`; transporte y tira de páginas/escenas comparten exactamente ese ancho. Los segmentos de la tira crecen en proporción a las cartas que contienen (`flex: var(--w)`).
+- **Columna central**: escenario 16:9 cuyo ancho es `min(100%, (100dvh − 56px − 310px) × 16/9)` (190px sin carpeta, cuando no hay guion abajo); transporte, tira de páginas/escenas y guion comparten exactamente ese ancho. Los segmentos de la tira crecen en proporción a las cartas que contienen (`flex: var(--w)`). El escenario sigue a la pestaña: Cartas muestra el binder, Plan del video reproduce el video, y cada uno vuelve a donde había quedado.
+- **Guion bajo el escenario**: lo que dice el teleprompter en ese punto (el guion de la carta en escena, o el de la primera de un grupo de mismo arte, o el de la escena), editable ahí; llena el resto de la columna (mínimo 110px). En la portada del binder queda deshabilitado con la explicación.
 - **Estudio**: pantalla completa negra, escenario a la izquierda, columna de teleprompter de 400px a la derecha (no se graba).
 - **Ritmo**: paneles con padding 16px; secciones e interiores con 14px; separaciones entre controles de 6–10px; formularios en pares de dos columnas con gap 10px.
 - El inspector es un contenedor (`container-type: inline-size`): por debajo de 380px de ancho las acciones de imagen esconden su texto largo.
@@ -476,7 +485,7 @@ Tactiles y callados: vidrio por defecto, tinta solo para la acción principal.
 - **Split:** dos botones unidos, el segundo separado por `inset 1px 0 0 rgba(0,0,0,.25)`.
 
 ### Chips
-- **Style:** píldora de 28px, vidrio con texto tenue 13px 600; contador en negrita al 75%.
+- **Style:** píldora de 28px, vidrio con texto tenue 13px 600; contador en negrita.
 - **State:** presionado se invierte a tinta con texto vitrina.
 - **Temas (Marca):** píldora de 32px sobre vitrina con muestras circulares de 12px superpuestas; activo invertido a tinta.
 
@@ -504,13 +513,22 @@ Marco de acetato 63/88 alrededor de toda miniatura (44px en el estante, 104px en
 ### Navigation
 - **Selector de vista:** riel segmentado sobre estante (radio 9px, padding 3px); cada pestaña 700 en `dim` con contador 12px; la seleccionada se invierte a tinta con texto vitrina.
 - **Estante:** filas de 44px de miniatura + título 700 + meta 12.5px; grupos de mismo arte comparten un fondo de tinta al 4% con esquinas unidas; asa de arrastre visible en hover o selección; marcador de soltar de 3px en tinta.
-- **Tira:** segmentos en estante (8px de radio) con bolsillos de 7×9px (menta hecho, rojo falta, tinta ahora); activo en riel con borde superior iluminado.
+- **Tira:** segmentos en estante (8px de radio) con bolsillos de 7×9px (`pocket-empty` vacío, menta hecho, rojo falta, tinta ahora); activo en riel con borde superior iluminado. Un segmento de escena angosto se nombra con su capítulo o, si es un cartel, con su primera palabra.
+- **Plan del video:** arriba, fija, la fila "El video" (música, capítulos, unir partes); cada capítulo es un encabezado ("Capítulo" en `dim` 12px + nombre 700 12.5px y una línea de vidrio) sobre la escena donde empieza. La meta de cada fila admite dos renglones.
+- **Selectores segmentados (ajustes de Grabar):** "Qué graba" y "Desde dónde" en vitrina con padding 3px; la opción elegida se invierte a tinta, como el selector de vista.
 
 ### Menus, Popovers, Toasts, Dialogs
 Menús (min 220px) y popovers (360px) en riel con sombra flotante, entran con escala .97 y −4px en 160–180ms. Toasts abajo a la derecha, entran 12px desde abajo en 400ms. Diálogos en estante, 16px de radio, entran con escala .97 en 220ms. Todo respeta `prefers-reduced-motion` (sin animación de entrada ni parpadeo).
 
+### Inspector
+- **Carta:** imagen, etiquetas, acciones de imagen, "me falta", "mismo arte" y el dato en pantalla a la vista; los datos de catálogo (set, número, año, rareza, variantes, ilustrador, idioma, grupo) en un desplegable de vidrio "Datos de la carta", abierto si falta el set o el número. El guion está debajo del escenario.
+- **Escena:** título con el botón de volver a verla; una fila de vidrio "Desde acá" con Ensayar y Grabar (rojo, porque graba); después lo que la escena muestra (con el fondo como lista de opciones y el tramo de binder como dos números), el capítulo, y al pie, separado por una línea de vidrio, el tipo de escena y su lugar en el plan (subir, bajar, duplicar, quitar).
+
 ### Studio (teleprompter)
-Columna vitrina de 400px junto al escenario negro: indicador de toma (punto de 12px, gris en ensayo, rojo parpadeando 1.2s al grabar), tiempo tabular, tira de progreso de 8px proporcional, texto del guion grande, "a un toque" en estante, atajos en `kbd` de vidrio. La cuenta regresiva es un 180px 900 sobre vitrina al 96%.
+Columna vitrina de 400px junto al escenario negro: indicador de toma (punto de 12px, gris en ensayo, rojo parpadeando 1.2s al grabar, amarillo en pausa), tiempo tabular (corre también en el ensayo), tira de progreso de 8px proporcional, texto del guion grande, "a un toque" en estante, atajos en `kbd` de vidrio. En el ensayo, un botón rojo "Grabar desde acá" (tecla R) pasa a grabar desde ese punto. Grabando, Esc primero pausa y recién el segundo Esc termina. La cuenta regresiva es un 180px 900 sobre vitrina al 96%.
+
+### Tu video (fin de la toma)
+El diálogo entra entero en la pantalla (el video se achica primero). Debajo de los capítulos, una fila de vidrio dice dónde arranca la parte siguiente con "Grabar la siguiente" (guarda en la carpeta si hace falta y vuelve a grabar desde ahí). Una vez guardada o descargada, "Descartar" pasa a "Cerrar" y Esc cierra.
 
 ## Do's and Don'ts
 

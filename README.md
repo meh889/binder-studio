@@ -10,16 +10,16 @@ Funciona en **Chrome o Edge en una computadora** (son los navegadores que permit
 
 1. Creá una carpeta por especie, por ejemplo `Ponyta/`, y poné ahí las imágenes de las cartas.
 2. Abrí la herramienta y tocá **Abrir carpeta**. El navegador te pide permiso una vez. Para abrir otra especie o una reciente, usá el menú de la carpeta, arriba a la izquierda.
-3. En **Cartas** está el estante: cada carta lleva etiquetas de lo que le falta (*sin imagen*, *sin guion*, *me falta*) o de lo que tiene (*2 zooms*). Tocá una y el escenario la muestra; a la derecha completás sus datos, la recortás o marcás sus zooms. Filtrá por etiqueta o buscá con `/`. Para sumar cartas: **+ Agregar** (imágenes, pegar desde planilla o carta vacía).
-4. Tocá **● Grabar**, avanzá con **→** y al terminar guardá el video en la carpeta o descargalo. La calidad, los cuadros por segundo y el audio están en el botón de ajustes, al lado de Grabar.
+3. En **Cartas** está el estante: cada carta lleva etiquetas de lo que le falta (*sin imagen*, *sin guion*, *me falta*) o de lo que tiene (*2 zooms*). Tocá una y el escenario la muestra; debajo del escenario escribís lo que vas a decir (el guion de esa carta) y a la derecha el dato en pantalla, la imagen y los zooms. Los datos de catálogo (set, número, rareza, idioma…) están en el desplegable **Datos de la carta**. Filtrá por etiqueta o buscá con `/`. Para sumar cartas: **+ Agregar** (imágenes, pegar desde planilla o carta vacía).
+4. Tocá **● Grabar**, avanzá con **→** y al terminar guardá el video en la carpeta o descargalo. En el botón de ajustes, al lado de Grabar, elegís **qué graba** (el video completo o solo el binder), **desde dónde** (el principio o donde está el escenario), la calidad, los cuadros por segundo y el audio. El botón Grabar siempre dice qué va a grabar.
 
 Si sumás imágenes a la carpeta mientras la herramienta está abierta, elegí **Volver a leer la carpeta** en el menú de la carpeta (o simplemente volvé a la pestaña: la relee sola).
 
 ## El video completo (Plan del video)
 
 1. Escribí el guion y pasáselo a Claude en el chat. Claude propone la edición y deja un `video.json` en tu carpeta con las escenas: ráfaga, carteles, tramos de binder, cartas especiales y cierre. La herramienta lo carga sola al volver a la pestaña.
-2. En **Plan del video** ves las escenas en orden, cuánto dura cada una más o menos y qué imágenes, GIF o clips te faltan (van en `media/`). Tocá una escena para retocarla a la derecha mientras el escenario la reproduce.
-3. Debajo del escenario elegís **Video completo** y tocás **● Grabar**. Leés el guion en el teleprompter y avanzás con →. Se graba tu voz, la música de `musica/` (que baja sola cuando hablás) y los efectos de sonido.
+2. En **Plan del video** ves las escenas en orden, agrupadas por capítulo, cuánto dura cada una más o menos y qué imágenes, GIF o clips te faltan (van en `media/`). Tocá una escena para retocarla a la derecha mientras el escenario la reproduce; su guion está debajo del escenario. La primera fila, **El video**, tiene la música, los capítulos y **Unir partes**.
+3. Tocá **● Grabar** (dice "video" cuando graba el video completo). Leés el guion en el teleprompter y avanzás con →. Se graba tu voz, la música de `musica/` (que baja sola cuando hablás) y los efectos de sonido.
 4. Al terminar, te da el MP4 con audio y la lista de capítulos para pegar en la descripción de YouTube.
 
 Tipos de escena: ráfaga, portada, cartel cinético (golpe, barrido, máquina de escribir, contador), binder, carta en grande, imagen o clip, lista y cierre. En los carteles, `*palabra*` sale grande y en color, `_palabra_` chica en cursiva y `~palabra~` aparece y se tacha.
@@ -54,7 +54,7 @@ Ponyta/
 └── videos/               los videos que guardes desde la herramienta
 ```
 
-La app viene con la marca de Mafia TCG puesta: el logo (como sticker en la tapa, en la esquina y en el cierre), el binder lila y los colores del logo. Todo se cambia en la vista **Marca** (el tema **Mafia TCG** la vuelve a poner con un clic) y se guarda en el navegador para todas las especies. Los archivos de la marca en alta (avatar, banner, logo y stickers) están en [`marca/`](marca/).
+La app viene con la marca de Mafia TCG puesta: el logo (como sticker en la tapa, en la esquina y en el cierre), el binder lila y los colores del logo. Todo se cambia con el botón **Marca** de arriba (el tema **Mafia TCG** la vuelve a poner con un clic) y se guarda en el navegador para todas las especies. Los archivos de la marca en alta (avatar, banner, logo y stickers) están en [`marca/`](marca/).
 
 ## Atajos mientras grabás
 
@@ -64,15 +64,18 @@ La app viene con la marca de Mafia TCG puesta: el logo (como sticker en la tapa,
 | ← | Volver un paso |
 | Z | Zoom rápido |
 | P | Pausar y retomar (no corta el archivo: lo que pasa en la pausa no queda en el video; al retomar hay una cuenta 3-2-1) |
-| Esc | Terminar la grabación |
+| R | En el ensayo: empezar a grabar desde ese punto |
+| Esc | Grabando, primero pausa; el segundo Esc termina. En el ensayo, termina. |
 
 ## Grabar por partes
 
 No hace falta grabar todo de un tirón ni pasar por un editor:
 
-- **Pausa:** en el estudio, **P** pausa y retoma. Mientras está en pausa podés moverte con ← y → para volver a la carta que querías rehacer.
-- **Grabar desde acá:** en **Plan del video**, elegí una escena y tocá **Grabar desde acá**. En un tramo de binder elegí también la carta ("Grabar desde la carta"): las anteriores ya aparecen guardadas y tildadas. En **Cartas** está el mismo botón en la ficha de cada carta.
-- **Unir partes:** guardá cada parte con **Guardar en la carpeta** (se guarda con sus capítulos en `videos/`). Después, en **Plan del video → El video → Unir partes…**, marcalas, ordenalas y tocá **Unir**: queda un solo video con los capítulos corridos. Tarda lo mismo que dura el video y la pestaña tiene que quedar al frente.
+- **Pausa:** en el estudio, **P** pausa y retoma (Esc también pausa). Mientras está en pausa podés moverte con ← y → para volver a la carta que querías rehacer.
+- **Desde acá:** "acá" es donde está el escenario. En **Plan del video**, elegí una escena y usá **Desde acá → Ensayar** o **Grabar**; para empezar en una carta de un tramo de binder, llegá a ella con → en el escenario antes de tocar. También podés prender **Desde acá** en los ajustes de Grabar (sirve en Cartas). Las cartas anteriores ya aparecen guardadas y tildadas.
+- **Del ensayo a la toma:** ensayando, tocá **Grabar desde acá** (o **R**) y empieza a grabar en ese punto, con cuenta 3-2-1.
+- **La parte siguiente:** al terminar una toma, el diálogo dice dónde arranca la siguiente; **Grabar la siguiente** guarda la parte en `videos/` y vuelve a grabar desde ahí.
+- **Unir partes:** cada parte se guarda con sus capítulos en `videos/`. Después, en **Plan del video → El video → Unir partes…** (o en el menú de la carpeta), marcalas, ordenalas y tocá **Unir**: queda un solo video con los capítulos corridos. Tarda lo mismo que dura el video y la pestaña tiene que quedar al frente.
 
 Fuera de la grabación también funcionan → y ← sobre el escenario, **Inicio** para volver al principio, **/** para buscar cartas, **↑ ↓** para moverte por la lista y **Ctrl+Z** para deshacer.
 

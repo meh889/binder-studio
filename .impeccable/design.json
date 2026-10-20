@@ -663,6 +663,11 @@
           "#cbc7cf",
           "#f1edf4"
         ]
+      },
+      "pocket-empty": {
+        "role": "neutral",
+        "displayName": "Bolsillo vacío",
+        "canonical": "#5f6a72"
       }
     },
     "typographyMeta": {
