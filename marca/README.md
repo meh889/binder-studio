@@ -17,16 +17,24 @@ La identidad del canal es el binder del coleccionista: una tapa de cuerina lila 
 
 ### Stickers
 
+Todos con fondo transparente y sin sombra, para apoyarlos sobre cualquier fondo y ponerles la sombra que pida cada pieza.
+
+**En acuarela, con banda azul y borde crema** (como Psyduck y Ponyta: banda `#3a5aa6` de un 2 % del alto y borde `#fbf9f4` de un 4 %). Salen de las imágenes que mandaste, recortadas del papel y sin las partículas, los nombres ni las sombras del piso:
+
 | Archivo | Qué es |
 |---|---|
+| `pikachu.png`, `charizard.png`, `eevee.png`, `gengar.png`, `mewtwo.png`, `lucario.png`, `greninja.png`, `snorlax.png`, `bulbasaur.png`, `mimikyu.png` | Uno por personaje, de la hoja de diez |
+| `energia-planta.png`, `energia-fuego.png`, `energia-agua.png`, `energia-electrica.png`, `energia-psiquica.png`, `energia-lucha.png`, `energia-oscura.png`, `energia-metal.png` | Una por energía, solo la esfera |
+| `pokebola.png`, `pokebola-amor.png` | Poké Ball y Love Ball |
+| `dorso-acuarela.png` | Dorso de carta en acuarela (fan art, el que va con la regla de la marca) |
 | `psyduck.png`, `ponyta.png` | Los dos del logo, recortados del logo original |
-| `heracross.png` | El Heracross que mandaste, recortado del fondo negro, con el borde pasado al crema de los demás |
-| `pokebola.png`, `energia-agua.png`, `energia-fuego.png` | Pokébola y energías del banner |
-| `dorso-pocket-monsters.png` | Dorso japonés de 1996 (Pocket Monsters Card Game) |
-| `dorso-japones-borde-amarillo.png` | Dorso japonés actual, con borde amarillo |
-| `dorso-clasico.png` | Dorso clásico, con borde azul |
+| `heracross.png` | El Heracross que mandaste, recortado del fondo negro |
 
-El borde de todos es crema (`#fbf9f4`), de un 5 % del ancho y sin sombra, para que se puedan apoyar sobre cualquier fondo y ponerles la sombra que pida cada pieza. Los dorsos salen de imágenes chicas (unos 350 px de ancho): sirven para miniaturas y separadores, no para verse en grande. Con una foto más grande de cada dorso se rehacen igual.
+**Del banner** (planos, borde crema): `pokebola-banner.png`, `energia-agua-banner.png`, `energia-fuego-banner.png`.
+
+**Dorsos oficiales** (borde crema, sin banda): `dorso-pocket-monsters.png` (japonés de 1996), `dorso-japones-borde-amarillo.png` y `dorso-clasico.png`. Son oficiales: para usar adentro de los videos cuando se habla de ellos, no en el banner, el avatar ni el logo. Salen de imágenes chicas (unos 350 px de ancho); con fotos más grandes se rehacen igual.
+
+Los personajes y las energías quedaron de unos 550 a 780 px de alto (las hojas originales los traían a unos 300 px y se agrandaron al doble), las Poké Ball de unos 1500 px y el dorso en acuarela de 1233 px.
 
 En el banner, el nombre y la frase quedan dentro de la franja que muestran el celular y la compu (1546×423 en el centro). Lo de arriba y abajo solo se ve en la tele.
 
