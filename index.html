@@ -857,9 +857,13 @@ const coverTex = () => texCanvas("cover" + binderColor(), BW, BH, (x, w, h) => {
   x.save(); rrx(x, 0, 0, w, h, 26); x.clip();
   const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, "rgba(255,255,255,.075)"); g.addColorStop(.5, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(0,0,0,.2)");
   x.fillStyle = g; x.fillRect(0, 0, w, h); x.restore();
-  // zip-around binder: a zipper track on the outer edge, teeth catching the light, and the pull at the top corner
-  x.save(); rrx(x, 4, 4, w - 8, h - 8, 23); x.lineWidth = 15; x.strokeStyle = "rgba(0,0,0,.55)"; x.stroke(); x.restore();
-  x.save(); rrx(x, 4, 4, w - 8, h - 8, 23); x.setLineDash([3.2, 3.2]); x.lineWidth = 7; x.strokeStyle = "rgba(170,170,176,.38)"; x.stroke(); x.restore();
+  // zip-around binder: the zipper track runs along the three open sides, teeth catching the light, and ends at the spine
+  // (left, where the binder folds, with no zipper) with a small metal stop; the pull sits at the top corner
+  const zip = () => { const i = 4, r = 23, sp0 = 58; x.beginPath(); x.moveTo(sp0, i); x.lineTo(w - i - r, i); x.arcTo(w - i, i, w - i, i + r, r);
+    x.lineTo(w - i, h - i - r); x.arcTo(w - i, h - i, w - i - r, h - i, r); x.lineTo(sp0, h - i); };
+  x.save(); zip(); x.lineWidth = 15; x.strokeStyle = "rgba(0,0,0,.55)"; x.stroke(); x.restore();
+  x.save(); zip(); x.setLineDash([3.2, 3.2]); x.lineWidth = 7; x.strokeStyle = "rgba(170,170,176,.38)"; x.stroke(); x.restore();
+  for(const y of [4, h - 4]){ x.save(); const g = x.createLinearGradient(0, y - 8, 0, y + 8); g.addColorStop(0, "#4a4b4f"); g.addColorStop(.5, "#b9bbc0"); g.addColorStop(1, "#4a4b4f"); x.fillStyle = g; rrx(x, 50, y - 8, 12, 16, 3); x.fill(); x.restore(); }
   x.save(); x.setLineDash([11, 7]); x.lineWidth = 2.2; x.strokeStyle = "rgba(255,255,255,.14)"; rrx(x, 22, 22, w - 44, h - 44, 15); x.stroke(); x.restore();
   // raised edge: light on the top and left, shade on the bottom and right
   x.save(); rrx(x, 1, 1, w - 2, h - 2, 25); x.lineWidth = 2; const e = x.createLinearGradient(0, 0, w, h); e.addColorStop(0, "rgba(255,255,255,.22)"); e.addColorStop(.5, "rgba(255,255,255,.04)"); e.addColorStop(1, "rgba(0,0,0,.5)"); x.strokeStyle = e; x.stroke(); x.restore();
