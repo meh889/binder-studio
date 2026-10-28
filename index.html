@@ -1897,8 +1897,8 @@ function flySprite(c){
   const x = sharp.getContext("2d"); rrx(x, 0, 0, FLY_W, FLY_H, FLY_W*.045); x.clip();
   const k = Math.max(FLY_W/im.width, FLY_H/im.height); x.imageSmoothingQuality = "high"; x.drawImage(im, (FLY_W - im.width*k)/2, (FLY_H - im.height*k)/2, im.width*k, im.height*k);
   const soft = document.createElement("canvas"); soft.width = FLY_W/2 + FLY_PAD; soft.height = FLY_H/2 + FLY_PAD;
-  const y = soft.getContext("2d"); y.filter = "blur(5px)"; y.drawImage(sharp, FLY_PAD/2, FLY_PAD/2, FLY_W/2, FLY_H/2);
-  e = {sharp, soft}; flySprites.set(src, e); return e;
+  const y = soft.getContext("2d"); y.drawImage(sharp, FLY_PAD/2, FLY_PAD/2, FLY_W/2, FLY_H/2);
+  e = {sharp, soft:softCopy(soft, soft.width, soft.height, soft.width, soft.height, 6)}; flySprites.set(src, e); return e;
 }
 // Everything the adelanto draws is prepared before it is on screen (the cloud's small copies, each front card and the
 // suspense card), one piece per task, so no frame of the take stops to load or resize a scan.
@@ -1934,16 +1934,30 @@ function drawFront(c, cx, cy, h, rot, alpha){
   ctx.fillStyle = g; rr(-w/2, -h/2, w, h, w*.045); ctx.fill();
   ctx.restore();
 }
-// the suspense card, big and out of focus: you can tell it is a card, not which one
+// the suspense card, big and out of focus: you can tell it is a card, not which one. The blur comes from shrinking the
+// card to a few pixels and growing it back in steps, which works in every browser (a canvas blur filter isn't everywhere)
 const suspenseSprites = new Map();
+function softCopy(im, sw, sh, tw, th, tiny){
+  // tiny → a few steps up to the final size, each one smoothing the last
+  let cur = document.createElement("canvas"); cur.width = Math.max(2, Math.round(tw/tiny)); cur.height = Math.max(2, Math.round(th/tiny));
+  let x = cur.getContext("2d"); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high"; x.drawImage(im, 0, 0, sw, sh, 0, 0, cur.width, cur.height);
+  while(cur.width < tw){
+    const nx = document.createElement("canvas"); nx.width = Math.min(tw, cur.width*2); nx.height = Math.min(th, cur.height*2);
+    const y = nx.getContext("2d"); y.imageSmoothingEnabled = true; y.imageSmoothingQuality = "high"; y.drawImage(cur, 0, 0, nx.width, nx.height); cur = nx;
+  }
+  return cur;
+}
 function suspenseSprite(c){
   const src = cardSrc(c), im = getImg(src); if(!im) return null;
   let e = suspenseSprites.get(src); if(e) return e;
-  const w = 600, h = Math.round(w*88/63), pad = 160; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
-  const x = e.getContext("2d"); x.filter = "blur(56px) saturate(.75) brightness(.85)";
+  const w = 600, h = Math.round(w*88/63), pad = 160;
   const card = document.createElement("canvas"); card.width = w; card.height = h; const y = card.getContext("2d"); rrx(y, 0, 0, w, h, w*.045); y.clip();
   const k = Math.max(w/im.width, h/im.height); y.drawImage(im, (w - im.width*k)/2, (h - im.height*k)/2, im.width*k, im.height*k);
-  x.drawImage(card, pad, pad); suspenseSprites.set(src, e); return e;
+  // the card on a transparent sheet with room around it, so its edges melt into the dark too
+  const sheet = document.createElement("canvas"); sheet.width = w + 2*pad; sheet.height = h + 2*pad; sheet.getContext("2d").drawImage(card, pad, pad);
+  e = softCopy(sheet, sheet.width, sheet.height, sheet.width, sheet.height, 48);
+  const z = e.getContext("2d"); z.globalCompositeOperation = "source-atop"; z.fillStyle = "rgba(20,12,24,.25)"; z.fillRect(0, 0, e.width, e.height);
+  suspenseSprites.set(src, e); return e;
 }
 // long lines break into rows of about `max` letters (markup kept whole); " / " forces a break
 function adWrap(label, max){
