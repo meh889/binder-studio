@@ -3014,10 +3014,11 @@ async function openStudio(record, from, t){
   // the take starts once the opening scenes' pictures are ready, so its first seconds don't stutter
   await warmIdle(8000); if(!studioOpen) return;
   if(record){
+    const okAudio = await audioReady(); if(!studioOpen){ stopMic(); return; }
     const cd = $("countdown"); cd.hidden = false;
     for(const n of [3,2,1]){ cd.textContent = n; await sleep(800); if(!studioOpen){ cd.hidden = true; stopMic(); return; } }
     cd.hidden = true;
-    startRec();
+    startRec(okAudio);
   } else { applyAudio(); runClock(); }
   startMusic();
   if(VM.on) startAt(from, record);
@@ -3044,10 +3045,11 @@ async function recordFromHere(){
   recFrom = pos.scene > 0 || pos.card > 0 ? pos : null; chapters = []; videoKind = "";
   $("recHere").hidden = $("rKey").hidden = true; $("recLbl").textContent = "PREPARANDO"; $("recTime").textContent = "00:00";
   if(!VM.on) drawAt(pos.card ? pos.card - 1 : -1);
+  const okAudio = await audioReady(); if(!studioOpen){ stopMic(); return; }
   const cd = $("countdown"); cd.hidden = false;
   for(const n of [3,2,1]){ cd.textContent = n; await sleep(800); if(!studioOpen){ cd.hidden = true; stopMic(); return; } }
   cd.hidden = true;
-  startRec(); startMusic();
+  startRec(okAudio); startMusic();
   if(VM.on) startAt(pos, true);
 }
 // Where the next part starts once a take ends: after the last card shown, or at the next scene
@@ -3060,12 +3062,29 @@ function nextFrom(){
   const k = s.tipo !== "binder" && recElapsed() - sceneRecT < 2 ? VM.i : VM.i + 1;
   return k < list.length ? {scene:k} : null;
 }
-function startRec(){
+// Chrome's MP4 recorder holds the video until the sound starts flowing: if the page's audio isn't running yet when a take
+// starts (it can stall for a moment while the Mac moves the headphones over to their mic), everything before it is lost.
+// So a take starts only once the audio clock is moving; if it never does, it records without sound rather than coming out short.
+let takeNoAudio = false;
+async function audioReady(maxMs = 5000){
+  const ax = audio(); if(!ax) return false;
+  $("recLbl").textContent = "PREPARANDO EL AUDIO";
+  try{ if(ax.state !== "running") await Promise.race([ax.resume(), sleep(maxMs)]); }catch(e){}
+  const t0 = performance.now(); let last = ax.currentTime, moving = 0;
+  while(performance.now() - t0 < maxMs){
+    await sleep(50);
+    if(ax.state === "running" && ax.currentTime > last){ if(++moving >= 4) return true; } else moving = 0;
+    last = ax.currentTime;
+  }
+  return false;
+}
+function startRec(withAudio = true){
   setRes(+$("res").value);
   const fps = +$("fps").value, mime = pickMime();
   const tracks = cv.captureStream(fps).getVideoTracks();
   recording = true; applyAudio();
-  if(AB) tracks.push(...AB.rec.stream.getAudioTracks());
+  takeNoAudio = !withAudio;
+  if(AB && withAudio) tracks.push(...AB.rec.stream.getAudioTracks());
   const stream = new MediaStream(tracks), bits = K === 2 ? 40e6 : 14e6;
   try{ rec = new MediaRecorder(stream, mime ? {mimeType:mime, videoBitsPerSecond:bits, audioBitsPerSecond:192000} : {videoBitsPerSecond:bits}); }
   catch(e){ try{ rec = new MediaRecorder(stream); }catch(err){ recording = false; notice("No se pudo iniciar la grabación."); return; } }
@@ -3125,7 +3144,7 @@ function showVideo(blob, type, secs, is4k, hasAudio){
   videoBlob = blob; videoType = type; if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = URL.createObjectURL(blob);
   $("vPrev").src = videoUrl;
   const mb = (blob.size/1048576).toFixed(1), ext = type.includes("mp4") ? "MP4" : "WebM";
-  $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${fmtClock(secs)} · ${mb} MB. ${hasAudio ? "Con sonido." : "Sin sonido: la voz, la música y los efectos estaban apagados."}`;
+  $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${fmtClock(secs)} · ${mb} MB. ${hasAudio ? "Con sonido." : takeNoAudio ? "Sin sonido: el audio del navegador no arrancó y la toma se grabó sin sonido para no cortarse. Tocá cualquier cosa en la página y volvé a grabar." : "Sin sonido: la voz, la música y los efectos estaban apagados."}`;
   const fmt = t => { t = Math.max(0, Math.floor(t)); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
   const ch = chapters.slice(); if(ch.length && ch[0].t > 1) ch.unshift({t:0, name:"Intro"}); if(ch.length) ch[0].t = 0;
   $("chapBox").hidden = !ch.length; $("chapText").value = ch.map(c => fmt(c.t) + " " + c.name).join("\n");
