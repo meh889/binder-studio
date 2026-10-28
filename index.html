@@ -722,7 +722,7 @@ function setRes(k){ K = k; cv.width = W*k; cv.height = H*k; ctx = cv.getContext(
 function requestDraw(){ if(!drawQueued){ drawQueued = true; requestAnimationFrame(frame); } }
 // A tween that ends this frame resolves its promise after the frame is drawn, and the code awaiting it then
 // changes the scene (a card lands, a page settles): one more frame shows that change.
-function frame(t){ drawQueued = false; const ended = stepTweens(t); draw(); if(ended || tweens.size || recording || studioOpen || VM.shake > .3 || (VM.on && (studioOpen || performance.now() - VM.t0 < 25000))) requestDraw(); }
+function frame(t){ drawQueued = false; const ended = stepTweens(t); draw(); if(ended || tweens.size || recording || studioOpen || VM.shake > .3 || (VM.on && (studioOpen || performance.now() - Math.max(VM.t0, VM.stepT || 0) < 25000))) requestDraw(); }
 
 const tweens = new Set();
 const easeOut = p => 1 - Math.pow(1-p, 3);
@@ -786,6 +786,7 @@ const HERO = {cx: BCX + 6, cy: 548, h: 900, rot: -.034};
 const SHEET = {x: 1004, y: 58, w: 792, h: 1130, rot: .017};
 const PEN = "#1e3a86", INK = "#1b1b1c", GREY = "#67645c";
 const easeOutQuint = p => 1 - Math.pow(1 - p, 5);
+const lerp = (a, b, k) => a + (b - a)*k;
 // A spring as an easing: damping 1 settles without overshoot, below 1 overshoots a little; response in seconds.
 // The tween must last about 1.2 × response (critically damped) for the spring to settle before it ends.
 function springEase(damping, response, ms){
@@ -1582,6 +1583,7 @@ cv.addEventListener("click", advance);
 /* ================= Video plan (escenas) ================= */
 const SCENE_TYPES = {
   rafaga:{name:"Ráfaga", fields:[["items","Elementos, uno por línea (archivo | qué es, carta X, texto X, color)","area"],["ritmo","Segundos por elemento","text"],["fin","Al terminar","select",[["auto","Pasa sola a la siguiente"],["espera","Espera tu →"]]]]},
+  adelanto:{name:"Adelanto", fields:[["items","Pasos, uno por toque","area"],["vuelan","Cartas que vuelan (posiciones, ej. 1-409; vacío: todas)","text"]]},
   titulo:{name:"Portada", fields:[]},
   cartel:{name:"Cartel cinético", fields:[["estilo","Estilo","select",[["golpe","Golpe, palabra por palabra"],["barrido","Barrido"],["maquina","Máquina de escribir"],["contador","Contador"]]],["texto","Texto (*grande*, _chico_, ~tachado~)","area"],["valor","Número (contador)","text"],["fondo","Fondo (blanco, negro, acento, marca, carta X, media/archivo)","text"]]},
   binder:{name:"Binder", fields:[["cartas","Cartas (posiciones, ej. 1-9)","text"]]},
@@ -1593,7 +1595,7 @@ const SCENE_TYPES = {
 const ARRAY_FIELDS = new Set(["items"]);
 function newScene(tipo){
   const base = {id:uid("s"), tipo, capitulo:"", guion:""};
-  const d = {rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:""}, media:{media:"", pide:"", texto:"", sonido:"no"}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
+  const d = {adelanto:{items:["texto En este video vamos a ver *TODAS* las cartas", "texto *409*", "carta #1 | LA *PRIMERA*", "suspenso #1 | US$1.000", "silencio ¿CUÁL ES?"], vuelan:""}, rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:""}, media:{media:"", pide:"", texto:"", sonido:"no"}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
   return {...base, ...d};
 }
 function itemToLine(it){
@@ -1853,6 +1855,7 @@ const VM = {on:false, i:-1, t0:0, step:0, stepT:0, played:{}, lastItem:-1, auto:
 function drawScene(s, el){
   const T = TT();
   switch(s.tipo){
+    case "adelanto": return drawAdelanto(s, el, T);
     case "rafaga": return drawRafaga(s, el, T);
     case "cartel": return drawCartel(s, el, T);
     case "carta": return drawCartaScene(s, el, T);
@@ -1860,6 +1863,169 @@ function drawScene(s, el){
     case "lista": return drawLista(s, el, T);
     case "cierre": return drawCierre(s, el, T);
   }
+}
+/* ---------- adelanto ---------- */
+// The cold open: the species' own cards fly at the camera while the creator promises the video; then each → brings one card
+// to the front (the cloud keeps flying behind), the suspense card comes out of focus with a counter, and the silence stops it all.
+// Steps, one per line: "texto …" (or a bare line), "carta #11 | label", "suspenso #32 | US$66.000", "silencio ¿CUÁL ES?".
+function adelantoSteps(s){
+  return (s.items || []).map(x => String(x).trim()).filter(Boolean).map(line => {
+    const m = line.match(/^(texto|carta|suspenso|silencio)\b\s*(.*)$/i), kind = m ? m[1].toLowerCase() : "texto", rest = m ? m[2] : line;
+    if(kind === "texto" || kind === "silencio") return {kind, label:rest.trim()};
+    const [ref, ...lab] = rest.split("|"); return {kind, ref:ref.trim(), label:lab.join("|").trim()};
+  });
+}
+// the cards that fly: an even spread of the list (or of the stretch in `vuelan`), only the ones with a picture
+function adelantoPool(s){
+  const list = cards(), [a, b] = String(s.vuelan || "").trim() ? parseRange(s.vuelan) : [0, list.length - 1], idx = [];
+  for(let k = a; k <= b; k++) if(list[k] && cardSrc(list[k]) && !list[k].falta) idx.push(k);
+  const n = Math.min(40, idx.length), out = [];
+  for(let j = 0; j < n; j++) out.push(list[idx[Math.floor(j*idx.length/n)]]);
+  return out;
+}
+// each flying card is drawn from a small sharp copy, or a soft one when it is close to the lens or out of focus
+const flySprites = new Map(), FLY_W = 260, FLY_H = Math.round(FLY_W*88/63), FLY_PAD = 24;
+function flySprite(c){
+  const src = cardSrc(c), im = getImg(src); if(!im) return null;
+  let e = flySprites.get(src); if(e) return e;
+  const sharp = document.createElement("canvas"); sharp.width = FLY_W; sharp.height = FLY_H;
+  const x = sharp.getContext("2d"); rrx(x, 0, 0, FLY_W, FLY_H, FLY_W*.045); x.clip();
+  const k = Math.max(FLY_W/im.width, FLY_H/im.height); x.imageSmoothingQuality = "high"; x.drawImage(im, (FLY_W - im.width*k)/2, (FLY_H - im.height*k)/2, im.width*k, im.height*k);
+  const soft = document.createElement("canvas"); soft.width = FLY_W/2 + FLY_PAD; soft.height = FLY_H/2 + FLY_PAD;
+  const y = soft.getContext("2d"); y.filter = "blur(5px)"; y.drawImage(sharp, FLY_PAD/2, FLY_PAD/2, FLY_W/2, FLY_H/2);
+  e = {sharp, soft}; flySprites.set(src, e); return e;
+}
+// Everything the adelanto draws is prepared before it is on screen (the cloud's small copies, each front card and the
+// suspense card), one piece per task, so no frame of the take stops to load or resize a scan.
+const warmQ = []; let warmBusy = false, warmLoading = 0;
+function warmLater(fn){ warmQ.push(fn); if(!warmBusy){ warmBusy = true; setTimeout(warmNext, 0); } }
+// resolves when nothing is loading or waiting to be prepared (or after `max` ms)
+function warmIdle(max){ const t0 = Date.now(); return new Promise(r => (function chk(){ if((!warmBusy && !warmLoading) || Date.now() - t0 > max) r(); else setTimeout(chk, 40); })()); }
+function warmNext(){ const fn = warmQ.shift(); if(!fn){ warmBusy = false; return; } try{ fn(); }catch(e){} setTimeout(warmNext, 12); }
+function warmAdelanto(s){
+  const ready = c => { warmLoading++; return loadImg(cardSrc(c), 15000).then(im => im && im.decode ? im.decode().then(() => im, () => im) : im).finally(() => warmLoading--); };
+  adelantoPool(s).forEach(c => ready(c).then(im => im && warmLater(() => flySprite(c))));
+  adelantoSteps(s).forEach(p => { const c = p.ref && cards()[findCard(p.ref)]; if(!c) return;
+    ready(c).then(im => im && warmLater(() => { flySprite(c); if(p.kind === "suspenso") suspenseSprite(c); else frontSprite(c); })); });
+}
+// the card in front, at the size it is shown, so each frame draws a ready copy instead of the full scan
+const frontSprites = new Map(), FRONT_H = 900, FRONT_W = Math.round(FRONT_H*63/88);
+function frontSprite(c){
+  const src = cardSrc(c), im = getImg(src); if(!im) return null;
+  let e = frontSprites.get(src); if(e) return e;
+  e = document.createElement("canvas"); e.width = FRONT_W; e.height = FRONT_H;
+  const x = e.getContext("2d"); rrx(x, 0, 0, FRONT_W, FRONT_H, FRONT_W*.045); x.clip();
+  const k = Math.max(FRONT_W/im.width, FRONT_H/im.height); x.imageSmoothingQuality = "high"; x.drawImage(im, (FRONT_W - im.width*k)/2, (FRONT_H - im.height*k)/2, im.width*k, im.height*k);
+  frontSprites.set(src, e); return e;
+}
+function drawFront(c, cx, cy, h, rot, alpha){
+  const sp = frontSprite(c), w = h*63/88; if(!sp) return;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(cx, cy); ctx.rotate(rot);
+  ctx.save(); ctx.globalAlpha *= .6; ctx.drawImage(shadowTex(), -w*.62, -h*.56, w*1.32, h*1.24); ctx.restore();
+  ctx.drawImage(sp, -w/2, -h/2, w, h);
+  // the lamp sliding across the surface as the card settles
+  const g = ctx.createLinearGradient(-w/2, -h/2, w/2, h/2); g.addColorStop(.35, "rgba(255,255,255,0)"); g.addColorStop(.5, "rgba(255,255,255,.10)"); g.addColorStop(.65, "rgba(255,255,255,0)");
+  ctx.fillStyle = g; rr(-w/2, -h/2, w, h, w*.045); ctx.fill();
+  ctx.restore();
+}
+// the suspense card, big and out of focus: you can tell it is a card, not which one
+const suspenseSprites = new Map();
+function suspenseSprite(c){
+  const src = cardSrc(c), im = getImg(src); if(!im) return null;
+  let e = suspenseSprites.get(src); if(e) return e;
+  const w = 600, h = Math.round(w*88/63), pad = 60; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
+  const x = e.getContext("2d"); x.filter = "blur(14px) saturate(1.15)";
+  const card = document.createElement("canvas"); card.width = w; card.height = h; const y = card.getContext("2d"); rrx(y, 0, 0, w, h, w*.045); y.clip();
+  const k = Math.max(w/im.width, h/im.height); y.drawImage(im, (w - im.width*k)/2, (h - im.height*k)/2, im.width*k, im.height*k);
+  x.drawImage(card, pad, pad); suspenseSprites.set(src, e); return e;
+}
+// long lines break into rows of about `max` letters (markup kept whole); " / " forces a break
+function adWrap(label, max){
+  const t = String(label || "").trim(); if(t.includes(" / ")) return t.split(" / ").join("\n");
+  const words = t.match(/\*[^*]+\*\S*|_[^_]+_\S*|~[^~]+~\S*|\S+/g) || [], vis = w => w.replace(/[*_~]/g, "").length, rows = [];
+  let row = "";
+  for(const w of words){ if(row && vis(row) + 1 + vis(w) > max){ rows.push(row); row = w; } else row = row ? row + " " + w : w; }
+  if(row) rows.push(row);
+  return rows.join("\n");
+}
+function drawFlySprite(sp, cw, soft){
+  const ch = cw*FLY_H/FLY_W;
+  if(soft){ const kx = (FLY_W + 2*FLY_PAD)/FLY_W, ky = (FLY_H + 2*FLY_PAD)/FLY_H; ctx.drawImage(sp.soft, -cw*kx/2, -ch*ky/2, cw*kx, ch*ky); }
+  else ctx.drawImage(sp.sharp, -cw/2, -ch/2, cw, ch);
+}
+// the cloud: every card rides from far away in the middle out past the camera, spinning, about five seconds a lap
+function drawFlying(pool, t, o){
+  const parts = [], fr = k => { const v = Math.sin(k*12.9898)*43758.5453; return v - Math.floor(v); };
+  pool.forEach((c, j) => {
+    const h1 = fr(j + 1.3), h2 = fr(j*2.7 + 4.1), h3 = fr(j*3.3 + 7.7), p = (t*.2 + h1) % 1, z = .14 + p*p*2.7;
+    const ang = h2*Math.PI*2, r0 = 110 + h3*500;
+    parts.push({c, p, z, x:W/2 + Math.cos(ang)*r0*z*1.3, y:H/2 + Math.sin(ang)*r0*z*.85, rot:(h1 - .5)*1.4 + t*(h2 - .5)*1.6, tilt:Math.cos(t*(.7 + h3*.9) + h2*6)});
+  });
+  parts.sort((a, b) => a.z - b.z);
+  for(const q of parts){
+    const sp = flySprite(q.c); if(!sp) continue;
+    const cw = 230*q.z, a = Math.min(1, q.p*7)*Math.min(1, (1 - q.p)*6)*(o.dim ?? 1);
+    if(a <= .01 || q.x < -cw || q.x > W + cw || q.y < -cw*1.5 || q.y > H + cw*1.5) continue;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(q.x, q.y); ctx.rotate(q.rot); ctx.scale(Math.max(.45, Math.abs(q.tilt)), 1);
+    drawFlySprite(sp, cw, o.blur || q.z > 1.45);
+    ctx.restore();
+  }
+}
+// the music cuts out for the silence step and comes back with the next scene
+let musicHush = false;
+function setHush(on){
+  if(on === musicHush) return; musicHush = on;
+  if(AX && AB) AB.music.gain.setTargetAtTime(on || VM.clip ? 0 : S.brand.audio.musicVol/100, AX.currentTime, on ? .03 : .25);
+}
+function drawAdelanto(s, el, T){
+  const steps = adelantoSteps(s), k = clamp(VM.step, 0, Math.max(0, steps.length - 1)), st = steps[k] || {kind:"texto", label:""};
+  const se = performance.now() - VM.stepT, live = studioOpen || recording, kind = st.kind;
+  setHush(kind === "silencio" && live);
+  // the cloud's own clock: it slows down behind a card, almost stops in the suspense and freezes in the silence
+  const now = performance.now(), dt = VM.flyLast ? Math.min(100, now - VM.flyLast) : 0, want = {texto:1, carta:.35, suspenso:.12, silencio:0}[kind] ?? 1;
+  VM.flyLast = now; VM.flySpeed += (want - VM.flySpeed)*Math.min(1, dt/260); VM.flyT += dt/1000*VM.flySpeed;
+  drawBg(T); ctx.fillStyle = "rgba(14,8,18,.62)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+  const glow = ctx.createRadialGradient(W/2, H/2, 40, W/2, H/2, H*.75); glow.addColorStop(0, "rgba(255,236,214,.10)"); glow.addColorStop(1, "rgba(255,236,214,0)"); ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+  const pool = adelantoPool(s), suspense = kind === "suspenso" || kind === "silencio";
+  drawFlying(pool, VM.flyT, {blur:suspense, dim:kind === "texto" ? 1 : suspense ? .45 : .55});
+  if(kind === "texto"){
+    const g = ctx.createRadialGradient(W/2, H/2, 80, W/2, H/2, H*.62); g.addColorStop(0, "rgba(10,5,14,.62)"); g.addColorStop(1, "rgba(10,5,14,0)"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    drawKin(adWrap(st.label, 22), se, {x:150, y:170, w:W - 300, h:H - 340}, 230, "dark", "golpe", "at" + k);
+    return;
+  }
+  if(kind === "carta"){
+    const c = cards()[findCard(st.ref)];
+    // the card before it keeps flying, past the lens, for a moment
+    const pv = steps[k - 1], pc = pv && pv.kind === "carta" ? cards()[findCard(pv.ref)] : null;
+    if(!c){ missingBox(st.ref, "No encuentro esa carta en la lista"); return; }
+    const p = clamp(se/620, 0, 1), e = easeOutQuint(p), n = live && !reduced ? now : 0, sc = .22 + .78*e, h = 860*sc;
+    const fromX = W/2 + (hash("ax" + k) - .5)*900, fromY = H/2 + (hash("ay" + k) - .5)*500, cx = lerp(fromX, 720, e), cy = lerp(fromY, 545, e);
+    const rot = lerp((hash("ar" + k) - .5)*1.6, -.035, e) + (n ? .004*Math.sin(n/1300) : 0);
+    drawFront(c, cx, cy, h, rot, Math.min(1, p*3));
+    if(pc && se < 420){ const q = se/420; drawFront(pc, 720 - 520*q, 545 + 120*q, 860*(1 + .9*q), -.035 - .3*q, 1 - q); }
+    if(st.label) drawKin(adWrap(st.label, 13), se - 280, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
+    return;
+  }
+  // suspense and silence: the card stays out of focus, with its price counting up; the silence keeps it and asks
+  let sk = k; while(sk > 0 && steps[sk].kind !== "suspenso") sk--;
+  const sp = steps[sk] && steps[sk].kind === "suspenso" ? steps[sk] : null, c = sp ? cards()[findCard(sp.ref)] : null, f = c && flySprite(c);
+  const blurCard = c && suspenseSprite(c);
+  if(blurCard){ ctx.save(); ctx.translate(W/2, H*.5); ctx.rotate(-.04); ctx.drawImage(blurCard, -blurCard.width/2, -blurCard.height/2); ctx.restore(); }
+  ctx.fillStyle = kind === "silencio" ? "rgba(8,4,10,.5)" : "rgba(8,4,10,.2)"; ctx.fillRect(0, 0, W, H);
+  if(sp && sp.label){
+    const raw = sp.label, val = parseFloat(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
+    const prefix = (raw.match(/^[^\d-]*/) || [""])[0], suffix = (raw.match(/[^\d.,]*$/) || [""])[0];
+    const sinceS = kind === "suspenso" ? se : 99999, p = clamp((sinceS - 250)/1500, 0, 1), cur = Math.round(val*easeOut(p));
+    if(kind === "suspenso"){
+      if(cur !== VM.adLast && p > 0 && p < 1){ VM.adLast = cur; if(!VM.played["ad" + Math.floor(p*24)]){ VM.played["ad" + Math.floor(p*24)] = 1; playSfx("tick"); } }
+      if(p >= 1 && !VM.played["adEnd" + k]){ VM.played["adEnd" + k] = 1; playSfx("hit"); VM.shake = 20; }
+    }
+    const txt = prefix + cur.toLocaleString("es-AR") + suffix; let size = 300; ctx.font = fDisp(size); while(ctx.measureText(txt).width > W - 260 && size > 90){ size -= 10; ctx.font = fDisp(size); }
+    const pop = kind === "suspenso" && p >= 1 ? 1 + .08*Math.max(0, 1 - (se - 1750)/260) : 1;
+    ctx.save(); ctx.translate(W/2, kind === "silencio" ? H*.36 : H*.5); ctx.scale(pop, pop); ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 40; ctx.fillStyle = T.acc; ctx.fillText(txt, 0, size*.34); ctx.restore(); ctx.textAlign = "left";
+  }
+  if(kind === "silencio" && st.label) drawKin(adWrap(st.label, 16), se - 150, {x:200, y:H*.56, w:W - 400, h:H*.3}, 190, "dark", "golpe", "as" + k);
 }
 function drawRafaga(s, el, T){
   const items = sceneItems(s), r = clamp((parseFloat(String(s.ritmo).replace(",", ".")) || .28), .08, 3)*1000;
@@ -2004,6 +2170,7 @@ function warmScene(s){
   if(s.tipo === "rafaga") sceneItems(s).forEach(it => { if(it.kind === "media") getMedia(it.val); else if(it.kind === "carta") card(it.val); });
   if(s.tipo === "media") getMedia(s.media);
   if(s.tipo === "carta") card(s.carta);
+  if(s.tipo === "adelanto") warmAdelanto(s);
   const f = String(s.fondo || "").trim(), m = f.match(/^carta\s+(.+)$/i);
   if(m) card(m[1]); else if(/\.\w{2,4}$/.test(f)) getMedia(f);
 }
@@ -2012,7 +2179,8 @@ function goScene(i, opts={}){
   if(i >= list.length){ VM.ended = true; updPrompter(); return; }
   i = clamp(i, 0, list.length - 1);
   cancelAnim(); pauseMedia();
-  Object.assign(VM, {i, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false});
+  Object.assign(VM, {i, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false, flyT:0, flyLast:0, flySpeed:1, adLast:-1});
+  setHush(false);
   const s = list[i]; warmScene(s); warmScene(list[i + 1]);
   if(s.tipo === "media" && s.sonido === "si") startClipSound(s);
   if(s.tipo === "binder") enterBinder(s);
@@ -2038,6 +2206,10 @@ async function advanceVideo(){
   if(s.tipo === "carta"){
     const c = cards()[findCard(s.carta)], zs = (c && c.zooms) || [];
     if(VM.step < zs.length){ const z = zs[VM.step++]; updPrompter(); playSfx("whoosh"); await tweenZoom(z); return; }
+  }
+  if(s.tipo === "adelanto"){
+    const st = adelantoSteps(s), nx = st[VM.step + 1];
+    if(nx){ VM.step++; VM.stepT = performance.now(); if(nx.kind !== "silencio"){ playSfx(nx.kind === "texto" ? "hit2" : "whoosh"); VM.shake = Math.max(VM.shake, nx.kind === "texto" ? 9 : 5); } updPrompter(); requestDraw(); return; }
   }
   if(s.tipo === "lista"){
     const n = (s.items || []).filter(x => String(x).trim()).length;
@@ -2071,6 +2243,11 @@ function nextHint(){
   }
   if(s.tipo === "carta"){ const c = cards()[findCard(s.carta)], zs = (c && c.zooms) || []; if(VM.step < zs.length) return {html:`<b>Zoom ${VM.step + 1} de ${zs.length}</b>`, card:c}; }
   if(s.tipo === "lista"){ const items = (s.items || []).filter(x => String(x).trim()); if(VM.step < items.length) return {html:`<b>Punto ${VM.step + 1} de ${items.length}</b> · ${esc(items[VM.step])}`, card:null}; }
+  if(s.tipo === "adelanto"){
+    const st = adelantoSteps(s), nx = st[VM.step + 1];
+    if(nx){ const what = {texto:"Texto", carta:"Carta", suspenso:"Suspenso", silencio:"Silencio"}[nx.kind], lab = String(nx.label || "").replace(/[*_~]/g, "");
+      return {html:`<b>Paso ${VM.step + 2} de ${st.length}</b> · ${what}${lab ? " · " + esc(lab) : ""}`, card:nx.ref ? cards()[findCard(nx.ref)] : null}; }
+  }
   return nextScene;
 }
 function nextBinder(){
@@ -2176,6 +2353,11 @@ function promptVideo(){
   const list = scenes(), s = list[VM.i];
   if(!s){ $("pCount").textContent = "Listo para empezar"; $("pText").innerHTML = `<span class="muted">Tocá → para arrancar con la primera escena.</span>`; $("pNext").innerHTML = nextHTML(nextHint()); return; }
   let title = `Escena ${VM.i + 1} de ${list.length} · ${sceneLabel(s)}` + (s.capitulo ? ` · ${s.capitulo}` : ""), txt = s.guion;
+  if(s.tipo === "adelanto"){
+    const st = adelantoSteps(s), lines = String(s.guion || "").split("\n").map(x => x.trim()).filter(Boolean);
+    title += ` · paso ${Math.min(VM.step, st.length - 1) + 1} de ${st.length}`;
+    if(lines.length === st.length) txt = lines[Math.min(VM.step, lines.length - 1)];
+  }
   if(s.tipo === "binder" && (held || idx >= VM.range[0])){
     const c = cards()[held ? held.i : idx];
     if(c && held && held.group){ title += ` · ${c.set} · ${condLabel(c) || "mismo arte"}, ${held.end - held.i + 1} versiones`; txt = cards().slice(held.i, held.end + 1).map(x => x.script).filter(Boolean).join("\n\n") || c.note || ""; }
@@ -2202,7 +2384,7 @@ function audio(){
 function applyAudio(){
   if(!AX) return; const a = S.brand.audio;
   AB.sfx.gain.value = a.sfx ? a.sfxVol/100 : 0;
-  AB.music.gain.value = VM.clip ? 0 : a.musicVol/100;
+  AB.music.gain.value = VM.clip || musicHush ? 0 : a.musicVol/100;
   AB.monitor.gain.value = recording && !a.listen ? 0 : 1;
 }
 function playSfx(kind){
@@ -2250,7 +2432,7 @@ async function startMic(){
     $("micLvl").style.width = Math.min(100, rms*420) + "%";
     const talking = rms > .018;
     if(VM.clip){ if(a.duck) AB.clip.gain.setTargetAtTime(talking ? .55 : 1, AX.currentTime, talking ? .06 : .5); }
-    else if(a.duck && musicSrc){ const target = (a.musicVol/100)*(talking ? .28 : 1); AB.music.gain.setTargetAtTime(target, AX.currentTime, talking ? .06 : .5); }
+    else if(a.duck && musicSrc){ const target = musicHush ? 0 : (a.musicVol/100)*(talking ? .28 : 1); AB.music.gain.setTargetAtTime(target, AX.currentTime, talking ? .06 : .5); }
   }, 50);
   listMics();
   return true;
@@ -2271,10 +2453,11 @@ function stripWord(s){
   if(s.tipo === "cartel"){ const w = String(s.texto || "").replace(/[*_~¿¡?!.,:;"“”]/g, " ").split(/\s+/).find(x => x.length >= 3); if(w) return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }
   return SCENE_WORD[s.tipo] || sceneLabel(s);
 }
-const SCENE_WORD = {rafaga:"Ráfaga", titulo:"Portada", cartel:"Cartel", binder:"Binder", carta:"Carta", media:"Clip", lista:"Lista", cierre:"Cierre"};
+const SCENE_WORD = {adelanto:"Adelanto", rafaga:"Ráfaga", titulo:"Portada", cartel:"Cartel", binder:"Binder", carta:"Carta", media:"Clip", lista:"Lista", cierre:"Cierre"};
 function sceneSummary(s){
   const items = (s.items || []).filter(x => String(x).trim());
   switch(s.tipo){
+    case "adelanto": return `${items.length} ${items.length === 1 ? "paso" : "pasos"} · cartas volando`;
     case "rafaga": return `${items.length} ${items.length === 1 ? "elemento" : "elementos"} · ${String(s.ritmo || "0.28").replace(".", ",")} s c/u`;
     case "titulo": return `${P().title1 || ""} ${P().title2 || ""}`.trim() || "Portada";
     case "cartel": return String(s.estilo === "contador" ? (s.valor || "") + " " + (s.texto || "") : s.texto || "").replace(/[*_~]/g, "").replace(/\n/g, " · ") || "Sin texto";
@@ -2293,6 +2476,7 @@ function estSecs(s){
   if(s.tipo === "rafaga") sec = Math.max(sec, sceneItems(s).length*clamp(parseFloat(String(s.ritmo).replace(",", ".")) || .28, .08, 3) + .4);
   if(s.tipo === "binder"){ const [a, b] = parseRange(s.cartas); for(let k = a; k <= b;){ const c = cards()[k]; if(!c){ k++; continue; } sec += Math.max(3, words(c.script)/2.5); k = groupAt(k, b)[1] + 1; } }
   if(s.tipo === "cartel") sec = Math.max(sec, kinDuration(s.texto || "", s.estilo)/1000 + 1);
+  if(s.tipo === "adelanto") sec = Math.max(sec, adelantoSteps(s).length*2.2);
   if(s.tipo === "lista") sec = Math.max(sec, (s.items || []).filter(x => String(x).trim()).length*2.5);
   return Math.max(2, sec);
 }
@@ -2303,6 +2487,7 @@ function sceneTags(s){
   if(sceneNeeds(s).length) t.push(["pink", "falta archivo"]);
   if(!String(s.guion || "").trim() && s.tipo !== "binder") t.push(["yel", "sin guion"]);
   if(s.tipo === "carta" && findCard(s.carta) < 0) t.push(["pink", "carta no encontrada"]);
+  if(s.tipo === "adelanto" && adelantoSteps(s).some(p => p.ref != null && findCard(p.ref) < 0)) t.push(["pink", "carta no encontrada"]);
   return t;
 }
 function sceneItemHTML(s, i){
@@ -2400,6 +2585,7 @@ function sceneFieldsHTML(s){
   return SCENE_TYPES[s.tipo].fields.map(([k, l, kind, opts]) => {
     if(k === "valor" && s.estilo !== "contador") return "";
     if(k === "pide" && s.media && files.has(s.media)) return "";
+    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
     if(k === "items" && s.tipo === "rafaga") return sceneFieldHTML(s, k, "Elementos, uno por línea", kind) + `<span class="lbl" style="margin-top:-8px">Un archivo con lo que es (<code>media/fuego.gif | llamas</code>), <code>carta SH11/99</code>, <code>texto 29 CARTAS</code> o <code>color</code>.</span>`;
     if(k === "fondo"){
       const m = fondoMode(s), f = String(s.fondo || "").trim(), val = m === "carta" ? f.replace(/^carta\s+/i, "") : m === "archivo" ? f : "";
@@ -2554,7 +2740,7 @@ async function openStudio(record, from, t){
   closeFloat(); studioOpen = true; chapters = []; document.body.classList.add("in-studio");
   takeTarget = t; if((t === "video") !== VM.on) setMode(t, true);
   $("recHere").hidden = $("rKey").hidden = record;
-  if(VM.on){ const l = scenes(); warmScene(l[Math.max(0, VM.i)]); warmScene(l[Math.max(0, VM.i) + 1]); }
+  if(t === "video"){ const l = scenes(), i0 = from && from.scene ? from.scene : 0; warmScene(l[i0]); warmScene(l[i0 + 1]); }
   $("sHost").appendChild(cv); $("studio").hidden = false;
   document.documentElement.style.setProperty("--pf", pfSize + "px");
   if(document.activeElement) document.activeElement.blur();
@@ -2563,6 +2749,8 @@ async function openStudio(record, from, t){
   updPrompter();
   $("recline").classList.remove("on"); $("recLbl").textContent = record ? "PREPARANDO" : "ENSAYO"; $("recTime").textContent = "00:00";
   try{ await document.documentElement.requestFullscreen(); }catch(e){}
+  // the take starts once the opening scenes' pictures are ready, so its first seconds don't stutter
+  await warmIdle(8000); if(!studioOpen) return;
   if(record){
     const cd = $("countdown"); cd.hidden = false;
     for(const n of [3,2,1]){ cd.textContent = n; await sleep(800); if(!studioOpen){ cd.hidden = true; stopMic(); return; } }

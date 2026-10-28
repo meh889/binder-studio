@@ -54,6 +54,7 @@ Tipos:
 
 | tipo | campos | qué hace |
 |---|---|---|
+| `adelanto` | `items` (pasos, uno por →), `vuelan` (posiciones de las cartas que vuelan, ej. `"1-409"`; vacío: todas) | Apertura tipo "en este video": las cartas de la especie vuelan hacia la cámara, desenfocadas de cerca. Pasos: `texto …` (frase sobre las cartas volando), `carta #11 \| JAPÓN, *1996*` (esa carta viene al frente y la nube sigue atrás), `suspenso #32 \| US$66.000` (la carta desenfocada con un contador) y `silencio ¿CUÁL *ES*?` (corta la música y congela todo). Si el `guion` tiene una línea por paso, el teleprompter muestra la de cada paso. En las frases, ` / ` fuerza un renglón. |
 | `rafaga` | `items` (lista), `ritmo` (seg por elemento, ej. `"0.28"`), `fin` (`"auto"` o `"espera"`) | Montaje rápido con zoom de golpe, sacudida y flashes. |
 | `titulo` | — | Portada con el título de la especie y la cantidad de cartas. |
 | `cartel` | `estilo` (`golpe`, `barrido`, `maquina`, `contador`), `texto`, `valor` (contador), `fondo` | Tipografía cinética a pantalla completa, sobre papel, el playmat o cartulina de color. |
@@ -80,7 +81,8 @@ Texto de los carteles (`texto`):
 
 Referencias: Casey Neistat "Do What You Can't" (energía, tipografía cinética, cortes al ritmo) y Check The Box (formato de master list: binder, reglas, cartas que faltan). El video tiene que parecer filmado: un binder real sobre el playmat, nada de look generado.
 
-- **Gancho en los primeros 10 segundos**: abrí con una `rafaga` de 6 a 10 elementos (ritmo 0.25–0.35) que mezcle cartas llamativas del binder, 1 o 2 textos con datos duros (cantidad de cartas, años) y 1 o 2 GIF/clips temáticos. Después, un `cartel` golpe con la pregunta o promesa del video, y recién ahí la `titulo`.
+- **Gancho en los primeros 10 segundos**: abrí con un `adelanto` (lo que eligió el creador para Bulbasaur): la promesa en una frase ("En este video vamos a ver todas las cartas de … que existen"), la cantidad y los idiomas, 5 o 6 cartas que van subiendo (la más vieja, otro idioma, una rareza de un lugar, una exclusiva, un premio) y al final un `suspenso` con la carta más cara o más rara y un `silencio` ("¿Cuál es? Quedate hasta el final"). Después, unos `cartel` con el porqué del canal, la intro, la `titulo` y las reglas. La `rafaga` sigue sirviendo para montajes rápidos en el medio.
+- **El creador no tiene las cartas**: el canal muestra todas las que existen de cada especie. Nunca escribas en un guion que las tiene, las juntó, le faltan o le costó conseguirlas; sí que armó la lista y que la información estaba desparramada.
 - **Reglas** de la lista en una `lista` corta (3 puntos) si el guion las menciona.
 - **Separá el binder por eras** (Wizards, EX, Diamante y Perla/Platino, HGSS/BW, XY, Sun & Moon, Sword & Shield, Scarlet & Violet). Antes de cada tramo, un `cartel` (alterná `barrido` y `golpe`) con el nombre de la era. Cada tramo es un capítulo.
 - **Cartas especiales** (shiny, promos, la más cara, errores, stamps) van como escena `carta` aparte, antes del tramo de binder que la contiene, con un `texto` corto ("LA *MÁS BUSCADA*").
