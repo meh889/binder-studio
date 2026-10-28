@@ -22,7 +22,7 @@ Si sumás imágenes a la carpeta mientras la herramienta está abierta, elegí *
 3. Tocá **● Grabar** (dice "video" cuando graba el video completo). Leés el guion en el teleprompter y avanzás con →. Se graba tu voz, la música de `musica/` (que baja sola cuando hablás) y los efectos de sonido.
 4. Al terminar, te da el MP4 con audio y la lista de capítulos para pegar en la descripción de YouTube.
 
-Tipos de escena: adelanto (la apertura tipo "en este video": las cartas volando, una frase por toque, cada carta al frente, el suspenso con un contador y el silencio), ráfaga, portada, cartel cinético (golpe, barrido, máquina de escribir, contador), binder, carta en grande, imagen o clip, lista y cierre. En los carteles, `*palabra*` sale grande y en color, `_palabra_` chica en cursiva y `~palabra~` aparece y se tacha.
+Tipos de escena: del caos al orden (las cartas desparramadas que en el segundo toque se ordenan en una hoja), adelanto (la apertura tipo "en este video": las cartas volando, una frase por toque, cada carta al frente, el suspenso con un contador y el silencio), ráfaga, portada, cartel cinético (golpe, barrido, máquina de escribir, contador), binder, carta en grande, imagen o clip, lista y cierre. En los carteles, `*palabra*` sale grande y en color, `_palabra_` chica en cursiva y `~palabra~` aparece y se tacha.
 
 ## Mismo arte en varios idiomas
 
