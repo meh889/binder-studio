@@ -1873,8 +1873,8 @@ function adelantoSteps(s){
   return (s.items || []).map(x => String(x).trim()).filter(Boolean).map(line => {
     const m = line.match(/^(texto|carta|suspenso|silencio)\b\s*(.*)$/i), kind = m ? m[1].toLowerCase() : "texto", rest = m ? m[2] : line;
     if(kind === "texto" || kind === "silencio") return {kind, label:rest.trim()};
-    const [ref, label = "", extra = ""] = rest.split("|").map(x => x.trim()), g = extra.match(/crece\s*([\d.,]+)?/i);
-    return {kind, ref, label, grow:g ? 1000*(parseFloat(String(g[1] || "0.6").replace(",", ".")) || .6) : 0};
+    const [ref, label = "", extra = ""] = rest.split("|").map(x => x.trim()), g = extra.match(/crece\s*([\d.,]+)?/i), f = extra.match(/sale\s+de\s+(\S+)/i);
+    return {kind, ref, label, grow:g ? 1000*(parseFloat(String(g[1] || "0.6").replace(",", ".")) || .6) : 0, from:f ? f[1] : ""};
   });
 }
 // the cards that fly: an even spread of the list (or of the stretch in `vuelan`), only the ones with a picture
@@ -1910,7 +1910,8 @@ function warmAdelanto(s){
   const ready = c => { warmLoading++; return loadImg(cardSrc(c), 15000).then(im => im && im.decode ? im.decode().then(() => im, () => im) : im).finally(() => warmLoading--); };
   adelantoPool(s).forEach(c => ready(c).then(im => im && warmLater(() => flySprite(c))));
   adelantoSteps(s).forEach(p => { const c = p.ref && cards()[findCard(p.ref)]; if(!c) return;
-    ready(c).then(im => im && warmLater(() => { flySprite(c); if(p.kind === "suspenso") suspenseSprite(c); else frontSprite(c); })); });
+    ready(c).then(im => im && warmLater(() => { flySprite(c); if(p.kind === "suspenso") suspenseSprite(c); else frontSprite(c); }));
+    if(p.from) getMedia(p.from); });
 }
 // the card in front, at the size it is shown, so each frame draws a ready copy instead of the full scan
 const frontSprites = new Map(), FRONT_H = 900, FRONT_W = Math.round(FRONT_H*63/88);
@@ -1975,6 +1976,30 @@ function drawFlying(pool, t, o){
     ctx.restore();
   }
 }
+// "sale de media/…": the object (a pack, a magazine) drops in, the card peeks out from behind it, then flies to the
+// front while the object slides away below
+function drawOutOf(st, c, se, k){
+  const md = getMedia(st.from);
+  let ow = 0, oh = 0, src = null;
+  if(md){ const [im, sw, sh] = mediaFrame(md, se); src = im; const f = Math.min(1000/sw, 700/sh); ow = sw*f; oh = sh*f; }
+  const ocx = W/2, ocy = H/2 + 40, top = ocy - oh/2;
+  const a = clamp(se/420, 0, 1), drop = LIFT(a), out = clamp((se - 760)/520, 0, 1), sink = out*out;
+  const os = .84 + .16*drop, oy = ocy - 90*(1 - drop) + 760*sink, oAlpha = Math.min(1, a*3)*(1 - out*.6);
+  const drawObj = () => {
+    if(!src){ missingBox(st.from, ""); return; }
+    ctx.save(); ctx.globalAlpha *= oAlpha; ctx.translate(ocx, oy); ctx.rotate(-.035 + .02*sink); ctx.scale(os, os);
+    ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18; ctx.drawImage(src, -ow/2, -oh/2, ow, oh); ctx.restore();
+  };
+  // the card: hidden behind the object, it rises out of its top edge, then comes to the front
+  const rise = clamp((se - 330)/430, 0, 1), fly = clamp((se - 760)/560, 0, 1), fe = easeOutQuint(fly), re = easeOut(rise);
+  const hx = ocx + 40, hy = lerp(ocy, top - 40, re), hh = 520;
+  const cx = lerp(hx, 720, fe), cy = lerp(hy + 760*0, 545, fe), ch = lerp(hh, 860, fe), rot = lerp(.06, -.035, fe);
+  if(rise > 0 && !VM.played["out" + k]){ VM.played["out" + k] = 1; playSfx("lift"); }
+  if(fly > 0 && !VM.played["outf" + k]){ VM.played["outf" + k] = 1; playSfx("whoosh"); }
+  if(fly <= 0){ if(rise > 0) drawFront(c, cx, cy, ch, rot, 1); drawObj(); }
+  else { drawObj(); drawFront(c, cx, cy, ch, rot, 1); }
+  if(st.label) drawKin(adWrap(st.label, 13), se - 1050, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
+}
 // the music cuts out for the silence step and comes back with the next scene
 let musicHush = false;
 function setHush(on){
@@ -2002,6 +2027,7 @@ function drawAdelanto(s, el, T){
     // the card before it keeps flying, past the lens, for a moment
     const pv = steps[k - 1], pc = pv && pv.kind === "carta" ? cards()[findCard(pv.ref)] : null;
     if(!c){ missingBox(st.ref, "No encuentro esa carta en la lista"); return; }
+    if(st.from){ drawOutOf(st, c, se, k); return; }
     const p = clamp(se/620, 0, 1), e = easeOutQuint(p), n = live && !reduced ? now : 0;
     // a card marked "crece" (a jumbo) comes in smaller and grows when its word is said
     const gq = st.grow ? clamp((se - st.grow)/520, 0, 1) : 0, base = st.grow ? 590 : 860, h = base*(.22 + .78*e)*(st.grow ? 1 + (1000/590 - 1)*GROW(gq) : 1);
@@ -2592,7 +2618,7 @@ function sceneFieldsHTML(s){
   return SCENE_TYPES[s.tipo].fields.map(([k, l, kind, opts]) => {
     if(k === "valor" && s.estilo !== "contador") return "";
     if(k === "pide" && s.media && files.has(s.media)) return "";
-    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente; con <code>| crece</code> entra más chica y crece a los 0,6 s, como una jumbo), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
+    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente; con <code>| crece</code> entra más chica y crece a los 0,6 s, como una jumbo; con <code>| sale de media/pack.jpg</code> la carta sale de esa foto), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
     if(k === "items" && s.tipo === "rafaga") return sceneFieldHTML(s, k, "Elementos, uno por línea", kind) + `<span class="lbl" style="margin-top:-8px">Un archivo con lo que es (<code>media/fuego.gif | llamas</code>), <code>carta SH11/99</code>, <code>texto 29 CARTAS</code> o <code>color</code>.</span>`;
     if(k === "fondo"){
       const m = fondoMode(s), f = String(s.fondo || "").trim(), val = m === "carta" ? f.replace(/^carta\s+/i, "") : m === "archivo" ? f : "";
