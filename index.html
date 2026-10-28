@@ -3144,7 +3144,17 @@ function showVideo(blob, type, secs, is4k, hasAudio){
   videoBlob = blob; videoType = type; if(videoUrl) URL.revokeObjectURL(videoUrl); videoUrl = URL.createObjectURL(blob);
   $("vPrev").src = videoUrl;
   const mb = (blob.size/1048576).toFixed(1), ext = type.includes("mp4") ? "MP4" : "WebM";
-  $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${fmtClock(secs)} · ${mb} MB. ${hasAudio ? "Con sonido." : takeNoAudio ? "Sin sonido: el audio del navegador no arrancó y la toma se grabó sin sonido para no cortarse. Tocá cualquier cosa en la página y volvé a grabar." : "Sin sonido: la voz, la música y los efectos estaban apagados."}`;
+  const sound = hasAudio ? "Con sonido." : takeNoAudio ? "Sin sonido: el audio del navegador no arrancó y la toma se grabó sin sonido para no cortarse. Tocá cualquier cosa en la página y volvé a grabar." : "Sin sonido: la voz, la música y los efectos estaban apagados.";
+  // the length shown is what the file really lasts, read from the file itself, not the time the take was running
+  const info = len => { const kept = ($("vInfo").textContent.match(/ Guardado como .*$/) || [""])[0]; $("vInfo").textContent = `${ext} · ${is4k ? "4K" : "1080p"} · ${len == null ? "midiendo…" : fmtClock(len)} · ${mb} MB. ${sound}` +
+    (len != null && len < secs - 1.5 ? ` Ojo: el archivo dura ${fmtClock(len)} y grabaste ${fmtClock(secs)}; se perdió el principio. Volvé a grabar esta parte.` : "") + kept; };
+  info(null);
+  const probe = document.createElement("video"), url = videoUrl; probe.muted = true; probe.preload = "metadata";
+  const done = d => { if(videoUrl === url) info(d); probe.removeAttribute("src"); probe.load(); };
+  probe.onloadedmetadata = () => { if(isFinite(probe.duration) && probe.duration > 0) return done(probe.duration);
+    probe.onseeked = () => done(probe.currentTime); probe.currentTime = 1e7; };
+  probe.onerror = () => done(secs);
+  probe.src = url;
   const fmt = t => { t = Math.max(0, Math.floor(t)); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
   const ch = chapters.slice(); if(ch.length && ch[0].t > 1) ch.unshift({t:0, name:"Intro"}); if(ch.length) ch[0].t = 0;
   $("chapBox").hidden = !ch.length; $("chapText").value = ch.map(c => fmt(c.t) + " " + c.name).join("\n");
