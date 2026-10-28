@@ -797,6 +797,7 @@ function springEase(damping, response, ms){
 }
 const LIFT = springEase(.84, .56, 720);   // a hand bringing the card up to the lens stops with the slightest give
 const LOWER = springEase(1, .5, 640);     // and puts it down without any
+const GROW = springEase(.5, .3, 520);      // a jumbo growing in front of the camera, with a little bounce
 const SNUG = springEase(.62, .19, 260);   // the card taps the bottom of the pocket
 const DEAL = springEase(.8, .42, 560);    // cards dealt onto the binder
 
@@ -1872,13 +1873,16 @@ function adelantoSteps(s){
   return (s.items || []).map(x => String(x).trim()).filter(Boolean).map(line => {
     const m = line.match(/^(texto|carta|suspenso|silencio)\b\s*(.*)$/i), kind = m ? m[1].toLowerCase() : "texto", rest = m ? m[2] : line;
     if(kind === "texto" || kind === "silencio") return {kind, label:rest.trim()};
-    const [ref, ...lab] = rest.split("|"); return {kind, ref:ref.trim(), label:lab.join("|").trim()};
+    const [ref, label = "", extra = ""] = rest.split("|").map(x => x.trim()), g = extra.match(/crece\s*([\d.,]+)?/i);
+    return {kind, ref, label, grow:g ? 1000*(parseFloat(String(g[1] || "0.6").replace(",", ".")) || .6) : 0};
   });
 }
 // the cards that fly: an even spread of the list (or of the stretch in `vuelan`), only the ones with a picture
 function adelantoPool(s){
   const list = cards(), [a, b] = String(s.vuelan || "").trim() ? parseRange(s.vuelan) : [0, list.length - 1], idx = [];
-  for(let k = a; k <= b; k++) if(list[k] && cardSrc(list[k]) && !list[k].falta) idx.push(k);
+  // the suspense card never flies with the others, or it would give the ending away
+  const hide = new Set(adelantoSteps(s).filter(p => p.kind === "suspenso").map(p => findCard(p.ref)));
+  for(let k = a; k <= b; k++) if(list[k] && cardSrc(list[k]) && !list[k].falta && !hide.has(k)) idx.push(k);
   const n = Math.min(40, idx.length), out = [];
   for(let j = 0; j < n; j++) out.push(list[idx[Math.floor(j*idx.length/n)]]);
   return out;
@@ -1933,8 +1937,8 @@ const suspenseSprites = new Map();
 function suspenseSprite(c){
   const src = cardSrc(c), im = getImg(src); if(!im) return null;
   let e = suspenseSprites.get(src); if(e) return e;
-  const w = 600, h = Math.round(w*88/63), pad = 60; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
-  const x = e.getContext("2d"); x.filter = "blur(14px) saturate(1.15)";
+  const w = 600, h = Math.round(w*88/63), pad = 90; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
+  const x = e.getContext("2d"); x.filter = "blur(28px) saturate(1.1)";
   const card = document.createElement("canvas"); card.width = w; card.height = h; const y = card.getContext("2d"); rrx(y, 0, 0, w, h, w*.045); y.clip();
   const k = Math.max(w/im.width, h/im.height); y.drawImage(im, (w - im.width*k)/2, (h - im.height*k)/2, im.width*k, im.height*k);
   x.drawImage(card, pad, pad); suspenseSprites.set(src, e); return e;
@@ -1998,12 +2002,15 @@ function drawAdelanto(s, el, T){
     // the card before it keeps flying, past the lens, for a moment
     const pv = steps[k - 1], pc = pv && pv.kind === "carta" ? cards()[findCard(pv.ref)] : null;
     if(!c){ missingBox(st.ref, "No encuentro esa carta en la lista"); return; }
-    const p = clamp(se/620, 0, 1), e = easeOutQuint(p), n = live && !reduced ? now : 0, sc = .22 + .78*e, h = 860*sc;
+    const p = clamp(se/620, 0, 1), e = easeOutQuint(p), n = live && !reduced ? now : 0;
+    // a card marked "crece" (a jumbo) comes in smaller and grows when its word is said
+    const gq = st.grow ? clamp((se - st.grow)/520, 0, 1) : 0, base = st.grow ? 590 : 860, h = base*(.22 + .78*e)*(st.grow ? 1 + (1000/590 - 1)*GROW(gq) : 1);
+    if(st.grow && gq > 0 && !VM.played["grow" + k]){ VM.played["grow" + k] = 1; playSfx("hit"); VM.shake = Math.max(VM.shake, 14); }
     const fromX = W/2 + (hash("ax" + k) - .5)*900, fromY = H/2 + (hash("ay" + k) - .5)*500, cx = lerp(fromX, 720, e), cy = lerp(fromY, 545, e);
     const rot = lerp((hash("ar" + k) - .5)*1.6, -.035, e) + (n ? .004*Math.sin(n/1300) : 0);
     drawFront(c, cx, cy, h, rot, Math.min(1, p*3));
     if(pc && se < 420){ const q = se/420; drawFront(pc, 720 - 520*q, 545 + 120*q, 860*(1 + .9*q), -.035 - .3*q, 1 - q); }
-    if(st.label) drawKin(adWrap(st.label, 13), se - 280, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
+    if(st.label) drawKin(adWrap(st.label, 13), st.grow ? se - st.grow : se - 280, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
     return;
   }
   // suspense and silence: the card stays out of focus, with its price counting up; the silence keeps it and asks
@@ -2585,7 +2592,7 @@ function sceneFieldsHTML(s){
   return SCENE_TYPES[s.tipo].fields.map(([k, l, kind, opts]) => {
     if(k === "valor" && s.estilo !== "contador") return "";
     if(k === "pide" && s.media && files.has(s.media)) return "";
-    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
+    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente; con <code>| crece</code> entra más chica y crece a los 0,6 s, como una jumbo), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
     if(k === "items" && s.tipo === "rafaga") return sceneFieldHTML(s, k, "Elementos, uno por línea", kind) + `<span class="lbl" style="margin-top:-8px">Un archivo con lo que es (<code>media/fuego.gif | llamas</code>), <code>carta SH11/99</code>, <code>texto 29 CARTAS</code> o <code>color</code>.</span>`;
     if(k === "fondo"){
       const m = fondoMode(s), f = String(s.fondo || "").trim(), val = m === "carta" ? f.replace(/^carta\s+/i, "") : m === "archivo" ? f : "";
