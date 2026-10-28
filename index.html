@@ -1874,7 +1874,8 @@ function adelantoSteps(s){
     const m = line.match(/^(texto|carta|suspenso|silencio)\b\s*(.*)$/i), kind = m ? m[1].toLowerCase() : "texto", rest = m ? m[2] : line;
     if(kind === "texto" || kind === "silencio") return {kind, label:rest.trim()};
     const [ref, label = "", extra = ""] = rest.split("|").map(x => x.trim()), g = extra.match(/crece\s*([\d.,]+)?/i), f = extra.match(/sale\s+de\s+(\S+)/i);
-    return {kind, ref, label, grow:g ? 1000*(parseFloat(String(g[1] || "0.6").replace(",", ".")) || .6) : 0, from:f ? f[1] : ""};
+    const sl = extra.match(/desde\s+([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i);
+    return {kind, ref, label, grow:g ? 1000*(parseFloat(String(g[1] || "0.6").replace(",", ".")) || .6) : 0, from:f ? f[1] : "", slot:sl ? sl.slice(1, 5).map(v => +v/100) : null};
   });
 }
 // the cards that fly: an even spread of the list (or of the stretch in `vuelan`), only the ones with a picture
@@ -1938,8 +1939,8 @@ const suspenseSprites = new Map();
 function suspenseSprite(c){
   const src = cardSrc(c), im = getImg(src); if(!im) return null;
   let e = suspenseSprites.get(src); if(e) return e;
-  const w = 600, h = Math.round(w*88/63), pad = 90; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
-  const x = e.getContext("2d"); x.filter = "blur(28px) saturate(1.1)";
+  const w = 600, h = Math.round(w*88/63), pad = 160; e = document.createElement("canvas"); e.width = w + 2*pad; e.height = h + 2*pad;
+  const x = e.getContext("2d"); x.filter = "blur(56px) saturate(.75) brightness(.85)";
   const card = document.createElement("canvas"); card.width = w; card.height = h; const y = card.getContext("2d"); rrx(y, 0, 0, w, h, w*.045); y.clip();
   const k = Math.max(w/im.width, h/im.height); y.drawImage(im, (w - im.width*k)/2, (h - im.height*k)/2, im.width*k, im.height*k);
   x.drawImage(card, pad, pad); suspenseSprites.set(src, e); return e;
@@ -1976,29 +1977,54 @@ function drawFlying(pool, t, o){
     ctx.restore();
   }
 }
-// "sale de media/…": the object (a pack, a magazine) drops in, the card peeks out from behind it, then flies to the
-// front while the object slides away below
+// "sale de media/…": the card comes out of a photo of where it came from.
+// With "desde x,y,w,h" (where the card sits in the photo, in percent, like a pack's window) the camera goes into the box,
+// up to that spot, and the card lifts out of its place; without it (a magazine) the photo lands on the right and the card
+// slides out of its side, between the pages, towards the front.
 function drawOutOf(st, c, se, k){
-  const md = getMedia(st.from);
-  let ow = 0, oh = 0, src = null;
-  if(md){ const [im, sw, sh] = mediaFrame(md, se); src = im; const f = Math.min(1000/sw, 700/sh); ow = sw*f; oh = sh*f; }
-  const ocx = W/2, ocy = H/2 + 40, top = ocy - oh/2;
-  const a = clamp(se/420, 0, 1), drop = LIFT(a), out = clamp((se - 760)/520, 0, 1), sink = out*out;
-  const os = .84 + .16*drop, oy = ocy - 90*(1 - drop) + 760*sink, oAlpha = Math.min(1, a*3)*(1 - out*.6);
-  const drawObj = () => {
-    if(!src){ missingBox(st.from, ""); return; }
-    ctx.save(); ctx.globalAlpha *= oAlpha; ctx.translate(ocx, oy); ctx.rotate(-.035 + .02*sink); ctx.scale(os, os);
-    ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18; ctx.drawImage(src, -ow/2, -oh/2, ow, oh); ctx.restore();
+  const md = getMedia(st.from); let src = null, sw = 0, sh = 0;
+  if(md){ const fr = mediaFrame(md, se); src = fr[0]; sw = fr[1]; sh = fr[2]; }
+  if(!src){ missingBox(st.from, ""); return; }
+  const a = clamp(se/420, 0, 1), drop = LIFT(a), FX = 720, FY = 545, FH = 860;
+  if(!VM.played["oin" + k]){ VM.played["oin" + k] = 1; playSfx("slide"); }
+  const photo = (cx, cy, w, h, rot, alpha, dark) => {
+    ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(cx, cy); ctx.rotate(rot);
+    ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18; ctx.drawImage(src, -w/2, -h/2, w, h); ctx.shadowColor = "transparent";
+    if(dark > 0){ ctx.fillStyle = `rgba(10,6,14,${dark})`; ctx.fillRect(-w/2, -h/2, w, h); }
+    ctx.restore();
   };
-  // the card: hidden behind the object, it rises out of its top edge, then comes to the front
-  const rise = clamp((se - 330)/430, 0, 1), fly = clamp((se - 760)/560, 0, 1), fe = easeOutQuint(fly), re = easeOut(rise);
-  const hx = ocx + 40, hy = lerp(ocy, top - 40, re), hh = 520;
-  const cx = lerp(hx, 720, fe), cy = lerp(hy + 760*0, 545, fe), ch = lerp(hh, 860, fe), rot = lerp(.06, -.035, fe);
-  if(rise > 0 && !VM.played["out" + k]){ VM.played["out" + k] = 1; playSfx("lift"); }
-  if(fly > 0 && !VM.played["outf" + k]){ VM.played["outf" + k] = 1; playSfx("whoosh"); }
-  if(fly <= 0){ if(rise > 0) drawFront(c, cx, cy, ch, rot, 1); drawObj(); }
-  else { drawObj(); drawFront(c, cx, cy, ch, rot, 1); }
-  if(st.label) drawKin(adWrap(st.label, 13), se - 1050, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
+  if(st.slot){
+    // the box lands, then the camera goes in towards the card's window
+    const f = Math.min(1000/sw, 700/sh), ow = sw*f, oh = sh*f, ocx = W/2, ocy = H/2 + 30;
+    const [fx, fy, fw, fh] = st.slot, s0x = ocx - ow/2 + (fx + fw/2)*ow, s0y = ocy - oh/2 + (fy + fh/2)*oh, slotH = fh*oh;
+    const zq = clamp((se - 380)/620, 0, 1), ze = easeInOut(zq), zf = 1 + (Math.min(3.2, 560/slotH) - 1)*ze;
+    const camX = lerp(s0x, W/2, ze), camY = lerp(s0y, H/2, ze), lift = clamp((se - 950)/560, 0, 1), le = easeOutQuint(lift);
+    const os = (.86 + .14*drop), boxAlpha = Math.min(1, a*3)*(1 - .55*le);
+    // the box, through the camera: scaled around the card's window, which travels to the middle of the frame
+    ctx.save(); ctx.translate(camX, camY); ctx.scale(zf*os, zf*os); ctx.translate(-s0x, -s0y);
+    photo(ocx, ocy - 90*(1 - drop), ow, oh, 0, boxAlpha, .35*le);
+    // once the card has left, its window in the tray is empty
+    if(lift > 0){ ctx.globalAlpha = Math.min(1, lift*3)*boxAlpha; ctx.fillStyle = "rgba(18,16,24,.92)"; rr(s0x - fw*ow/2, s0y - fh*oh/2, fw*ow, fh*oh, 6); ctx.fill(); ctx.globalAlpha = 1; }
+    ctx.restore();
+    if(lift > 0){
+      if(!VM.played["olift" + k]){ VM.played["olift" + k] = 1; playSfx("lift"); }
+      const startH = slotH*zf*os, ch = lerp(startH, FH, le), cx = lerp(W/2, FX, le), cy = lerp(H/2, FY, le) - 40*Math.sin(Math.PI*le), rot = lerp(0, -.035, le) - .05*Math.sin(Math.PI*le);
+      drawFront(c, cx, cy, ch, rot, 1);
+    }
+    if(st.label) drawKin(adWrap(st.label, 13), se - 1300, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
+    return;
+  }
+  // the magazine lands on the right; the card slides out of its left side, between the pages, and comes to the front
+  const f = Math.min(560/sw, 760/sh), ow = sw*f, oh = sh*f, ocx = 1250, ocy = H/2 + 30;
+  const slide = clamp((se - 330)/460, 0, 1), se2 = easeOut(slide), fly = clamp((se - 800)/520, 0, 1), fe = easeOutQuint(fly), away = fly*fly;
+  const mx = ocx + 520*away, my = ocy - 90*(1 - drop) + 120*away, mAlpha = Math.min(1, a*3)*(1 - away);
+  const insH = oh*.46, cx0 = ocx - 40, cx1 = ocx - ow/2 - insH*63/88*.28;
+  const cx = fly > 0 ? lerp(cx1, FX, fe) : lerp(cx0, cx1, se2), cy = fly > 0 ? lerp(ocy + 30, FY, fe) : ocy + 30, ch = fly > 0 ? lerp(insH, FH, fe) : insH, rot = fly > 0 ? lerp(-.02, -.035, fe) : -.02;
+  if(slide > 0 && !VM.played["oslide" + k]){ VM.played["oslide" + k] = 1; playSfx("lift"); }
+  if(fly > 0 && !VM.played["ofly" + k]){ VM.played["ofly" + k] = 1; playSfx("whoosh"); }
+  if(fly <= 0){ if(slide > 0) drawFront(c, cx, cy, ch, rot, 1); photo(mx, my, ow, oh, .03, mAlpha, 0); }
+  else { photo(mx, my, ow, oh, .03 + .05*away, mAlpha, 0); drawFront(c, cx, cy, ch, rot, 1); }
+  if(st.label) drawKin(adWrap(st.label, 13), se - 1100, {x:1130, y:300, w:680, h:480}, 150, "dark", "golpe", "ac" + k);
 }
 // the music cuts out for the silence step and comes back with the next scene
 let musicHush = false;
@@ -2279,7 +2305,7 @@ function nextHint(){
   if(s.tipo === "adelanto"){
     const st = adelantoSteps(s), nx = st[VM.step + 1];
     if(nx){ const what = {texto:"Texto", carta:"Carta", suspenso:"Suspenso", silencio:"Silencio"}[nx.kind], lab = String(nx.label || "").replace(/[*_~]/g, "");
-      return {html:`<b>Paso ${VM.step + 2} de ${st.length}</b> · ${what}${lab ? " · " + esc(lab) : ""}`, card:nx.ref ? cards()[findCard(nx.ref)] : null}; }
+      return {html:`<b>Paso ${VM.step + 2} de ${st.length}</b> · ${what}${lab ? " · " + esc(lab) : ""}`, card:nx.ref && nx.kind !== "suspenso" ? cards()[findCard(nx.ref)] : null}; }
   }
   return nextScene;
 }
@@ -2618,7 +2644,7 @@ function sceneFieldsHTML(s){
   return SCENE_TYPES[s.tipo].fields.map(([k, l, kind, opts]) => {
     if(k === "valor" && s.estilo !== "contador") return "";
     if(k === "pide" && s.media && files.has(s.media)) return "";
-    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente; con <code>| crece</code> entra más chica y crece a los 0,6 s, como una jumbo; con <code>| sale de media/pack.jpg</code> la carta sale de esa foto), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
+    if(k === "items" && s.tipo === "adelanto") return sceneFieldHTML(s, k, "Pasos, uno por toque", kind) + `<span class="lbl" style="margin-top:-8px">Cada → pasa al siguiente. <code>texto En este video…</code> (sobre las cartas volando), <code>carta #11 | JAPÓN, 1996</code> (la trae al frente; con <code>| crece</code> entra más chica y crece a los 0,6 s, como una jumbo; con <code>| sale de media/revista.jpg</code> sale por el costado de esa foto, y agregando <code>desde x,y,ancho,alto</code> (en % de la foto, donde está la carta) la cámara entra hasta ahí y la carta sale de su lugar), <code>suspenso #32 | US$66.000</code> (desenfocada, con contador) y <code>silencio ¿CUÁL ES?</code> (corta la música). Si el guion tiene una línea por paso, el teleprompter muestra la de cada paso.</span>`;
     if(k === "items" && s.tipo === "rafaga") return sceneFieldHTML(s, k, "Elementos, uno por línea", kind) + `<span class="lbl" style="margin-top:-8px">Un archivo con lo que es (<code>media/fuego.gif | llamas</code>), <code>carta SH11/99</code>, <code>texto 29 CARTAS</code> o <code>color</code>.</span>`;
     if(k === "fondo"){
       const m = fondoMode(s), f = String(s.fondo || "").trim(), val = m === "carta" ? f.replace(/^carta\s+/i, "") : m === "archivo" ? f : "";
