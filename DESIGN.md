@@ -32,8 +32,10 @@ colors:
   video-ink: "#1b1b1c"
   video-grey: "#67645c"
   video-pen: "#1e3a86"
-  video-postit: "#ffe57a"
-  video-postit-ink: "#26285e"
+  video-note: "#fbf7ef"
+  video-note-ink: "#26285e"
+  video-sheet-accent: "#6b4a7c"
+  video-sheet-tint: "rgba(160,118,178,.26)"
   video-highlighter: "rgba(255,222,64,.78)"
   video-lamp: "rgba(255,234,204,.16)"
   video-notebook-rule: "rgba(70,110,180,.3)"
@@ -324,9 +326,9 @@ components:
     typography: "{typography.video-print-title}"
     width: "580px"
     height: "340px"
-  video-postit:
-    backgroundColor: "{colors.video-postit}"
-    textColor: "{colors.video-postit-ink}"
+  video-note:
+    backgroundColor: "{colors.video-note}"
+    textColor: "{colors.video-note-ink}"
     typography: "{typography.video-hand-note}"
     padding: "0 26px"
     width: "520px"
@@ -555,12 +557,12 @@ Segundo sistema del proyecto, separado de la interfaz: lo que se graba y ven los
 
 **Creative North Star: "El binder filmado sobre la mesa"**
 
-Un plano cenital real: el binder del creador sobre un playmat de neoprene oscuro, bajo una sola lámpara arriba a la izquierda. La página de 3×3 bolsillos ocupa los dos tercios izquierdos, apenas girada; a la derecha, una hoja de checklist impresa que el borde del cuadro corta abajo. Cada carta sube a la cámara en la mano, se mete en su bolsillo y se tilda con birome; mientras está en la mano, un post-it amarillo con el dato se apoya sobre la hoja. Todo tiene grano de película, viñeta de lente y una cámara que se mece unos pocos píxeles.
+Un plano cenital real: el binder del creador sobre un playmat de neoprene oscuro, bajo una sola lámpara arriba a la izquierda. La página de 3×3 bolsillos ocupa los dos tercios izquierdos, apenas girada; a la derecha, una hoja de checklist impresa que el borde del cuadro corta abajo. Cada carta sube a la cámara en la mano, se mete en su bolsillo y se tilda con birome; mientras está en la mano, una tarjetita con el dato, sostenida con cinta washi lila, se apoya sobre la hoja. Todo tiene grano de película, viñeta de lente y una cámara que se mece unos pocos píxeles.
 
 Las escenas de edición (carteles cinéticos, ráfagas, la carta en grande, la lista, el cierre) son la voz de edición del canal y viven sobre los mismos materiales: papel de impresora, el playmat o cartulina del color del canal. La tipografía cinética usa la fuente display de la marca en mayúsculas con palabras chicas en itálica; lo impreso usa Libre Franklin y lo escrito a mano, Caveat.
 
 **Key Characteristics:**
-- Un mundo de materiales pintados una vez (playmat, cuero sintético con cierre y costura, página negra con bolsillos soldados, papel, post-it) y una sola luz.
+- Un mundo de materiales pintados una vez (playmat, cuero sintético con cierre y costura, página negra con bolsillos soldados, papel, la tarjetita de la nota) y una sola luz.
 - Lo del mundo se mueve con la cámara y recibe la lámpara; lo de postproducción (logo, usuario, Suscribite) queda quieto encima.
 - Imprenta (Libre Franklin) para lo que salió de la impresora, birome (Caveat en `video-pen`) para lo que escribió el creador.
 - Carteles cinéticos en la fuente display de la marca, mayúsculas, con `*grande*` en acento y `_chica_` en Instrument Sans itálica.
@@ -579,7 +581,8 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 - **Resaltador** (`video-highlighter`, en modo multiply, con charcos de tinta en `rgba(235,180,20,.32)` en las puntas): la fila de la carta que está en la mano.
 
 #### Tertiary
-- **Post-it** (`video-postit`) con **tinta de post-it** (`video-postit-ink`): el dato de la carta; también el texto de `pide` cuando falta un archivo.
+- **Tarjetita de la nota** (`video-note`, papel crema con borde de pelo) con **tinta azul** (`video-note-ink`), sostenida por una cinta washi en el lila de la hoja: el dato de la carta. El amarillo `#ffe57a` queda solo para el texto de `pide` cuando falta un archivo.
+- **Lila de la hoja** (`video-sheet-accent` para texto, `video-sheet-tint` para píldoras, la barra de progreso pintada y la cinta): el único acento impreso del checklist; con un binder que no es lila, sale del segundo color del tema.
 - **Rojo de tachado** (`video-strike`): la línea que tacha una palabra `~así~`.
 - **Rojo Suscribite** (`video-subscribe`): solo el botón Suscribite.
 
@@ -597,7 +600,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 #### Named Rules
 **La Regla de la Tinta Impresa.** Un color de marca impreso en papel se lee más oscuro que en pantalla: si su luminancia pasa .45 se mezcla 38% con negro (`paperInk`). En carteles sobre papel la palabra grande se oscurece 25% si la luminancia del acento pasa .6.
 
-**La Regla de un Solo Acento.** El acento del tema es el único color saturado del mundo filmado, además de los materiales (post-it, resaltador, birome) y el rojo de Suscribite.
+**La Regla de un Solo Acento.** El acento del tema es el único color saturado del mundo filmado, además de los materiales (el lila de la hoja, resaltador, birome) y el rojo de Suscribite.
 
 ### Typography
 
@@ -616,7 +619,7 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 - **Datos impresos** (`video-print-meta`, gris): "Página 4 de 6", pie, línea de datos bajo el título.
 - **Nota en la ficha** (`video-print-body`, 28px, interlínea 1.42; baja hasta 18px para quedar en 6 renglones).
 - **Contador a mano** (`video-hand-count`, en birome, girado −0.06 rad): "29/47".
-- **Post-it** (`video-hand-note`, 34px, baja hasta 22px para entrar).
+- **Nota** (`video-hand-note`, 33px, baja hasta 22px para entrar).
 - **Lista** (`video-hand-list`, sobre renglones de 74px).
 - **Falta** (Caveat 600 30px, `rgba(90,88,82,.85)`): la palabra en la fila de una carta que falta. "me falta" en la ficha: Caveat 700 54px en birome.
 - **Postproducción** (`video-overlay`): etiqueta de usuario (30px) y Suscribite superpuesto (29px). El Suscribite del cierre y el usuario debajo usan Libre Franklin 600 (`video-print-button` 50px; 34px).
@@ -629,8 +632,8 @@ Mundo oscuro y cálido de mesa, papel casi blanco, tinta azul de birome y un sol
 ### Layout
 
 - **Encuadre del binder:** binder de 860×992 en (74, 44) girado −0.012 rad; la página va 86px adentro del lomo y 30px de los otros bordes (744×932). 3×3 bolsillos con margen de 22px y separación de 14px; cada carta 63/88, 18px más baja que su bolsillo, corrida hasta ±2.5px y ±0.008 rad siempre igual (sale de su id).
-- **Hoja de checklist:** 792×1130 en (1004, 58), girada 0.017 rad, cortada por el borde inferior del cuadro. Márgenes de 62px; título arriba a la izquierda, contador a mano arriba a la derecha (y 150); "Página" en y 266 con una línea de 2px debajo; filas de 50px (mínimo 40px) hasta y 752; casilla de 26px con trazo de 2px.
-- **Post-it:** 520px de ancho y al menos 240px de alto, en (250, 756) dentro de la hoja, girado −0.035 rad, encimado sobre la hoja mientras la carta está en la mano.
+- **Hoja de checklist:** 792×1130 en (1004, 58), girada 0.017 rad, cortada por el borde inferior del cuadro. Márgenes de 62px. Arriba, el título de la lista en versalitas lila (800 18px, +2.4px), la especie en 96px y el contador a mano a la derecha (y 130); debajo, una barra de 12px de alto con trazo de pelo que se pinta con marcador lila a medida que se guardan cartas; "Página" y el pie en 20px gris, y una línea de pelo. Después, las nueve cartas de la página: cada edición con más de una versión lleva un título (set en tinta y la impresión en lila, la que dicen la mayoría de sus cartas y con el © si es el mismo en todas, versalitas 800 18px, con una píldora "N idiomas") y una fila por idioma (casilla de 26px con radio de 5px, posición, píldora del idioma y su nombre, lo que la distingue en gris y el número a la derecha); una carta sola lleva set, variante, número y píldora del idioma en su fila. Filas de 46px y títulos de 40px, que se achican hasta 34/28px para entrar hasta y 818; entre filas, líneas de pelo al 8%.
+- **Nota:** una tarjetita del ancho de la hoja menos 140px, debajo de la lista (desde y 690 como mínimo), girada −0.014 rad, con una cinta washi lila arriba, mientras la carta está en la mano.
 - **Carta en la mano:** 900px de alto, centrada en (BCX + 6, 548), girada −0.034 rad, tapando la página. En grupo (mismo arte y misma condición), hasta 9 cartas, las que entran en lo que queda de la hoja, repartidas en hasta 4 filas sobre el área del binder, con 18px de separación, giro alternado de 0.05–0.09 rad y una etiquetita de papel con el idioma a mano.
 - **Escena carta:** carta de 880px de alto en x 488 y la ficha impresa en el lugar de la hoja.
 - **Lista:** cuaderno de 1420×1016 en (250, 64), girado −0.008 rad; renglones desde y 222 cada 74px y margen rojo en x 150.
@@ -643,7 +646,7 @@ Profundidad física: sombras de contacto que caen lejos de la lámpara (hacia ab
 #### Shadow Vocabulary
 - **Hoja** (blur 20, desplazamiento 9/14, `rgba(0,0,0,.5)`): checklist y ficha.
 - **Cuaderno** (blur 22, 10/16, `.5`).
-- **Post-it** (blur 16, 5/9, `.32`), con una franja de pegamento arriba (`rgba(150,110,0,.08)`, 28px).
+- **Nota** (blur 12, 3/6, `rgba(30,16,36,.26)`), con borde de pelo y la cinta washi lila al 50% con los extremos rasgados.
 - **Etiqueta de tapa** (blur 8, 2/3, `.5`).
 - **Tapa al abrirse** (blur 24, 8/6, `.55`) y **página sobre la tapa** (blur 10, 3/4, `.55`).
 - **Carta** (sombra redondeada blur 34, al 55% en el bolsillo, al 50% grande); en la mano crece y se corre hasta 34/48px con la altura.
@@ -662,7 +665,7 @@ Profundidad física: sombras de contacto que caen lejos de la lámpara (hacia ab
 
 ### Shapes
 
-Formas de objeto real: la tapa con esquinas de 26px, cierre perimetral (riel de 15px, dientes punteados de 3.2px) y costura punteada 11/7 a 22px del borde con radio de 15px; tirador metálico en la esquina superior. Las cartas tienen esquinas del 4.5% de su ancho y proporción 63/88. Papel, hoja, post-it y cuaderno son rectángulos rectos, cada uno con su giro leve. La página tiene soldaduras de 5px con una ranura de 1px y el filo cortado del film de cada bolsillo del lado del lomo. Postproducción: Suscribite con 22px (cierre) o 12px (superpuesto), usuario en píldora de 29px con trazo de 1.5px a `rgba(255,255,255,.12)`.
+Formas de objeto real: la tapa con esquinas de 26px, cierre perimetral (riel de 15px, dientes punteados de 3.2px) y costura punteada 11/7 a 22px del borde con radio de 15px; tirador metálico en la esquina superior. Las cartas tienen esquinas del 4.5% de su ancho y proporción 63/88. Papel, hoja, nota y cuaderno son rectángulos rectos, cada uno con su giro leve. La página tiene soldaduras de 5px con una ranura de 1px y el filo cortado del film de cada bolsillo del lado del lomo. Postproducción: Suscribite con 22px (cierre) o 12px (superpuesto), usuario en píldora de 29px con trazo de 1.5px a `rgba(255,255,255,.12)`.
 
 ### Components
 
@@ -670,13 +673,13 @@ Formas de objeto real: la tapa con esquinas de 26px, cierre perimetral (riel de 
 Tapa cerrada con etiqueta de papel (580×340: título, segunda línea en acento, línea de datos y "N cartas, de AAAA a AAAA" en gris) y el logo del canal pegado como sticker (240px, a color, girado −4°, abajo a la derecha de la tapa). La primera → abre la tapa sobre el lomo (760ms, con perspectiva de cámara a 2600px). Las páginas giran como papel (640ms) proyectando sombra sobre la siguiente.
 
 #### Carta en la mano y archivado
-La carta sube a la cámara con `LIFT`, el fondo se desenfoca (460ms), el post-it aparece (320ms, tras 220ms) y el resaltador marca su fila (420ms, tras 160ms). Al archivar baja junto a su bolsillo, entra desde el lado del lomo, toca fondo con `SNUG` y se tilda en birome (300ms). En la mano la carta se mece (giro de 0.0042 y 0.0024 rad, 2.4/3px).
+La carta sube a la cámara con `LIFT`, el fondo se desenfoca (460ms), la nota aparece (320ms, tras 220ms) y el resaltador marca su fila (420ms, tras 160ms). Al archivar baja junto a su bolsillo, entra desde el lado del lomo, toca fondo con `SNUG` y se tilda en birome (300ms). En la mano la carta se mece (giro de 0.0042 y 0.0024 rad, 2.4/3px).
 
 #### Carta que falta
-El bolsillo queda vacío y la fila del checklist dice "falta" a mano, sin tilde. En la mano y en la escena carta aparece como impresión casera: papel `video-proxy-paper` con margen del 6.5%, imagen desaturada (saturate .82, contrast .9, brightness 1.04), sin brillo y con una esquina levantada. El post-it agrega "Esta me falta."
+El bolsillo queda vacío y la fila del checklist dice "falta" a mano, sin tilde. En la mano y en la escena carta aparece como impresión casera: papel `video-proxy-paper` con margen del 6.5%, imagen desaturada (saturate .82, contrast .9, brightness 1.04), sin brillo y con una esquina levantada. La nota agrega "Esta me falta."
 
-#### Checklist y post-it
-Hoja de papel con título impreso, contador a mano, "Página X de Y", y nueve filas: casilla, posición, set y variante, número e idioma. Post-it con el grupo ("1st Edition, N versiones: …", o "Mismo arte, …" en la impresión común), el dato de la carta y "Ilustró …".
+#### Checklist y nota
+Hoja de papel con el título de la lista, la especie, el contador a mano, la barra pintada y "Página X de Y"; las nueve cartas de la página agrupadas por edición, con una fila por idioma. Cada carta guardada se tilda en birome, después una raya de birome la tacha de izquierda a derecha y la fila se aclara al 58%. Nota con el grupo ("1st Edition, N versiones: …"), el dato de la carta y "Ilustró …".
 
 #### Carteles cinéticos
 Cuatro estilos: **golpe** (cada palabra cae desde escala 1.6 en 230ms, 165ms entre palabras y 70ms extra por renglón; la grande sacude la cámara), **barrido** (una barra de acento barre cada renglón, 260ms de desfase, 300ms + 280ms), **máquina** (34ms por letra con cursor que parpadea cada 380ms) y **contador** (cuenta en 1500ms y rebota 8%). Fondos: papel, playmat, cartulina de acento con grano, la carta desenfocada (blur 16, saturate 1.35, brightness .5) o un archivo de `media/` con velo negro al 50%.

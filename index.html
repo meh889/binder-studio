@@ -576,7 +576,7 @@ table.map select{padding:5px 26px 5px 8px;font-size:12px;background-color:var(--
 <div class="modal" id="mZoom" role="dialog" aria-modal="true" aria-labelledby="mZoomT" hidden>
   <div class="dialog">
     <h3 id="mZoomT">Zooms de la carta</h3>
-    <p>Hacé clic sobre la carta para marcar un zoom (un stamp, un detalle del arte) y arrastralo para ajustarlo. Al grabar, cada → recorre los zooms en orden antes de que la carta vaya a su bolsillo.</p>
+    <p>Hacé clic sobre la carta para marcar un zoom (un stamp, un detalle del arte) y arrastralo para ajustarlo. Al grabar, cada → recorre los zooms en orden antes de que la carta vaya a su bolsillo. Si la carta abre un grupo, la cámara se acerca a ella ahí, entre las demás.</p>
     <div class="editgrid">
       <canvas class="edcanvas" id="zCv" width="900" height="900"></canvas>
       <div class="ctrls">
@@ -644,7 +644,7 @@ const THEMES = {
 };
 const FONTS = {"Big Shoulders Display":900,"Bebas Neue":400,"Anton":400,"Archivo Black":400};
 const POS = [["tl","Arriba a la izquierda"],["tr","Arriba a la derecha"],["bl","Abajo a la izquierda"],["br","Abajo a la derecha"]];
-const SHOW = [["counter","Contador escrito a mano"],["strip","Checklist de la página"],["note","Post-it con el dato de la carta"],["illustrator","Ilustrador en el post-it"],["variants","Variantes en el checklist"],["ghost","Número en los bolsillos vacíos"],["page","Número de página"],["footer","Pie en la hoja"]];
+const SHOW = [["counter","Contador escrito a mano"],["strip","Checklist de la página"],["note","Nota con el dato de la carta"],["illustrator","Ilustrador en la nota"],["variants","Variantes en el checklist"],["ghost","Número en los bolsillos vacíos"],["page","Número de página"],["footer","Pie en la hoja"]];
 const ICON = (name, cls="") => `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 // Shelf filters: each one is a paper tag colour, so the chip and the tags on the rows read as the same thing.
 const FILTERS = [["all","Todas",""],["noimg","Sin imagen","pink"],["noscript","Sin guion","yel"],["zoom","Con zoom","mint"],["falta","Me faltan","out"],["group","Mismo arte",""]];
@@ -653,7 +653,7 @@ let view = "cards", flt = "all", query = "", selCard = null, selScene = null;
 
 /* ================= State ================= */
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false,idioma:"",grupo:""}; }
+function newCard(){ return {id:uid("c"),label:"",set:"",year:"",num:"",rarity:"",variants:"",illustrator:"",note:"",script:"",file:null,editFile:null,edit:null,zooms:[],falta:false,oculta:false,idioma:"",grupo:""}; }
 function newProject(name){ return {id:uid("p"),name,eyebrow:"Master list",title1:name,title2:"Master List",introLine:"Una especie, todas sus cartas",footer:"",cards:[]}; }
 function defaultBrand(){ return {marca:1,theme:"mafia",accent:"#fdca0d",accent2:"#3a5aa6",bg:"#231c2b",binder:"lila",font:"Big Shoulders Display",bgImage:null,bgDim:20,
   logo:{url:null,pos:"tr",size:6,opacity:100,builtin:true}, handle:{show:false,text:"",pos:"bl"}, subscribe:{show:false,text:"Suscribite",pos:"br"},
@@ -801,7 +801,7 @@ const GROW = springEase(.5, .3, 520);      // a jumbo growing in front of the ca
 const SNUG = springEase(.62, .19, 260);   // the card taps the bottom of the pocket
 const DEAL = springEase(.8, .42, 560);    // cards dealt onto the binder
 
-const sc = {page:0, filled:-1, hero:null, heroes:null, group:null, focus:0, pop:{}, fileA:null, fileB:-1, fileT:1, prog:0, intro:1, turn:null, note:null, hl:1};
+const sc = {page:0, filled:-1, hero:null, heroes:null, group:null, focus:0, pop:{}, fileA:null, fileB:-1, fileT:1, prog:0, intro:1, turn:null, note:null, hl:1, cz:null};
 let idx = -1;
 const hiIndex = () => sc.group ? sc.group.a : sc.hero ? sc.hero.i : idx + 1;
 const hiCount = () => sc.group ? sc.group.b + 1 : sc.hero ? sc.hero.i + 1 : idx + 1;
@@ -818,9 +818,9 @@ function printKey(c){
 // language together, the 1st Edition apart…), and never more than the pockets left on the page.
 function groupAt(i, limit){
   const list = cards(), c = list[i]; if(!c) return [i, i];
-  const g = String(c.grupo || "").trim(); if(!g) return [i, i];
+  const g = String(c.grupo || "").trim(); if(!g || isHidden(c)) return [i, i];
   const k = printKey(c), last = Math.min(limit, i + PER - 1 - i % PER);
-  let j = i; while(j + 1 <= last && list[j + 1] && String(list[j + 1].grupo || "").trim() === g && printKey(list[j + 1]) === k) j++;
+  let j = i; while(j + 1 <= last && list[j + 1] && String(list[j + 1].grupo || "").trim() === g && printKey(list[j + 1]) === k && !isHidden(list[j + 1])) j++;
   return [i, j];
 }
 
@@ -931,10 +931,6 @@ const glareTex = () => texCanvas("glare", PG.w, PG.h, (x, w, h) => {
 const sheetTex = () => texCanvas("sheet", SHEET.w + 90, SHEET.h + 90, (x, w, h) => {
   x.shadowColor = "rgba(0,0,0,.5)"; x.shadowBlur = 20; x.shadowOffsetX = 9; x.shadowOffsetY = 14; x.drawImage(paperTex(), 30, 30, SHEET.w, SHEET.h);
 });
-const postitTex = () => texCanvas("postit", 520 + 70, 250 + 70, (x, w, h) => {
-  x.shadowColor = "rgba(0,0,0,.32)"; x.shadowBlur = 16; x.shadowOffsetX = 5; x.shadowOffsetY = 9; x.fillStyle = "#ffe57a"; x.fillRect(25, 25, 520, 250);
-  x.shadowColor = "transparent"; x.fillStyle = "rgba(150,110,0,.08)"; x.fillRect(25, 25, 520, 28);
-});
 // Cards resting in pockets are drawn from a copy scaled to pocket size, not from the full scan every frame.
 const cardBmp = new Map();
 function cardBitmap(c, w, h){
@@ -983,10 +979,28 @@ function drawBg(t){
 }
 
 /* ---------- cards ---------- */
+// A card can go into its pocket face down ("oculta") and be turned over later in the video, by a Carta scene with
+// "revela": until then it shows the channel's watercolour card back and the checklist keeps its name to itself.
+const BACK_SRC = "marca/stickers/dorso-acuarela.png";
+let backCanvas = null;
+function cardBack(){
+  if(backCanvas) return backCanvas; const im = getImg(BACK_SRC); if(!im) return null;
+  const c = document.createElement("canvas"); c.width = 630; c.height = 880; const x = c.getContext("2d");
+  rrx(x, 0, 0, c.width, c.height, c.width*.045); x.clip(); x.imageSmoothingQuality = "high";
+  x.drawImage(im, im.width*.0701, im.height*.0487, im.width*.8565, im.height*.9035, 0, 0, c.width, c.height);   // the card, without the sticker's border
+  return backCanvas = c;
+}
+function revealScene(i){ const l = scenes(); for(let k = 0; k < l.length; k++){ const s = l[k]; if(s.tipo === "carta" && String(s.revela || "") === "si" && findCard(s.carta) === i) return k; } return -1; }
+function isHidden(c){
+  if(!c || !c.oculta || !VM.on) return false;
+  const r = revealScene(cards().indexOf(c));
+  return r < 0 || VM.i < r || (VM.i === r && (VM.flip || 0) < .5);
+}
 function drawCardAt(c, cx, cy, w, h, rot, o={}){
   ctx.save(); ctx.translate(cx, cy); if(rot) ctx.rotate(rot);
   const x = -w/2, y = -h/2, rad = w*.045;
   if(!o.noShadow){ ctx.save(); ctx.globalAlpha *= o.big ? .5 : .55; ctx.drawImage(shadowTex(), x - w*.16 + (o.big ? 0 : 1.5), y - h*.12 + (o.big ? 0 : 2.5), w*1.32, h*1.24); ctx.restore(); }
+  if(o.back || isHidden(c)){ const b = cardBack(); rr(x, y, w, h, rad); if(b){ ctx.save(); ctx.clip(); ctx.drawImage(b, x, y, w, h); ctx.restore(); } else { ctx.fillStyle = "#24479a"; ctx.fill(); } ctx.restore(); return; }
   if(o.proxy){ drawProxy(c, x, y, w, h); ctx.restore(); return; }
   const bmp = !o.big && !(o.zoom && o.zoom.s > 1.001) ? cardBitmap(c, w, h) : null;
   if(bmp){ ctx.drawImage(bmp, x, y, w, h); ctx.restore(); return; }
@@ -1144,7 +1158,7 @@ function drawBinder(t, p){
   ctx.restore();
 }
 
-/* ---------- the checklist sheet and the post-it ---------- */
+/* ---------- the checklist sheet and the card's note ---------- */
 function penTick(x, y, v, seed){
   if(v <= 0) return;
   const r = k => hash(seed + k) - .5, a = r("a")*.28, l1 = 1 + r("b")*.3, l2 = 1 + r("c")*.3, over = r("g") > .25 ? 7 : 0;
@@ -1164,94 +1178,175 @@ function marker(x, y, w, h, v){
   if(v >= 1){ ctx.beginPath(); ctx.ellipse(x2 - 1, y + h/2, 5, h/2, 0, 0, Math.PI*2); ctx.fill(); }
   ctx.restore();
 }
+// The printed checklist beside the binder: the species and its progress on top, then this page's nine cards, every
+// release under a small heading of its own with one row per language; each one gets a tick and a pen stroke as it is filed.
+const LANG_NAME = {EN:"Inglés", JP:"Japonés", KO:"Coreano", "ZH-T":"Chino tradicional", "ZH-S":"Chino simplificado", ZH:"Chino", FR:"Francés", DE:"Alemán", IT:"Italiano",
+  ES:"Español", "ES-ES":"Español de España", "ES-LA":"Español latino", PT:"Portugués", NL:"Neerlandés", TH:"Tailandés", ID:"Indonesio", PL:"Polaco", RU:"Ruso"};
+// The sheet's one printed accent: the binder's lilac, or the theme's second colour.
+const sheetInk = () => S.brand.binder === "lila" ? "#6b4a7c" : paperInk(TT().acc2);
+const sheetTint = a => S.brand.binder === "lila" ? `rgba(160,118,178,${a})` : rgba(TT().acc2, a);
+// The whole release a card belongs to, even when it runs over to the next page.
+function fullGroup(i){
+  const list = cards(), c = list[i], g = String((c || {}).grupo || "").trim(); if(!g) return [i, i];
+  const k = printKey(c), same = x => x && String(x.grupo || "").trim() === g && printKey(x) === k; let a = i, b = i;
+  while(a > 0 && same(list[a - 1])) a--; while(same(list[b + 1])) b++; return [a, b];
+}
+// What sets one version apart from the rest of its release: a copyright line, a deck code.
+function variantExtra(c){
+  const v = String(c.variants || ""), cp = (v.match(/©\s*[\d\s\-–]+\d/) || [""])[0].replace(/\s+/g, "").replace(/-/g, "–"), code = (v.match(/Code:\s*([\w-]+)/i) || [])[1];
+  return [cp, code ? "código " + code : ""].filter(Boolean).join(" · ");
+}
+// The print a release's heading names: the one most of its versions say (a Japanese "Normal" opening an Unlimited
+// release doesn't rename it), plus the copyright line when every version shares it.
+function releaseCond(list, a, b){
+  const n = new Map(); let cp = null;
+  for(let k = a; k <= b; k++){
+    const c = list[k], l = condLabel(c), x = (String(c.variants || "").match(/©\s*[\d\s\-–]+\d/) || [""])[0].replace(/\s+/g, "").replace(/-/g, "–");
+    if(l) n.set(l, (n.get(l) || 0) + 1); cp = cp === null || cp === x ? x : "";
+  }
+  const best = [...n].sort((p, q) => q[1] - p[1])[0];
+  return (best ? best[0] : "Normal") + (cp ? " " + cp : "");
+}
+// Text cut to a width with an ellipsis (squeezing it with maxWidth makes print look broken). Uses the current font.
+function fitLine(text, maxW){
+  text = String(text || ""); if(maxW <= 0) return ""; if(ctx.measureText(text).width <= maxW) return text;
+  let a = 0, b = text.length; while(a < b){ const m = (a + b + 1) >> 1; if(ctx.measureText(text.slice(0, m).trimEnd() + "…").width <= maxW) a = m; else b = m - 1; }
+  return a ? text.slice(0, a).trimEnd() + "…" : "";
+}
+// A printed pill; `y` is the text's baseline. Returns its width.
+function sheetPill(x, y, text, size, fill, ink, right){
+  ctx.font = fPrint(size, 700); ls(.6); const w = ctx.measureText(text).width + size*1.1, h = size*1.55, x0 = right ? x - w : x;
+  rr(x0, y - h*.71, w, h, h/2); ctx.fillStyle = fill; ctx.fill();
+  ctx.fillStyle = ink; ctx.textAlign = "center"; ctx.fillText(text, x0 + w/2, y); ctx.textAlign = "left"; ls(0); return w;
+}
+// The pen crossing a filed card's row out, drawn from left to right as `v` goes to 1.
+function penStrike(x0, x1, y, v, seed){
+  if(v <= 0 || x1 <= x0) return; const r = k => hash(seed + k) - .5, xe = x0 + (x1 - x0)*Math.min(1, v);
+  ctx.save(); ctx.strokeStyle = PEN; ctx.globalAlpha *= .58; ctx.lineWidth = 2.4 + r("w"); ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(x0 - 4, y + r("a")*3); ctx.quadraticCurveTo((x0 + xe)/2, y + r("b")*5, xe + 5, y + r("c")*3); ctx.stroke(); ctx.restore();
+}
 function drawChecklist(t, p, L, R, y0, yMax){
-  const sh = S.brand.show, pg = sc.turn && sc.turn.t < .5 ? sc.turn.from : sc.page, list = p.cards;
-  const a = held ? held.i : -1, b = held ? (held.end ?? held.i) : -1, X = L + 100;
-  const width = (t, sz, wt) => (ctx.font = fPrint(sz, wt), ctx.measureText(t).width);
-  // lay every row out first: one line when set and variant fit, otherwise the variant wraps below at 20 px
-  const rows = [];
-  for(let s = 0; s < PER; s++){
-    const i = pg*PER + s, c = list[i]; if(!c) break;
-    const right = [c.num, (c.idioma || "").toUpperCase()].filter(Boolean).join("   "), rw = width(right, 24, 500);
-    const room = R - rw - 24 - X, set = c.set || "Sin set", vr = sh.variants ? variantLabel(c) : "";
-    const sz1 = [24, 22].find(sz => width(set, sz, 600) + (vr ? 10 + width(vr, sz, 500) : 0) <= room);
-    let setSize = 22; while(setSize > 18 && width(set, setSize, 600) > room) setSize--;
-    const vlines = sz1 || !vr ? [] : (ctx.font = fPrint(20, 500), wrap(vr, R - X));
-    rows.push({i, c, right, rw, room, set, vr, sz1, setSize, vlines});
+  const sh = S.brand.show, pg = sc.turn && sc.turn.t < .5 ? sc.turn.from : sc.page, list = p.cards, ink = sheetInk();
+  const ha = held ? held.i : -1, hb = held ? (held.end ?? held.i) : -1, a0 = pg*PER, a1 = Math.min(list.length, a0 + PER) - 1;
+  if(a1 < a0) return y0;
+  // lay the page out first: a heading for every release with more than one version, then its rows
+  const items = [];
+  for(let i = a0, lastF = -1; i <= a1;){
+    const [g0, g1] = groupAt(i, a1), [f0, f1] = fullGroup(g0), multi = f1 > f0;
+    if(multi && f0 !== lastF) items.push({head:true, a:g0, f0, f1, c:list[f0]});   // a face-down card splits a release, not its heading
+    lastF = multi ? f0 : -1;
+    for(let k = g0; k <= g1; k++) items.push({i:k, c:list[k], sub:multi, lead:list[f0]});
+    i = g1 + 1;
   }
-  const extra = rows.reduce((n, r) => n + r.vlines.length, 0), avail = (yMax ?? 1e9) - y0;
-  let base = 50, line = 22; if(rows.length*base + extra*line > avail){ base = Math.max(40, (avail - extra*line)/Math.max(1, rows.length)); }
-  let top = y0;
-  for(const r of rows){
-    const {i, c} = r, rh = base + r.vlines.length*line, mid = top + base/2;
-    if(i >= a && i <= b) marker(L + 40, top + base/2 - 19, R - L - 40, 36 + r.vlines.length*line, sc.hl ?? 1);
-    ctx.strokeStyle = "rgba(24,24,24,.8)"; ctx.lineWidth = 2; ctx.strokeRect(L + 3, mid - 14, 26, 26);
-    ctx.textAlign = "left"; ctx.font = fPrint(21, 600); ctx.fillStyle = GREY; ctx.fillText(String(i + 1), L + 46, mid + 8);
-    ctx.textAlign = "right"; ctx.font = fPrint(24, 500); ctx.fillStyle = INK; ctx.fillText(r.right, R, mid + 8); ctx.textAlign = "left";
-    let endX;
-    if(r.sz1){
-      ctx.font = fPrint(r.sz1, 600); ctx.fillStyle = INK; ctx.fillText(r.set, X, mid + 8); endX = X + ctx.measureText(r.set).width;
-      if(r.vr){ ctx.font = fPrint(r.sz1, 500); ctx.fillStyle = GREY; ctx.fillText(r.vr, endX + 10, mid + 8); endX += 10 + ctx.measureText(r.vr).width; }
+  const heads = items.filter(x => x.head).length, rows = items.length - heads;
+  let rowH = 46, headH = 40; const need = rows*rowH + heads*headH;
+  if(need > yMax - y0){ const k = (yMax - y0)/need; rowH = Math.max(34, rowH*k); headH = Math.max(28, headH*k); }
+  const X = L + 86;
+  let y = y0;
+  for(const it of items){
+    if(it.head){
+      // the release's heading: set and print in small capitals, and how many versions it has
+      const my = y + headH*.68, n = it.f1 - it.f0 + 1, langs = new Set(list.slice(it.f0, it.f1 + 1).map(x => (x.idioma || "?").toUpperCase())).size;
+      const pw = sheetPill(R, my, langs === n ? `${n} idiomas` : `${n} versiones`, 16, sheetTint(.2), ink, true), room = R - L - pw - 20;
+      const name = up(it.c.set || "Sin set"), cond = up(releaseCond(list, it.f0, it.f1)) + (it.a > it.f0 ? " (sigue)" : "");
+      ctx.font = fPrint(18, 800); ls(1.4); ctx.fillStyle = INK; const nm = fitLine(name, room); ctx.fillText(nm, L, my); const nw = ctx.measureText(nm).width;
+      if(nw + 60 < room){ ctx.fillStyle = ink; ctx.fillText(fitLine("  ·  " + cond, room - nw), L + nw, my); } ls(0);
+      y += headH; continue;
+    }
+    const {i, c} = it, mid = y + rowH/2 + 1, hid = isHidden(c), lang = hid ? "" : (c.idioma || "").toUpperCase(), done = i <= sc.filled, pop = sc.pop[i] ?? 1;
+    if(i >= ha && i <= hb) marker(L + 34, mid - 17, R - L - 30, 34, sc.hl ?? 1);
+    ctx.strokeStyle = "rgba(24,24,24,.72)"; ctx.lineWidth = 2; rr(L + 2, mid - 13, 26, 26, 5); ctx.stroke();
+    ctx.save(); if(done && !c.falta) ctx.globalAlpha *= 1 - .42*Math.min(1, pop);       // what's filed recedes a little
+    ctx.font = fPrint(18, 600); ctx.fillStyle = GREY; ctx.textAlign = "right"; ctx.fillText(String(i + 1), X - 16, mid + 7); ctx.textAlign = "left";
+    let x;
+    if(it.sub){
+      // a version under its release: the language says which one it is; anything else that tells it apart, in grey
+      const pw = lang ? sheetPill(X, mid + 7, lang, 16, sheetTint(.26), ink) : 0, nm = hid ? "???" : LANG_NAME[lang] || lang || "—";
+      ctx.font = fPrint(22, 600); ctx.fillStyle = INK; const nmf = fitLine(nm, R - 130 - X - pw - 12); ctx.fillText(nmf, X + pw + 12, mid + 8); x = X + pw + 12 + ctx.measureText(nmf).width;
+      // what tells it apart in grey: its own set when it isn't the release's, then a copyright line or a code
+      const ex = hid ? "" : [it.lead && c.set && c.set !== it.lead.set ? c.set : "", sh.variants ? variantExtra(c) : ""].filter(Boolean).join(" · ");
+      if(ex){ ctx.font = fPrint(18, 500); ctx.fillStyle = GREY; const ef = fitLine(ex, R - 120 - x - 12); if(ef){ ctx.fillText(ef, x + 12, mid + 8); x += 12 + ctx.measureText(ef).width; } }
+      ctx.textAlign = "right"; ctx.font = fPrint(20, 500); ctx.fillStyle = GREY; ctx.fillText(hid ? "" : c.num || "", R, mid + 8); ctx.textAlign = "left";
     } else {
-      ctx.font = fPrint(r.setSize, 600); ctx.fillStyle = INK; ctx.fillText(r.set, X, mid + 8, r.room); endX = X + Math.min(r.room, ctx.measureText(r.set).width);
-      ctx.font = fPrint(20, 500); ctx.fillStyle = GREY; r.vlines.forEach((l, k) => ctx.fillText(l, X, mid + 8 + (k + 1)*line));
+      // a card on its own: set and print on one line, its number and language at the end
+      const lw = lang ? sheetPill(R, mid + 7, lang, 16, sheetTint(.26), ink, true) : 0;
+      const num = hid ? "" : c.num || "";
+      ctx.textAlign = "right"; ctx.font = fPrint(20, 500); ctx.fillStyle = GREY; ctx.fillText(num, R - lw - 12, mid + 8); const nw = ctx.measureText(num).width; ctx.textAlign = "left";
+      const room = R - lw - 26 - nw - X, set = hid ? "???" : c.set || "Sin set", vr = hid ? "se da vuelta al final" : sh.variants ? variantLabel(c) : "";
+      ctx.font = fPrint(22, 700); ctx.fillStyle = INK; const sf = fitLine(set, room); ctx.fillText(sf, X, mid + 8); x = X + ctx.measureText(sf).width;
+      if(vr && x + 60 < X + room){ ctx.font = fPrint(19, 500); ctx.fillStyle = GREY; const vf = fitLine(vr, X + room - x - 10); if(vf){ ctx.fillText(vf, x + 10, mid + 8); x += 10 + ctx.measureText(vf).width; } }
     }
-    if(i <= sc.filled){
-      if(c.falta){ ctx.font = fHand(30, 600); ctx.fillStyle = "rgba(90,88,82,.85)"; ctx.fillText("falta", Math.min(endX + 14, R - r.rw - 70), mid + 9); }
-      else penTick(L + 15, mid, sc.pop[i] ?? 1, c.id);
+    ctx.restore();
+    ctx.fillStyle = "rgba(27,27,28,.08)"; ctx.fillRect(X - 6, y + rowH - 1, R - X + 6, 1);
+    if(done){
+      if(c.falta){ ctx.font = fHand(28, 600); ctx.fillStyle = "rgba(90,88,82,.85)"; ctx.fillText("falta", Math.min(x + 14, R - 230), mid + 9); }
+      else { penTick(L + 15, mid, pop, c.id); penStrike(X - 4, x, mid + 1, clamp((pop - .2)/.8, 0, 1), c.id); }
     }
-    top += rh;
+    y += rowH;
   }
+  return y;
 }
 function ownedCount(p){ let n = 0; for(let i = 0; i <= sc.filled && i < p.cards.length; i++) if(!p.cards[i].falta) n++; return n; }
-function drawPostit(t, p){
+// The card's facts, written by hand on a small paper card held to the sheet with a strip of lilac washi tape.
+function drawNote(t, p, y0){
   const n = sc.note; if(!n || n.a <= .01) return;
   const c = p.cards[n.i]; if(!c) return;
   const sh = S.brand.show, lines = [];
-  if(n.group && sc.group && sc.group.b > sc.group.a){ const sel = p.cards.slice(sc.group.a, sc.group.b + 1), langs = [...new Set(sel.map(x => (x.idioma || "?").toUpperCase()))];
+  if(isHidden(c) && !n.group) lines.push("Esta la damos vuelta al final.");
+  else if(n.group && sc.group && sc.group.b > sc.group.a){ const sel = p.cards.slice(sc.group.a, sc.group.b + 1), langs = [...new Set(sel.map(x => (x.idioma || "?").toUpperCase()))];
     lines.push(`${condLabel(sel[0]) || "Mismo arte"}, ${sel.length} versiones: ${andList(langs)}`); }
-  if(c.falta && !n.group) lines.push("Esta me falta.");
-  if(sh.note && c.note) lines.push(c.note);
-  if(sh.illustrator && real(c.illustrator)) lines.push("Ilustró " + c.illustrator);
+  if(!isHidden(c)){
+    if(c.falta && !n.group) lines.push("Esta me falta.");
+    if(sh.note && c.note) lines.push(c.note);
+    if(sh.illustrator && real(c.illustrator)) lines.push("Ilustró " + c.illustrator);
+  }
   if(!lines.length) return;
-  const w = 520, x = 250, y = 756, first = 56, last = 184;
-  let size = 34, out = [];
-  for(; size >= 22; size -= 2){ ctx.font = fHand(size, 600); out = []; for(const l of lines) out.push(...wrap(l, w - 52)); if(first + (out.length - 1)*size*1.06 <= last) break; }
-  const lh = size*1.06, h = Math.max(240, first + (out.length - 1)*lh + 40);
-  ctx.save(); ctx.globalAlpha *= n.a; ctx.translate(x + w/2, y + h/2); ctx.rotate(-.035 + (1 - n.a)*.05); const s = .96 + .04*n.a; ctx.scale(s, s); ctx.translate(-w/2, -h/2);
-  ctx.drawImage(postitTex(), -25, -25, w + 70, h + 70);
+  const x = 70, w = SHEET.w - 140, first = 64, maxH = Math.max(150, 1004 - y0);
+  let size = 33, out = [];
+  for(; size >= 22; size -= 2){ ctx.font = fHand(size, 600); out = []; for(const l of lines) out.push(...wrap(l, w - 64)); if(first + (out.length - 1)*size*1.08 + 30 <= maxH) break; }
+  const lh = size*1.08, h = Math.min(maxH, first + (out.length - 1)*lh + 32);
+  ctx.save(); ctx.globalAlpha *= n.a; ctx.translate(x + w/2, y0 + h/2); ctx.rotate(-.014 + (1 - n.a)*.04); const s = .97 + .03*n.a; ctx.scale(s, s); ctx.translate(-w/2, -h/2);
+  ctx.save(); ctx.shadowColor = "rgba(30,16,36,.26)"; ctx.shadowBlur = 12; ctx.shadowOffsetX = 3; ctx.shadowOffsetY = 6; rr(0, 0, w, h, 5); ctx.fillStyle = "#fbf7ef"; ctx.fill(); ctx.restore();
+  rr(.5, .5, w - 1, h - 1, 5); ctx.strokeStyle = "rgba(27,27,28,.1)"; ctx.lineWidth = 1; ctx.stroke();
+  // the tape: see-through lilac with torn ends
+  ctx.save(); ctx.translate(w*.5, 3); ctx.rotate(-.035); const tw = 170, th = 34;
+  ctx.beginPath(); ctx.moveTo(-tw/2, -th/2); for(let k = 1; k <= 6; k++) ctx.lineTo(-tw/2 + (k % 2 ? 4 : 0), -th/2 + th*k/6);
+  for(let k = 6; k >= 0; k--) ctx.lineTo(tw/2 - (k % 2 ? 4 : 0), -th/2 + th*k/6); ctx.closePath();
+  ctx.fillStyle = sheetTint(.5); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(-tw/2 + 6, -th/2 + 5, tw - 12, 4); ctx.restore();
   ctx.font = fHand(size, 600); ctx.fillStyle = "#26285e"; ctx.textAlign = "left";
-  out.forEach((l, k) => ctx.fillText(l, 26, first + k*lh));
+  out.forEach((l, k) => ctx.fillText(l, 30, first + k*lh));
   ctx.restore();
 }
 function drawSheet(t, p){
-  const sh = S.brand.show, n = p.cards.length;
+  const sh = S.brand.show, n = p.cards.length, ink = sheetInk(), pg = sc.turn && sc.turn.t < .5 ? sc.turn.from : sc.page;
   ctx.save(); ctx.translate(SHEET.x, SHEET.y); ctx.rotate(SHEET.rot);
   ctx.drawImage(sheetTex(), -30, -30, SHEET.w + 90, SHEET.h + 90);
-  const L = 62, R = SHEET.w - 62;
+  const L = 62, R = SHEET.w - 62, done = ownedCount(p);
   ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-  const t1 = p.title1 || "", s1 = fitFont(t1, 92, 46, R - L - 230, fTitle); printTitle(t1, L, 44 + s1*.86, s1, R - L - 230, INK);
-  let hy = 44 + s1*.86;
-  if(p.title2){ const s2 = fitFont(p.title2, 48, 28, R - L - 230, fTitle); hy += s2 + 4; printTitle(p.title2, L, hy, s2, R - L - 230, paperInk(t.acc)); }
-  if(p.eyebrow){ ctx.font = fPrint(21, 500); ctx.fillStyle = GREY; ctx.fillText(p.eyebrow, L, hy + 40, R - L - 230); }
-  if(sh.counter){
-    const done = ownedCount(p);
-    ctx.save(); ctx.translate(R, 150); ctx.rotate(-.06); ctx.textAlign = "right"; ctx.font = fHand(92, 700); ctx.fillStyle = PEN; ctx.fillText(`${done}/${n}`, 0, 0); ctx.restore();
-  }
-  const top = 266;
-  ctx.font = fPrint(21, 500); ctx.fillStyle = GREY;
-  if(sh.page) ctx.fillText(`Página ${(sc.turn && sc.turn.t < .5 ? sc.turn.from : sc.page) + 1} de ${Math.max(1, Math.ceil(n/PER))}`, L, top);
-  if(sh.footer && p.footer){ ctx.textAlign = "right"; ctx.fillText(p.footer, R, top, R - L - 200); ctx.textAlign = "left"; }
-  ctx.fillStyle = "rgba(20,20,20,.6)"; ctx.fillRect(L, top + 14, R - L, 2);
-  if(sh.strip) drawChecklist(t, p, L, R, top + 34, 752);
-  drawPostit(t, p);
+  // what the list is, small and in the accent; the species big; the count written by hand
+  const eb = p.eyebrow || "", t2 = p.title2 || "", label = t2 && !eb.toLowerCase().includes(t2.toLowerCase()) ? t2 + (eb ? "  ·  " + eb : "") : eb;
+  let y = 72;
+  if(label){ ctx.font = fPrint(18, 800); ls(2.4); ctx.fillStyle = ink; ctx.fillText(up(label), L, y, R - L - 260); ls(0); }
+  const t1 = p.title1 || "", s1 = fitFont(t1, 96, 48, R - L - 250, fTitle); y += 12 + s1*.84; printTitle(t1, L, y, s1, R - L - 250, INK);
+  if(sh.counter){ ctx.save(); ctx.translate(R, 130); ctx.rotate(-.06); ctx.textAlign = "right"; ctx.font = fHand(88, 700); ctx.fillStyle = PEN; ctx.fillText(`${done}/${n}`, 0, 0); ctx.restore(); }
+  // a printed track, coloured in by hand with a lilac marker as the cards go in
+  y += 30; const tw = R - L, th = 12, k = n ? done/n : 0;
+  rr(L, y, tw, th, th/2); ctx.strokeStyle = "rgba(27,27,28,.24)"; ctx.lineWidth = 1.4; ctx.stroke();
+  if(k > 0){ ctx.save(); rr(L, y, tw, th, th/2); ctx.clip(); ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = sheetTint(.78); const fx = L + Math.max(th, tw*k);
+    ctx.beginPath(); ctx.moveTo(L - 2, y - 2); ctx.lineTo(fx, y - 1); ctx.lineTo(fx + 3, y + th + 1); ctx.lineTo(L - 2, y + th + 2); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  y += th + 40; ctx.font = fPrint(20, 500); ctx.fillStyle = GREY;
+  if(sh.page) ctx.fillText(`Página ${pg + 1} de ${Math.max(1, Math.ceil(n/PER))}`, L, y);
+  if(sh.footer && p.footer){ ctx.textAlign = "right"; ctx.fillText(p.footer, R, y, R - L - 220); ctx.textAlign = "left"; }
+  y += 18; ctx.fillStyle = "rgba(27,27,28,.2)"; ctx.fillRect(L, y, R - L, 1.5);
+  const end = sh.strip ? drawChecklist(t, p, L, R, y + 8, 818) : y;
+  drawNote(t, p, Math.max(end + 24, 690));
   ctx.restore();
 }
 
 /* ---------- the card in the creator's hand ---------- */
 function drawHeld(t, h, live, decor){
-  const c = cards()[h.i] || newCard(), n = live && !reduced ? performance.now() : 0;
-  const rot = h.rot + (n ? .0042*Math.sin(n/1300) + .0024*Math.sin(n/610) : 0), dx = n ? 2.4*Math.sin(n/1700) : 0, dy = n ? 3*Math.sin(n/1900 + 1) : 0;
+  const c = cards()[h.i] || newCard(), n = live && !reduced ? performance.now() : 0, calm = sc.cz ? 1 - .85*sc.cz.k : 1;   // a hand holds still for a close-up
+  const rot = h.rot + (n ? (.0042*Math.sin(n/1300) + .0024*Math.sin(n/610))*calm : 0), dx = n ? 2.4*Math.sin(n/1700)*calm : 0, dy = n ? 3*Math.sin(n/1900 + 1)*calm : 0;
   const lift = h.lift ?? 1;
   if(decor){ ctx.save(); ctx.globalAlpha *= h.a; ctx.translate(h.cx + dx, h.cy + dy); ctx.rotate(rot); decor(); ctx.restore(); return; }
   ctx.save(); ctx.globalAlpha *= h.a*(.35 + .35*lift);
@@ -1287,14 +1382,18 @@ function groupLayout(n, ids){
   return out;
 }
 function drawGroupHeld(t, live){
-  for(const h of sc.heroes) if(h.a > 0) drawHeld(t, h, live);
-  // the tags go on last: each is stuck on top, so no neighbouring card covers it
+  // the group's zoom moves in on its first card: when that card has zooms it lies on top, so no neighbour covers the detail
+  const h0 = sc.heroes[0], c0 = h0 && cards()[h0.i], top0 = !!c0 && !isHidden(c0) && (c0.zooms || []).length > 0;
+  for(const h of top0 ? [...sc.heroes.slice(1), h0] : sc.heroes) if(h.a > 0) drawHeld(t, h, live);
+  // the tags go on last: each is stuck on top, so no neighbouring card covers it; they fade while the camera
+  // zooms in, since they sit on the corner where the small print is (rarity, ©)
+  const zk = sc.cz ? sc.cz.k : 0;
   for(const h of sc.heroes){
     const c = cards()[h.i] || newCard(), lang = (c.idioma || "").toUpperCase();
-    if(h.a <= 0 || !lang || h.chip <= .01) continue;
+    if(h.a <= 0 || !lang || h.chip*(1 - zk) <= .01) continue;
     drawHeld(t, h, live, () => {
       // a little paper tag stuck on the corner, the language written on it by hand
-      ctx.globalAlpha *= h.chip; const tw = Math.max(58, h.w*.3), th = tw*.56;
+      ctx.globalAlpha *= h.chip*(1 - zk); const tw = Math.max(58, h.w*.3), th = tw*.56;
       ctx.translate(h.w/2 - tw*.72, h.h/2 - th*.62); ctx.rotate(.07 - (hash(c.id + "t") - .5)*.1);
       ctx.save(); ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2; ctx.fillStyle = "#f4f0e6"; ctx.fillRect(-tw/2, -th/2, tw, th); ctx.restore();
       ctx.font = fHand(Math.round(th*.78), 700); ctx.fillStyle = PEN; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(lang, 0, th*.04, tw - 8);
@@ -1316,6 +1415,10 @@ function makeFocusSnap(){
 /* ---------- one frame of the world ---------- */
 function drawWorld(t, p, live){
   ctx.save(); camera(live);
+  // a group's zoom: the camera moves in on its first card where it lies, the way a phone goes macro
+  // (the magnified window never leaves the frame: beyond it nothing is painted)
+  if(sc.cz && sc.cz.k > .001){ const {k, px, py, Z} = sc.cz, z = Math.pow(Z, k), hw = W/(2*z), hh = H/(2*z);
+    ctx.translate(W/2, H/2); ctx.scale(z, z); ctx.translate(-clamp(W/2 + (px - W/2)*k, hw, W - hw), -clamp(H/2 + (py - H/2)*k, hh, H - hh)); }
   drawBg(t);
   drawBinder(t, p);
   if(sc.focus > .001 && focusSnap){ ctx.save(); ctx.globalAlpha = Math.min(1, sc.focus); ctx.drawImage(focusSnap, 0, 0, W, H); ctx.restore(); }
@@ -1348,6 +1451,7 @@ function draw(){
     ctx.globalAlpha = 1; ctx.filter = "none"; ls(0); ctx.textAlign = "left";
     drawOverlay(t, s.tipo === "cierre" || (s.tipo === "media" && s.sonido === "si"));   // the closing and a finished clip (like the channel intro) carry their own logo
     if(VM.flash > .01){ ctx.fillStyle = `rgba(255,255,255,${VM.flash*.8})`; ctx.fillRect(0,0,W,H); }
+    if(TR) drawStickerTr();
     return;
   }
   drawWorld(t, p, live);
@@ -1398,7 +1502,7 @@ function cancelAnim(){ run++; killTweens(); queued = 0; held = null; busyAnim = 
 function drawAt(i){
   cancelAnim();
   idx = clamp(i, -1, cards().length - 1);
-  Object.assign(sc, {page: idx < 0 ? 0 : Math.floor(idx/PER), filled: idx, hero: null, heroes: null, group: null, cnt: undefined, focus: 0, pop: {}, turn: null, note: null, hl: 1, intro: idx < 0 ? 1 : 0});
+  Object.assign(sc, {page: idx < 0 ? 0 : Math.floor(idx/PER), filled: idx, hero: null, heroes: null, group: null, cnt: undefined, focus: 0, pop: {}, turn: null, note: null, hl: 1, intro: idx < 0 ? 1 : 0, cz: null});
   setFile(idx, false); setProgress(false); highlightRow(); updPrompter(); requestDraw();
 }
 // Opening the closed binder: the front cover swings over the spine.
@@ -1488,7 +1592,24 @@ async function putAway(h, my){
   await tween(520, v => { h.cy = y0 + (H + h.h*.75 - y0)*v; h.rot = r0 - .1*v; }, p => p*p);
   return my === run;
 }
+// The camera's target for a group's zoom: the detail on the group's first card, wherever that card lies.
+function groupFocus(z){
+  const h = sc.heroes && sc.heroes[0]; if(!h) return null;
+  const dx = (z.x - .5)*h.w, dy = (z.y - .5)*h.h, c = Math.cos(h.rot), s = Math.sin(h.rot);
+  // nearly as close as the same zoom on a card held alone, so a small print (a ©, a set symbol) can be read
+  return {px:h.cx + dx*c - dy*s, py:h.cy + dx*s + dy*c, Z:clamp(z.s*HERO.h/h.h*.85, 1.6, 9)};
+}
+async function groupZoomTo(z){
+  const f = sc.cz ? {...sc.cz} : {k:0, px:W/2, py:H/2, Z:1};
+  if(!z){ if(!sc.cz) return; await tween(620, v => { sc.cz = {...f, k:f.k*(1 - v)}; }, easeInOut); sc.cz = null; return; }
+  const g = groupFocus(z); if(!g) return;
+  playSfx("whoosh");
+  await tween(720, v => { sc.cz = {k:f.k + (1 - f.k)*v, px:f.px + (g.px - f.px)*v, py:f.py + (g.py - f.py)*v, Z:f.Z + (g.Z - f.Z)*v}; }, easeInOut);
+}
+const heldZooms = () => held && !isHidden(cards()[held.i]) ? (cards()[held.i] || {}).zooms || [] : [];
+function zoomHeld(z){ return held && held.group ? groupZoomTo(z) : zoomTo(z.s, z.x, z.y); }
 async function settleGroup(my){
+  if(sc.cz){ await groupZoomTo(null); if(my !== run) return false; }
   const hs = sc.heroes || []; held = null; updPrompter();
   const pageOf = k => Math.floor(k/PER);
   let rest = hs.slice();
@@ -1540,8 +1661,8 @@ async function showNext(my, mode, limit = cards().length - 1){
   const [ga, gb] = groupAt(idx + 1, limit);
   let ok = gb > ga ? await showGroup(ga, gb, my) : await showBig(idx + 1, my); if(!ok) return false;
   if(mode !== "tap"){
-    const zs = held.group ? [] : (cards()[held.i] || {}).zooms || [];
-    for(let k=0;k<zs.length;k++){ await sleep(+mode); if(my !== run || !held) return false; held.step = k; updPrompter(); await zoomTo(zs[k].s, zs[k].x, zs[k].y); }
+    const zs = heldZooms();
+    for(let k=0;k<zs.length;k++){ await sleep(+mode); if(my !== run || !held) return false; held.step = k; updPrompter(); await zoomHeld(zs[k]); }
     await sleep(+mode); if(my !== run) return false;
     ok = await settle(my);
   }
@@ -1553,8 +1674,8 @@ async function binderAdvance(limit){
   busyAnim = true;
   const my = run, mode = $("hold").value; let ok = true;
   if(held){
-    const zs = held.group ? [] : (cards()[held.i] || {}).zooms || [];
-    if(mode === "tap" && held.step < zs.length - 1){ held.step++; updPrompter(); const z = zs[held.step]; await zoomTo(z.s, z.x, z.y); }
+    const zs = heldZooms();
+    if(mode === "tap" && held.step < zs.length - 1){ held.step++; updPrompter(); await zoomHeld(zs[held.step]); }
     else { ok = await settle(my); if(ok && my === run && idx < limit && mode === "tap") ok = await showNext(my, mode, limit); }
   } else if(idx < limit){ ok = await showNext(my, mode, limit); }
   if(my !== run) return;
@@ -1562,10 +1683,10 @@ async function binderAdvance(limit){
   if(queued){ queued--; advance(); }
 }
 async function binderZoom(){
-  if(!held || held.group || !sc.hero || busyAnim) return;
-  busyAnim = true; const my = run, h = sc.hero, zs = (cards()[held.i] || {}).zooms || [];
-  if(h.zs > 1.001){ await zoomTo(1, .5, .5); if(held) held.step = -1; }
-  else { const z = zs[0] || {s:2.4, x:.5, y:.5}; held.step = zs.length ? 0 : -1; await zoomTo(z.s, z.x, z.y); }
+  if(!held || busyAnim || (held.group ? !sc.heroes : !sc.hero)) return;
+  busyAnim = true; const my = run, zs = heldZooms(), zoomed = held.group ? !!sc.cz : sc.hero.zs > 1.001;
+  if(zoomed){ await (held.group ? groupZoomTo(null) : zoomTo(1, .5, .5)); if(held) held.step = -1; }
+  else { const z = zs[0] || {s:2.4, x:.5, y:.5}; held.step = zs.length ? 0 : -1; await zoomHeld(z); }
   if(my !== run) return;
   busyAnim = false; updPrompter();
 }
@@ -1582,13 +1703,18 @@ $("hold").addEventListener("change", e => e.target.blur());
 cv.addEventListener("click", advance);
 
 /* ================= Video plan (escenas) ================= */
+// The channel's stickers a cartel can leave under (the round ones hide the whole frame at a smaller size).
+const STICKERS = {pokebola:"Poké Ball", "pokebola-amor":"Love Ball", "energia-planta":"Energía planta", "energia-agua":"Energía agua", "energia-fuego":"Energía fuego",
+  "energia-electrica":"Energía eléctrica", "energia-psiquica":"Energía psíquica", "energia-lucha":"Energía lucha", "energia-oscura":"Energía oscura", "energia-metal":"Energía metal",
+  bulbasaur:"Bulbasaur", "dorso-acuarela":"Dorso de carta"};
 const SCENE_TYPES = {
   rafaga:{name:"Ráfaga", fields:[["items","Elementos, uno por línea (archivo | qué es, carta X, texto X, color)","area"],["ritmo","Segundos por elemento","text"],["fin","Al terminar","select",[["auto","Pasa sola a la siguiente"],["espera","Espera tu →"]]]]},
   adelanto:{name:"Adelanto", fields:[["items","Pasos, uno por toque","area"],["vuelan","Cartas que vuelan (posiciones, ej. 1-409; vacío: todas)","text"]]},
   titulo:{name:"Portada", fields:[]},
-  cartel:{name:"Cartel cinético", fields:[["estilo","Estilo","select",[["golpe","Golpe, palabra por palabra"],["barrido","Barrido"],["maquina","Máquina de escribir"],["contador","Contador"]]],["texto","Texto (*grande*, _chico_, ~tachado~)","area"],["valor","Número (contador)","text"],["fondo","Fondo (blanco, negro, acento, marca, carta X, media/archivo)","text"]]},
+  cartel:{name:"Cartel cinético", fields:[["estilo","Estilo","select",[["golpe","Golpe, palabra por palabra"],["barrido","Barrido"],["maquina","Máquina de escribir"],["contador","Contador"]]],["texto","Texto (*grande*, _chico_, ~tachado~)","area"],["valor","Número (contador)","text"],["fondo","Fondo (blanco, negro, acento, marca, carta X, media/archivo)","text"],
+    ["transicion","Salida","select",[["","Corte"],["sticker","Un sticker lo tapa y se despega"]]],["sticker","Sticker de la salida","select",Object.entries(STICKERS)]]},
   binder:{name:"Binder", fields:[["cartas","Cartas (posiciones, ej. 1-9)","text"]]},
-  carta:{name:"Carta en grande", fields:[["carta","Carta (número o #posición)","text"],["texto","Texto al costado","area"]]},
+  carta:{name:"Carta en grande", fields:[["carta","Carta (número o #posición)","text"],["texto","Texto al costado","area"],["revela","Dar vuelta","select",[["","No"],["si","Empieza boca abajo y se da vuelta con →"]]]]},
   media:{name:"Imagen o clip", fields:[["media","Archivo (media/…)","text"],["pide","Qué conseguir","text"],["texto","Texto","area"],["sonido","Sonido del clip","select",[["no","Sin sonido, en loop"],["si","Con su sonido, una vez (baja la música)"]]]]},
   muro:{name:"Muro de cartas", fields:[["texto","Pregunta (el número entre *asteriscos* es el contador)","area"],["respuesta","Respuesta (segundo toque)","text"],["cartas","Cartas del muro","text"]]},
   caos:{name:"Del caos al orden", fields:[["texto","Texto del desorden (primer toque)","area"],["cinta","Cinta del orden (segundo toque)","text"],["cartas","Cartas de la hoja (posiciones, ej. 1-9)","text"]]},
@@ -1598,7 +1724,7 @@ const SCENE_TYPES = {
 const ARRAY_FIELDS = new Set(["items"]);
 function newScene(tipo){
   const base = {id:uid("s"), tipo, capitulo:"", guion:""};
-  const d = {muro:{texto:"¿Quién necesita\nesta *lista*?", respuesta:"Bueno… *yo*.", cartas:""}, caos:{texto:"LA INFO ESTÁ\n*DESPARRAMADA*", cinta:"UNA ESPECIE / POR VIDEO", cartas:"1-9"}, adelanto:{items:["texto En este video vamos a ver *TODAS* las cartas", "texto *409*", "carta #1 | LA *PRIMERA*", "suspenso #1 | US$1.000", "silencio ¿CUÁL ES?"], vuelan:""}, rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:""}, media:{media:"", pide:"", texto:"", sonido:"no"}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
+  const d = {muro:{texto:"¿Quién necesita\nesta *lista*?", respuesta:"Bueno… *yo*.", cartas:""}, caos:{texto:"LA INFO ESTÁ\n*DESPARRAMADA*", cinta:"UNA ESPECIE / POR VIDEO", cartas:"1-9"}, adelanto:{items:["texto En este video vamos a ver *TODAS* las cartas", "texto *409*", "carta #1 | LA *PRIMERA*", "suspenso #1 | US$1.000", "silencio ¿CUÁL ES?"], vuelan:""}, rafaga:{items:[], ritmo:"0.28", fin:"auto"}, cartel:{estilo:"golpe", texto:"", valor:"", fondo:"blanco", transicion:"", sticker:"pokebola"}, binder:{cartas:"1-9"}, carta:{carta:"#1", texto:"", revela:""}, media:{media:"", pide:"", texto:"", sonido:"no"}, lista:{titulo:"", items:[]}, cierre:{texto:"¡GRACIAS POR VER!"}}[tipo] || {};
   return {...base, ...d};
 }
 function itemToLine(it){
@@ -2090,7 +2216,7 @@ function drawAdelanto(s, el, T){
   if(blurCard){ ctx.save(); ctx.translate(W/2, H*.5); ctx.rotate(-.04); ctx.drawImage(blurCard, -blurCard.width/2, -blurCard.height/2); ctx.restore(); }
   ctx.fillStyle = kind === "silencio" ? "rgba(8,4,10,.5)" : "rgba(8,4,10,.2)"; ctx.fillRect(0, 0, W, H);
   if(sp && sp.label){
-    const raw = sp.label, val = parseFloat(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
+    const raw = sp.label, val = amount(raw);
     const prefix = (raw.match(/^[^\d-]*/) || [""])[0], suffix = (raw.match(/[^\d.,]*$/) || [""])[0];
     const sinceS = kind === "suspenso" ? se : 99999, p = clamp((sinceS - 250)/1500, 0, 1), cur = Math.round(val*easeOut(p));
     if(kind === "suspenso"){
@@ -2312,10 +2438,12 @@ function drawRafaga(s, el, T){
   if(local < 50 && k % 3 === 2){ ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fillRect(0,0,W,H); }
   if(s.fin !== "espera" && el > items.length*r + 180 && !VM.auto && VM.i >= 0){ VM.auto = true; const me = VM.i; setTimeout(() => { if(VM.i === me) goScene(me + 1); }, 0); }
 }
+// A number the way it's written here: dots for thousands, a comma for decimals ("US$809.943", "3,5").
+const amount = raw => parseFloat(String(raw || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
 function drawCartel(s, el, T){
   const theme = drawFondo(s.fondo || (s.estilo === "golpe" ? "blanco" : "marca"), el);
   if(s.estilo === "contador"){
-    const val = parseFloat(String(s.valor).replace(/[^\d.,-]/g, "").replace(",", ".")) || 0, p = clamp(el/1500, 0, 1), cur = Math.round(val*easeOut(p));
+    const val = amount(s.valor), p = clamp(el/1500, 0, 1), cur = Math.round(val*easeOut(p));
     const prefix = String(s.valor || "").match(/^[^\d-]*/)[0], suffix = String(s.valor || "").match(/[^\d.,]*$/)[0];
     const txt = prefix + cur.toLocaleString("es-AR") + suffix, C = kinColors(theme);
     const key = "c" + cur; if(cur !== VM.lastItem){ VM.lastItem = cur; if(!VM.played[key] && p < 1){ VM.played[key] = 1; playSfx("tick"); } }
@@ -2328,21 +2456,23 @@ function drawCartel(s, el, T){
   }
   drawKin(s.texto || "", el, {x:130, y:120, w:W - 260, h:H - 240}, 260, theme, s.estilo || "golpe", "k");
 }
-// The big card: held up on the left, its facts printed on a sheet beside it.
+// The big card: held up on the left, its facts printed on a sheet beside it, in the same print as the checklist.
 function drawFactSheet(T, c){
   ctx.save(); ctx.translate(SHEET.x, SHEET.y); ctx.rotate(SHEET.rot);
   ctx.drawImage(sheetTex(), -30, -30, SHEET.w + 90, SHEET.h + 90);
-  const L = 62, R = SHEET.w - 62, sh = S.brand.show; let y = 70;
+  const L = 62, R = SHEET.w - 62, sh = S.brand.show, ink = sheetInk(); let y = 72;
   ctx.textAlign = "left";
-  const t1 = c.set || "Sin set", s1 = fitFont(t1, 72, 38, R - L, fTitle); y = 44 + s1*.86; printTitle(t1, L, y, s1, R - L, INK);
-  if(c.label){ y += 44; ctx.font = fPrint(24, 500); ctx.fillStyle = GREY; ctx.fillText(c.label, L, y, R - L); }
-  y += 54; ctx.font = fPrint(24, 600); ctx.fillStyle = INK;
-  ctx.fillText([c.num ? "N.º " + c.num : "", c.rarity, sh.variants ? variantLabel(c) : "", c.year].filter(Boolean).join(",  "), L, y, R - L);
-  if(c.idioma){ y += 40; ctx.font = fPrint(24, 500); ctx.fillStyle = GREY; ctx.fillText("Idioma: " + c.idioma.toUpperCase(), L, y); }
-  if(sh.illustrator && real(c.illustrator)){ y += 38; ctx.font = fPrint(24, 500); ctx.fillStyle = GREY; ctx.fillText("Ilustración: " + c.illustrator, L, y, R - L); }
-  ctx.fillStyle = "rgba(20,20,20,.55)"; ctx.fillRect(L, y + 26, R - L, 2); y += 76;
+  if(c.label){ ctx.font = fPrint(18, 800); ls(2.4); ctx.fillStyle = ink; ctx.fillText(fitLine(up(c.label), R - L - (c.falta ? 230 : 0)), L, y); ls(0); }
+  const t1 = c.set || "Sin set", s1 = fitFont(t1, 72, 38, R - L, fTitle); y += 14 + s1*.86; printTitle(t1, L, y, s1, R - L, INK);
+  const meta = [c.num ? "N.º " + c.num : "", c.rarity, c.year].filter(Boolean).join("  ·  ");
+  if(meta){ y += 50; ctx.font = fPrint(24, 600); ctx.fillStyle = INK; ctx.fillText(meta, L, y, R - L); } else y += 12;
+  const vr = sh.variants ? variantLabel(c) : ""; if(vr){ y += 38; ctx.font = fPrint(22, 500); ctx.fillStyle = GREY; ctx.fillText(vr, L, y, R - L); }
+  const lang = (c.idioma || "").toUpperCase();
+  if(lang){ y += 44; const pw = sheetPill(L, y, lang, 18, sheetTint(.26), ink); ctx.font = fPrint(22, 600); ctx.fillStyle = INK; ctx.fillText(LANG_NAME[lang] || lang, L + pw + 12, y + 1); }
+  if(sh.illustrator && real(c.illustrator)){ y += 40; ctx.font = fPrint(22, 500); ctx.fillStyle = GREY; ctx.fillText("Ilustración: " + c.illustrator, L, y, R - L); }
+  ctx.fillStyle = "rgba(27,27,28,.2)"; ctx.fillRect(L, y + 26, R - L, 1.5); y += 76;
   if(sh.note && c.note){ let fs = 28, ls2; do { ctx.font = fPrint(fs, 500); ls2 = wrap(c.note, R - L); } while(ls2.length > 6 && (fs -= 2) >= 18); ctx.fillStyle = INK; ls2.forEach((l, k) => ctx.fillText(l, L, y + k*fs*1.42)); }
-  if(c.falta){ ctx.save(); ctx.translate(R - 10, 150); ctx.rotate(-.07); ctx.textAlign = "right"; ctx.font = fHand(54, 700); ctx.fillStyle = PEN; ctx.fillText("me falta", 0, 0); ctx.restore(); }
+  if(c.falta){ ctx.save(); ctx.translate(R - 4, 58); ctx.rotate(-.07); ctx.textAlign = "right"; ctx.font = fHand(50, 700); ctx.fillStyle = PEN; ctx.fillText("me falta", 0, 0); ctx.restore(); }
   ctx.restore();
 }
 function drawCartaScene(s, el, T){
@@ -2352,9 +2482,13 @@ function drawCartaScene(s, el, T){
   const live = studioOpen || recording, n = live && !reduced ? performance.now() : 0;
   const h = 880, w = h*63/88, p = clamp(el/700, 0, 1), e = easeOutQuint(p);
   const cx = 488, cy = 548 + (1 - e)*H*.72, rot = -.03 - (1 - e)*.12 + (n ? .0042*Math.sin(n/1300) + .0024*Math.sin(n/610) : 0);
-  ctx.save(); ctx.globalAlpha = .62; ctx.translate(cx + 36, cy + 50); ctx.rotate(rot); ctx.drawImage(shadowTex(), -w*.78, -h*.72, w*1.56, h*1.44); ctx.restore();
-  drawCardAt(c, cx, cy, w, h, rot, {big:true, noShadow:true, zoom:VM.z, gloss:n, proxy:!!c.falta});
-  ctx.save(); ctx.globalAlpha = clamp((el - 250)/400, 0, 1); drawFactSheet(T, c); ctx.restore();
+  const rev = String(s.revela || "") === "si", turn = rev ? Math.abs(Math.cos(Math.PI*(VM.flip || 0))) : 1, sx = Math.max(.015, turn), sy = 1 + .06*(1 - turn);
+  ctx.save(); ctx.globalAlpha = .62; ctx.translate(cx + 36, cy + 50); ctx.scale(sx, sy); ctx.rotate(rot); ctx.drawImage(shadowTex(), -w*.78, -h*.72, w*1.56, h*1.44); ctx.restore();
+  if(turn < .999){ ctx.save(); ctx.translate(cx, cy); ctx.scale(sx, sy); ctx.translate(-cx, -cy); }
+  drawCardAt(c, cx, cy, w, h, rot, {big:true, noShadow:true, zoom:VM.z, gloss:n, proxy:!!c.falta, back:rev && (VM.flip || 0) < .5});
+  if(turn < .999) ctx.restore();
+  const sheetA = isHidden(c) ? 0 : rev ? clamp((VM.flip || 0)*2 - 1, 0, 1) : 1;   // the facts show up once the card is face up
+  ctx.save(); ctx.globalAlpha = clamp((el - 250)/400, 0, 1)*sheetA; drawFactSheet(T, c); ctx.restore();
   lampLight();
   if(s.texto) drawKin(s.texto, el - 650, {x:SHEET.x + 50, y:H*.7, w:SHEET.w - 100, h:H*.24}, 130, "light", "golpe", "cs");
 }
@@ -2417,6 +2551,8 @@ function enterBinder(s){
 // Ask for a scene's pictures before it is on screen: a burst shows each one for a quarter of a second, too short to load.
 function warmScene(s){
   if(!s) return;
+  if(String(s.transicion || "") === "sticker"){ const name = String(s.sticker || "").trim() || "pokebola"; loadImg(stickerSrc(name), 15000).then(im => im && warmLater(() => stickerCover(im, stickerTilt(s, name)))); }
+  if(cards().some(c => c.oculta) || String(s.revela || "") === "si") loadImg(BACK_SRC, 15000).then(im => im && warmLater(cardBack));
   const card = ref => { const c = cards()[findCard(ref)]; if(c) getImg(cardSrc(c)); };
   if(s.tipo === "rafaga") sceneItems(s).forEach(it => { if(it.kind === "media") getMedia(it.val); else if(it.kind === "carta") card(it.val); });
   if(s.tipo === "media") getMedia(s.media);
@@ -2431,8 +2567,9 @@ function goScene(i, opts={}){
   const list = scenes(); if(!list.length) return;
   if(i >= list.length){ VM.ended = true; updPrompter(); return; }
   i = clamp(i, 0, list.length - 1);
+  if(!opts.keepTr) TR = null;
   cancelAnim(); pauseMedia();
-  Object.assign(VM, {i, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false, flyT:0, flyLast:0, flySpeed:1, adLast:-1});
+  Object.assign(VM, {i, flip:0, t0:performance.now(), step:0, stepT:performance.now(), played:{}, lastItem:-1, auto:false, z:{s:1,x:.5,y:.5}, stamp:0, ended:false, flyT:0, flyLast:0, flySpeed:1, adLast:-1});
   setHush(false);
   const s = list[i]; warmScene(s); warmScene(list[i + 1]);
   if(s.tipo === "media" && s.sonido === "si") startClipSound(s);
@@ -2448,7 +2585,86 @@ function goScene(i, opts={}){
   highlightScene(); updPrompter(); requestDraw();
 }
 function tweenZoom(z){ const f = {...VM.z}; return tween(700, v => { VM.z = {s:f.s + (z.s - f.s)*v, x:f.x + (z.x - f.x)*v, y:f.y + (z.y - f.y)*v}; }, easeInOut); }
+
+/* ---------- leaving a scene under a sticker ---------- */
+// One of the channel's stickers slaps onto the lens, big enough to hide the whole frame; the next scene starts under
+// it, and the sticker peels off from a corner, its white backing curling over, until the new scene is all there.
+let TR = null;
+const stickerSrc = n => `marca/stickers/${STICKERS[n] ? n : "pokebola"}.png`;
+const stickerTilt = (s, name) => (hash((s.id || "") + name) - .5)*.18;
+const coverCache = new Map();
+// How wide the sticker has to be so its opaque part hides every point of the frame, tilted as it lands.
+function stickerCover(img, rot){
+  const key = img.src + "|" + rot.toFixed(3); if(coverCache.has(key)) return coverCache.get(key);
+  const w = 240, h = Math.round(w*img.height/img.width), c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h); const d = x.getImageData(0, 0, w, h).data;
+  let sx = 0, sy = 0, n = 0; for(let j = 0; j < h; j += 2) for(let i = 0; i < w; i += 2) if(d[(j*w + i)*4 + 3] > 230){ sx += i; sy += j; n++; }
+  const cu = n ? sx/n/w : .5, cvv = n ? sy/n/h : .5, cs = Math.cos(-rot), sn = Math.sin(-rot);
+  const solid = (u, v) => { const px = Math.round(u*w), py = Math.round(v*h); return px >= 0 && py >= 0 && px < w && py < h && d[(py*w + px)*4 + 3] > 230; };
+  const covers = sw => { const sh = sw*h/w;
+    for(let gy = 0; gy <= 8; gy++) for(let gx = 0; gx <= 12; gx++){ const px = gx/12*W - W/2, py = gy/8*H - H/2, lx = px*cs - py*sn, ly = px*sn + py*cs; if(!solid(cu + lx/sw, cvv + ly/sh)) return false; }
+    return true; };
+  let lo = W*.5, hi = W*8; for(let k = 0; k < 16; k++){ const m = (lo + hi)/2; if(covers(m)) hi = m; else lo = m; }
+  const back = document.createElement("canvas"); back.width = img.width; back.height = img.height;
+  const bx = back.getContext("2d"); bx.drawImage(img, 0, 0); bx.globalCompositeOperation = "source-in"; bx.fillStyle = "#f3eee4"; bx.fillRect(0, 0, back.width, back.height);
+  const out = {w:hi*1.04, cu, cv:cvv, back}; coverCache.set(key, out); return out;
+}
+async function leaveScene(s){
+  if(String(s.transicion || "") !== "sticker" || reduced || VM.i >= scenes().length - 1) return goScene(VM.i + 1);
+  const name = String(s.sticker || "").trim() || "pokebola", at = VM.i, wait = TR = {pending:true};
+  const img = await loadImg(stickerSrc(name), 2500);
+  if(TR !== wait || VM.i !== at || !VM.on){ if(TR === wait) TR = null; return; }
+  if(!img){ TR = null; return goScene(at + 1); }
+  const seed = hash((s.id || "") + name), rot = stickerTilt(s, name), cov = stickerCover(img, rot), corner = [[W, H], [0, H], [W, 0], [0, 0]][(seed*997 | 0) % 2];
+  const T = TR = {img, rot, cov, k:0, peel:-1, corner, from:seed > .5 ? 1 : -1}, my = VM.i;
+  playSfx("whoosh");
+  await tween(300, v => T.k = v, p => p*p);
+  if(TR !== T) return;
+  if(!VM.on){ TR = null; return; }
+  playSfx("stamp"); VM.shake = Math.max(VM.shake, 9);
+  goScene(my + 1, {silent:true, keepTr:true});
+  await sleep(110); if(TR !== T) return;
+  playSfx("peel");
+  await tween(640, v => T.peel = v, p => p < .5 ? 2*p*p : 1 - Math.pow(2 - 2*p, 2)/2);
+  if(TR === T){ TR = null; requestDraw(); }
+}
+function drawStickerTr(){
+  const T = TR; if(!T || T.pending) return;
+  const {img, cov} = T, sw = cov.w, sh = sw*img.height/img.width;
+  const put = (x, im) => { x.translate(W/2, H/2); x.rotate(T.rot); x.drawImage(im, -cov.cu*sw, -cov.cv*sh, sw, sh); };
+  ctx.save();
+  if(T.peel < 0){
+    // slapped on from the side: it swings in from beyond the frame, still turning and a little bigger, its shadow
+    // darkening the frame as it gets close
+    const k = T.k, q = 1 - k, s = 1 + .22*q;
+    ctx.fillStyle = `rgba(0,0,0,${.34*k})`; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = Math.min(1, k*12); ctx.translate(W/2 + T.from*W*.95*q, H/2 - H*.75*q); ctx.scale(s, s); ctx.rotate(T.rot + T.from*.55*q); ctx.drawImage(img, -cov.cu*sw, -cov.cv*sh, sw, sh);
+    ctx.restore(); return;
+  }
+  // peeling: a fold line runs from one corner of the frame to the opposite one; behind it the sticker is gone, and the
+  // strip just before it is the backing, folded over onto the part still stuck
+  const [cx0, cy0] = T.corner, D = Math.hypot(W, H), nx = (W - 2*cx0)/D, ny = (H - 2*cy0)/D, mx = -ny, my = nx;
+  const f = -30 + (D + 60)*T.peel, flap = Math.min(f + 30, 420), L = 4000;
+  const band = (u0, u1) => { ctx.beginPath(); ctx.moveTo(cx0 + nx*u0 + mx*L, cy0 + ny*u0 + my*L); ctx.lineTo(cx0 + nx*u0 - mx*L, cy0 + ny*u0 - my*L); ctx.lineTo(cx0 + nx*u1 - mx*L, cy0 + ny*u1 - my*L); ctx.lineTo(cx0 + nx*u1 + mx*L, cy0 + ny*u1 + my*L); ctx.closePath(); };
+  // the part still stuck
+  ctx.save(); band(f, D + 900); ctx.clip(); put(ctx, img); ctx.restore();
+  // the shadow the lifted flap throws on what is still stuck
+  ctx.save(); band(f, f + flap + 70); ctx.clip();
+  const sg = ctx.createLinearGradient(cx0 + nx*(f + flap*.55), cy0 + ny*(f + flap*.55), cx0 + nx*(f + flap + 60), cy0 + ny*(f + flap + 60));
+  sg.addColorStop(0, "rgba(0,0,0,.32)"); sg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H); ctx.restore();
+  // the flap: the peeled strip mirrored over the fold, showing the sticker's backing
+  ctx.save(); band(f, f + flap); ctx.clip();
+  const off = 2*(cx0*nx + cy0*ny + f);
+  ctx.save(); ctx.transform(1 - 2*nx*nx, -2*nx*ny, -2*nx*ny, 1 - 2*ny*ny, off*nx, off*ny); put(ctx, cov.back); ctx.restore();
+  const fg = ctx.createLinearGradient(cx0 + nx*f, cy0 + ny*f, cx0 + nx*(f + flap), cy0 + ny*(f + flap));
+  fg.addColorStop(0, "rgba(255,255,255,.35)"); fg.addColorStop(.25, "rgba(255,255,255,0)"); fg.addColorStop(1, "rgba(60,40,30,.28)");
+  ctx.fillStyle = fg; ctx.fillRect(0, 0, W, H); ctx.restore();
+  // the crease, where the backing bends
+  ctx.save(); ctx.strokeStyle = "rgba(0,0,0,.18)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx0 + nx*f + mx*L, cy0 + ny*f + my*L); ctx.lineTo(cx0 + nx*f - mx*L, cy0 + ny*f - my*L); ctx.stroke(); ctx.restore();
+  ctx.restore();
+}
 async function advanceVideo(){
+  if(TR) return;
   const list = scenes(), s = list[VM.i];
   if(!s){ goScene(0); return; }
   if(s.tipo === "binder"){
@@ -2458,6 +2674,13 @@ async function advanceVideo(){
   }
   if(s.tipo === "carta"){
     const c = cards()[findCard(s.carta)], zs = (c && c.zooms) || [];
+    if(String(s.revela || "") === "si" && VM.flip < 1){
+      if(busyAnim) return; busyAnim = true; const my = run;
+      playSfx("flip"); setTimeout(() => { if(my === run) playSfx("hit"); }, 330);
+      await tween(700, v => { if(my === run) VM.flip = v; }, easeInOut);
+      if(my !== run) return;
+      busyAnim = false; VM.shake = Math.max(VM.shake, 8); updPrompter(); requestDraw(); return;
+    }
     if(VM.step < zs.length){ const z = zs[VM.step++]; updPrompter(); playSfx("whoosh"); await tweenZoom(z); return; }
   }
   if(s.tipo === "muro" && VM.step < 1 && String(s.respuesta || "").trim()){ VM.step = 1; VM.stepT = performance.now(); updPrompter(); requestDraw(); return; }
@@ -2470,7 +2693,7 @@ async function advanceVideo(){
     const n = (s.items || []).filter(x => String(x).trim()).length;
     if(VM.step < n){ VM.step++; VM.stepT = performance.now(); playSfx("pop"); updPrompter(); requestDraw(); return; }
   }
-  goScene(VM.i + 1);
+  leaveScene(s);
 }
 function backVideo(){
   const s = scenes()[VM.i];
@@ -2489,13 +2712,16 @@ function nextHint(){
   const list = scenes(), s = list[VM.i], n = list[VM.i + 1];
   const nextScene = n ? {html:`<b>${esc(sceneLabel(n))}</b>${n.capitulo ? " · " + esc(n.capitulo) : ""}`, card:n.tipo === "carta" ? cards()[findCard(n.carta)] : n.tipo === "binder" ? cards()[parseRange(n.cartas)[0]] : null} : {html:"Termina el video", card:null};
   if(!s) return list.length ? {html:`<b>${esc(sceneLabel(list[0]))}</b> · empieza el video`, card:null} : {html:"No hay escenas", card:null};
+  if(n && String(s.transicion || "") === "sticker") nextScene.html = `Un sticker tapa y sigue ${nextScene.html}`;
   if(s.tipo === "binder"){
-    const end = VM.range[1];
+    const end = VM.range[1], gz = heldZooms();
+    if(held && $("hold").value === "tap" && held.step < gz.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${gz.length}</b>`, card:cards()[held.i]};
     if(held && held.group){ const nc = cards()[held.end + 1]; return held.end < end && nc ? {html:`Se guardan las ${held.end - held.i + 1} y sigue ${tapLabel(held.end + 1, end)}`, card:nc} : {html:`Se guardan las ${held.end - held.i + 1}`, card:null}; }
-    if(held){ const c = cards()[held.i], zs = (c || {}).zooms || []; if($("hold").value === "tap" && held.step < zs.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${zs.length}</b>`, card:c}; const nc = cards()[held.i + 1]; return held.i < end && nc ? {html:`Se ubica y sigue ${tapLabel(held.i + 1, end)}`, card:nc} : {html:"Se ubica la carta", card:null}; }
+    if(held){ const nc = cards()[held.i + 1]; return held.i < end && nc ? {html:`Se ubica y sigue ${tapLabel(held.i + 1, end)}`, card:nc} : {html:"Se ubica la carta", card:null}; }
     if(idx < end){ const nc = cards()[idx + 1]; return {html:tapLabel(idx + 1, end), card:nc}; }
     return nextScene;
   }
+  if(s.tipo === "carta" && String(s.revela || "") === "si" && VM.flip < 1) return {html:`<b>Se da vuelta</b> la carta`, card:null};
   if(s.tipo === "carta"){ const c = cards()[findCard(s.carta)], zs = (c && c.zooms) || []; if(VM.step < zs.length) return {html:`<b>Zoom ${VM.step + 1} de ${zs.length}</b>`, card:c}; }
   if(s.tipo === "lista"){ const items = (s.items || []).filter(x => String(x).trim()); if(VM.step < items.length) return {html:`<b>Punto ${VM.step + 1} de ${items.length}</b> · ${esc(items[VM.step])}`, card:null}; }
   if(s.tipo === "muro" && VM.step < 1 && String(s.respuesta || "").trim()) return {html:`<b>Paso 2 de 2</b> · ${esc(String(s.respuesta).replace(/[*_~]/g, ""))}`, card:null};
@@ -2511,8 +2737,9 @@ function nextBinder(){
   const list = cards(), c = list[held ? held.i : idx], nextI = held ? (held.end ?? held.i) + 1 : idx + 1, nc = list[nextI];
   const name = () => tapLabel(nextI, list.length - 1);
   if(!list.length) return {html:"Todavía no hay cartas", card:null};
+  const gz = heldZooms(); if(held && $("hold").value === "tap" && held.step < gz.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${gz.length}</b>`, card:c};
   if(held && held.group) return nc ? {html:`Se guardan las ${held.end - held.i + 1} y sigue ${name(nc)}`, card:nc} : {html:`Se guardan las ${held.end - held.i + 1}`, card:null};
-  if(held){ const zs = (c && c.zooms) || []; if($("hold").value === "tap" && held.step < zs.length - 1) return {html:`<b>Zoom ${held.step + 2} de ${zs.length}</b>`, card:c}; return nc ? {html:`Se ubica y sigue ${name(nc)}`, card:nc} : {html:"Se ubica la última carta", card:null}; }
+  if(held){ return nc ? {html:`Se ubica y sigue ${name(nc)}`, card:nc} : {html:"Se ubica la última carta", card:null}; }
   return nc ? {html:name(nc), card:nc} : {html:"Terminaste la lista", card:null};
 }
 function thumbHTML(c, eager){
@@ -2667,6 +2894,7 @@ function playSfx(kind){
     case "pen": env(filt(noise(.07), "highpass", 3200), .004, .055, .09); break;
     case "deal": env(filt(noise(.09), "lowpass", 1700), .002, .07, .3); env(osc("sine", 120, 70, .07), .002, .07, .13); break;
     case "flip": { const b = filt(noise(.62), "lowpass", 3200); b.frequency.setValueAtTime(3400, t); b.frequency.exponentialRampToValueAtTime(650, t + .46); env(b, .09, .42, .34); break; }
+    case "peel": { const b = filt(noise(.6), "bandpass", 900, 2.2); b.frequency.setValueAtTime(700, t); b.frequency.exponentialRampToValueAtTime(3800, t + .5); env(b, .05, .5, .26); env(filt(noise(.5), "highpass", 5200), .02, .45, .06); break; }
   }
 }
 async function startMusic(){
@@ -3738,6 +3966,7 @@ function cardInspHTML(c, i){
       ${src ? `<button class="btn sm" data-act="replace" title="Cambiar la imagen de la carta">${ICON("image")}Cambiar<span class="long">imagen</span></button>` : ""}
     </div>
     <label class="toggle"><span>Me falta esta carta<small>Su bolsillo queda vacío y el checklist dice “falta”.</small></span><input type="checkbox" data-k="falta"${c.falta ? " checked" : ""}></label>
+    <label class="toggle"><span>Dada vuelta en el video<small>Entra boca abajo al binder y se da vuelta en una escena Carta con “Dar vuelta”.</small></span><input type="checkbox" data-k="oculta"${c.oculta ? " checked" : ""}></label>
     ${i > 0 ? `<button class="toggle" data-act="join" style="border:0;width:100%;text-align:left;color:inherit;font:inherit"><span>${joined ? "Mismo arte que la de arriba" : "Unir con la de arriba"}<small>${joined ? "Tocá para separarla del grupo." : "Mismo arte en otro idioma: salen juntas en grande."}</small></span>${ICON(joined ? "x" : "link")}</button>` : ""}
     ${F("note", "Dato en pantalla", true)}
     <details class="more"${moreOpen || !c.set || !c.num ? " open" : ""}><summary><span>Datos de la carta<small>Set, número, año, rareza, idioma y grupo</small></span>${ICON("chev")}</summary><div class="morebody">
