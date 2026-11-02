@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guiones · Binder Studio</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f1e9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b181d" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="marca/avatar.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@400;500;600;700;800&family=Klee+One:wght@600&display=swap">
+<style>
+:root{
+  --bg:#f5f1e9;
+  --surface:#fffdf8;
+  --sunk:#f0ebe1;
+  --ink:#231e27;
+  --dim:#685f6c;
+  --faint:#776e7a;
+  --line:rgba(35,30,39,.12);
+  --line-2:rgba(35,30,39,.2);
+  --accent:#6b4a7c;
+  --accent-hover:#5a3c6a;
+  --accent-ink:#ffffff;
+  --accent-soft:rgba(107,74,124,.09);
+  --accent-text:#6b4a7c;
+  --warn-bg:#fbefc8;
+  --warn-ink:#5e4600;
+  --err-ink:#9e2f25;
+  --ok:#2f7a57;
+  --tag-ink:#1d1a14;
+  --tag-idea:#f4d23a;
+  --tag-mejora:#8fd9b6;
+  --tag-concepto:#dcc7e8;
+  --tag-pendiente:#f49ac1;
+  --shadow:0 1px 0 rgba(35,30,39,.05), 0 14px 34px -22px rgba(52,30,66,.35);
+  --veil:rgba(35,25,40,.38);
+  --font:"M PLUS 2", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tag-font:"Klee One", "M PLUS 2", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1b181d;
+    --surface:#242027;
+    --sunk:#1e1b21;
+    --ink:#ece6ef;
+    --dim:#aea4b1;
+    --faint:#8c838f;
+    --line:rgba(236,230,239,.1);
+    --line-2:rgba(236,230,239,.2);
+    --accent:#8d68a0;
+    --accent-hover:#9c79ae;
+    --accent-ink:#ffffff;
+    --accent-soft:rgba(190,150,212,.12);
+    --accent-text:#cfb0e0;
+    --warn-bg:#3b3219;
+    --warn-ink:#f1dc9c;
+    --err-ink:#ff9d93;
+    --ok:#8fd9b6;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 18px 40px -24px rgba(0,0,0,.7);
+    --veil:rgba(8,6,10,.6);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 var(--font);-webkit-font-smoothing:antialiased;min-height:100dvh}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent-text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+[hidden]{display:none!important}
+code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.92em;background:var(--accent-soft);padding:1px 5px;border-radius:5px}
+
+/* ---------- botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 15px;border:0;border-radius:9px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2);font-weight:600;font-size:14.5px;cursor:pointer;white-space:nowrap;transition:background-color .14s, box-shadow .14s, transform .1s, opacity .14s;text-decoration:none;color:var(--ink)}
+.btn:active{transform:scale(.97)}
+@media (hover:hover){.btn:hover{background:var(--sunk)}}
+.btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+@media (hover:hover){.btn.primary:hover{background:var(--accent-hover)}}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--dim)}
+@media (hover:hover){.btn.ghost:hover{background:var(--accent-soft);color:var(--ink)}}
+.btn.small{height:34px;padding:0 12px;font-size:14px}
+.btn.danger{color:var(--err-ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn[aria-disabled="true"]{opacity:.55}
+.btn svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent-text);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- barra superior ---------- */
+.top{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"brand picker conn save";align-items:center;gap:10px 18px;padding:12px max(20px, calc((100vw - 1240px) / 2));background:color-mix(in srgb, var(--bg) 90%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{grid-area:brand;display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none;color:inherit}
+.brand img{width:34px;height:34px;border-radius:9px;flex:none}
+.brand b{display:block;font-weight:800;font-size:18px;line-height:1.1;letter-spacing:-.01em}
+.brand small{display:block;font-size:12.5px;color:var(--dim);line-height:1.2}
+.picker{grid-area:picker;display:flex;gap:8px;min-width:0;align-items:center}
+.select{appearance:none;-webkit-appearance:none;height:38px;min-width:0;flex:0 1 360px;padding:0 36px 0 13px;border:0;border-radius:9px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23857c88' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;box-shadow:inset 0 0 0 1px var(--line-2);font-weight:700;font-size:14.5px;text-overflow:ellipsis;cursor:pointer}
+.select:disabled{opacity:.6;cursor:default}
+.conn{grid-area:conn}
+.conn .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+.conn.on .dot{background:#3fae7d}
+.conn.bad .dot{background:#e0a100}
+.conn .lbl-short{display:none}
+.savebar{grid-area:save;display:flex;align-items:center;gap:12px;min-width:0}
+.status{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;font-size:12.5px;color:var(--dim);min-width:0;text-align:right}
+.status .st1{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.status .st2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.st1 .pip{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.st1.dirty{color:var(--warn-ink)}
+.st1.dirty .pip{background:#e0a100}
+.st1.ro .pip{background:var(--faint)}
+.btn.save{min-width:150px}
+.btn.save.clean{background:var(--surface);color:var(--dim);box-shadow:inset 0 0 0 1px var(--line-2)}
+
+@media (max-width:1100px){
+  .top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand conn" "picker save"}
+}
+@media (max-width:720px){
+  .top{position:static;grid-template-areas:"brand conn" "picker picker";padding:10px 16px 12px;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
+  .select{flex:1 1 auto}
+  .brand small{display:none}
+  .savebar{position:fixed;left:0;right:0;bottom:0;z-index:30;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb, var(--surface) 94%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+  .status{align-items:flex-start;text-align:left}
+  .status .st2{max-width:52vw}
+  .btn.save{min-width:0}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .conn .lbl-long{display:none}
+  .conn .lbl-short{display:inline}
+  #btnNew{width:38px;padding:0}
+  #btnNew span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+
+/* ---------- avisos ---------- */
+.banners{max-width:1240px;margin:0 auto;padding:0 20px}
+.banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:10px 14px;border-radius:10px;background:var(--accent-soft);font-size:14px}
+.banner.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.banner.err{background:var(--warn-bg);color:var(--err-ink)}
+.banner p{margin:0;flex:1 1 260px}
+.banner .btn{height:32px}
+@media (max-width:720px){.banners{padding:0 16px}}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 64px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:28px;align-items:start}
+@media (max-width:960px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px}}
+@media (max-width:720px){.wrap{padding:14px 16px 40px}}
+
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow), inset 0 0 0 1px var(--line)}
+
+/* ---------- guion ---------- */
+.doc{padding:34px 48px 44px;min-width:0}
+@media (max-width:720px){.doc{padding:20px 18px 28px;border-radius:14px}}
+.doc-head{margin-bottom:18px}
+.doc-head h1{margin:0;font-size:30px;line-height:1.15;font-weight:800;letter-spacing:-.015em;overflow-wrap:anywhere}
+.title-input{width:100%;margin:0;padding:4px 10px;margin-left:-11px;border:0;border-radius:9px;background:transparent;box-shadow:inset 0 0 0 1px var(--line-2);font-size:30px;line-height:1.15;font-weight:800;letter-spacing:-.015em}
+.title-input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
+.doc-meta{margin:8px 0 0;color:var(--dim);font-size:13.5px;font-variant-numeric:tabular-nums}
+@media (max-width:720px){.doc-head h1,.title-input{font-size:24px}.title-input{margin-left:-6px;padding:4px 6px;width:calc(100% + 6px)}}
+
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding-bottom:18px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.toolbar .gap{flex:1}
+.seg{display:inline-flex;padding:3px;border-radius:11px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{height:32px;padding:0 16px;border:0;border-radius:8px;background:transparent;font-weight:700;font-size:14px;color:var(--dim);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08), inset 0 0 0 1px var(--line)}
+.seg button[aria-disabled="true"]{opacity:.55}
+@media (max-width:720px){
+  .toolbar{gap:8px;margin-bottom:20px}
+  .toolbar .gap{display:none}
+  .toolbar .seg{flex:1 0 100%}
+  .toolbar .seg button{flex:1}
+  .toolbar .btn.small{flex:1 1 0;padding:0 8px}
+}
+
+.reader{font-size:19px;line-height:1.72;max-width:68ch;overflow-wrap:break-word}
+.reader p{margin:0 0 1em}
+.reader h2{display:flex;align-items:baseline;gap:12px;font-size:23px;line-height:1.3;font-weight:800;letter-spacing:-.01em;margin:1.9em 0 .55em}
+.reader h2:first-child{margin-top:0}
+.reader .sec-n{flex:none;font-size:13px;font-weight:700;color:var(--accent-text);font-variant-numeric:tabular-nums;letter-spacing:.02em;min-width:1.6em;transform:translateY(-2px)}
+.reader .acot{color:var(--dim);font-style:italic;font-size:.88em}
+@media (max-width:720px){.reader{font-size:17.5px;line-height:1.7}.reader h2{font-size:20px;gap:9px}}
+
+.editor{display:block;width:100%;min-height:55vh;padding:18px 20px;border:0;border-radius:12px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line);font-size:19px;line-height:1.72;resize:none;overflow:hidden;field-sizing:content;caret-color:var(--accent)}
+.editor:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
+.editor::placeholder{color:var(--faint)}
+@media (max-width:720px){.editor{font-size:17px;padding:14px;min-height:50vh}}
+.hint{margin:10px 2px 0;font-size:13px;color:var(--dim)}
+
+.empty{padding:28px 0 8px;color:var(--dim);max-width:46ch}
+.empty h3{margin:0 0 6px;color:var(--ink);font-size:18px;font-weight:800}
+.empty p{margin:0 0 14px}
+.empty .row{display:flex;flex-wrap:wrap;gap:8px}
+
+.state{grid-column:1 / -1;width:100%;max-width:820px;justify-self:center;padding:56px 48px;text-align:left}
+.state h2{margin:0 0 8px;font-size:24px;font-weight:800;letter-spacing:-.01em}
+.state p{margin:0 0 18px;color:var(--dim);max-width:52ch;font-size:16px}
+.state .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:720px){.state{padding:28px 20px}}
+.skel{height:14px;border-radius:7px;background:var(--sunk);margin:12px 0;max-width:64ch}
+.skel.w1{width:70%}.skel.w2{width:92%}.skel.w3{width:55%}
+
+/* ---------- anotaciones ---------- */
+.notes{padding:20px 20px 16px;position:sticky;top:86px;max-height:calc(100dvh - 104px);overflow:auto;overscroll-behavior:contain}
+@media (max-width:1100px){.notes{top:132px;max-height:calc(100dvh - 150px)}}
+@media (max-width:960px){.notes{position:static;max-height:none;overflow:visible}}
+@media (max-width:720px){.notes{padding:18px 16px 12px;border-radius:14px}#kbdHint{visibility:hidden}}
+.notes-head{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.notes-head h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.notes-head .count{color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
+.addnote textarea,.note-edit textarea{display:block;width:100%;min-height:76px;padding:11px 12px;border:0;border-radius:10px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line);font-size:15px;line-height:1.5;resize:vertical;field-sizing:content;max-height:40vh}
+.addnote textarea:focus,.note-edit textarea:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
+.addnote textarea::placeholder{color:var(--faint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.chip{height:30px;padding:0 11px 0 9px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line-2);font-weight:600;font-size:13.5px;color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip i{width:9px;height:9px;border-radius:50%;flex:none}
+.chip[aria-checked="true"]{background:var(--ink);color:var(--bg);box-shadow:none}
+.addnote .foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.addnote .foot small{color:var(--faint);font-size:12px}
+.locked{padding:14px;border-radius:10px;background:var(--accent-soft);font-size:14px;color:var(--ink)}
+.locked p{margin:0 0 10px}
+
+.notelist{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.note{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding:12px 4px 12px 2px;border-top:1px solid var(--line)}
+.note:first-child{border-top:0}
+.note input[type=checkbox]{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin:2px 0 0;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--line-2);background:var(--surface);cursor:pointer;display:grid;place-content:center}
+.note input[type=checkbox]::after{content:"";width:10px;height:6px;border:2.2px solid var(--accent-ink);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.note input[type=checkbox]:checked{background:var(--accent);box-shadow:none}
+.note input[type=checkbox]:checked::after{opacity:1}
+.note input[type=checkbox]:disabled{cursor:default;opacity:.7}
+.note-top{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-bottom:3px}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:3px;font-family:var(--tag-font);font-weight:600;font-size:12px;line-height:1;color:var(--tag-ink)}
+.t-idea{background:var(--tag-idea)}.t-mejora{background:var(--tag-mejora)}.t-concepto{background:var(--tag-concepto)}.t-pendiente{background:var(--tag-pendiente)}
+.who{font-size:12.5px;color:var(--dim)}
+.unsaved{font-weight:700;color:var(--warn-ink)}
+.note-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.5}
+.note.done .note-text{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--line-2)}
+.note-actions{display:flex;gap:2px;margin:4px 0 0 -8px}
+.note-actions .btn{height:28px;padding:0 8px;font-size:13px}
+.note-edit .chips{margin:8px 0}
+.note-edit .row{display:flex;gap:6px;justify-content:flex-end}
+.donebox{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
+.donebox summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:8px 2px;font-weight:700;font-size:14px;color:var(--dim);border-radius:8px}
+.donebox summary::-webkit-details-marker{display:none}
+.donebox summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin:0 4px 0 2px}
+.donebox[open] summary::before{transform:rotate(45deg)}
+.donebox .notelist{margin-top:2px}
+.notes .empty{padding:14px 2px 4px;font-size:14px}
+
+/* ---------- diálogos ---------- */
+dialog.dlg{width:min(540px, calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:16px;background:var(--surface);color:var(--ink);box-shadow:0 30px 80px rgba(20,10,30,.35)}
+dialog.dlg.wide{width:min(880px, calc(100vw - 24px))}
+dialog.dlg:focus-visible{outline:none}
+dialog.dlg::backdrop{background:var(--veil)}
+.dlg form,.dlg .in{padding:24px 24px 20px;display:flex;flex-direction:column;gap:14px}
+.dlg h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.dlg p{margin:0}
+.dlg .lead{color:var(--dim)}
+.dlg .small{font-size:13px;color:var(--dim)}
+.dlg label.field{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+.dlg input[type=text],.dlg input[type=password]{height:42px;padding:0 12px;border:0;border-radius:9px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line-2);font-size:15px;font-weight:500;width:100%}
+.dlg input[type=text]:focus,.dlg input[type=password]:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
+.dlg .err{color:var(--err-ink);font-weight:600;font-size:14px}
+.dlg .err:empty{display:none}
+.dlg .actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px}
+@media (max-width:520px){.dlg .actions{flex-direction:column-reverse}.dlg .actions .btn{width:100%}}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:26px 1fr;gap:10px;font-size:14.5px;line-height:1.45}
+.steps li::before{content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font-weight:800;font-size:13px;display:grid;place-content:center}
+.help{font-size:13.5px;color:var(--dim)}
+.help summary{cursor:pointer;font-weight:600;color:var(--accent-text)}
+.help p{margin-top:6px}
+.filepick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:relative}
+.filepick input{position:absolute;opacity:0;width:1px;height:1px}
+.filepick:focus-within .btn{outline:2px solid var(--accent);outline-offset:2px}
+.planinfo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.planinfo li{display:flex;gap:8px;align-items:baseline}
+.planinfo li b{flex:none}
+.planinfo .ok{color:var(--ok);font-weight:800}
+.planinfo .no{color:var(--faint);font-weight:800}
+.warnbox{padding:10px 12px;border-radius:9px;background:var(--warn-bg);color:var(--warn-ink);font-size:14px;font-weight:600}
+.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.cf-grid{grid-template-columns:1fr}}
+.cf-grid section{min-width:0;border-radius:10px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line);padding:12px}
+.cf-grid h3{margin:0 0 2px;font-size:15px;font-weight:800}
+.cf-grid .small{display:block;margin-bottom:8px}
+.cf-text{margin:0;max-height:34vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:500 14px/1.55 var(--font)}
+.cf-text mark{background:rgba(244,210,58,.45);color:inherit;border-radius:3px}
+.acct{display:flex;align-items:center;gap:12px}
+.acct img{width:44px;height:44px;border-radius:50%;background:var(--sunk)}
+.acct b{font-size:17px}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:24px;z-index:60;transform:translate(-50%, 12px);opacity:0;pointer-events:none;max-width:min(520px, calc(100vw - 32px));padding:12px 16px;border-radius:11px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14.5px;box-shadow:0 14px 36px rgba(0,0,0,.25);transition:opacity .18s, transform .18s}
+.toast.show{opacity:1;transform:translate(-50%, 0)}
+.toast.err{background:#7c241c;color:#fff}
+@media (max-width:720px){.toast{bottom:calc(86px + env(safe-area-inset-bottom))}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <a class="brand" href="./" title="Ir a Binder Studio">
+    <img src="marca/avatar.png" alt="">
+    <span><b>Guiones</b><small>Binder Studio · Mafia TCG</small></span>
+  </a>
+  <div class="picker">
+    <label class="sr" for="pick">Guion abierto</label>
+    <select id="pick" class="select" disabled><option>Cargando…</option></select>
+    <button id="btnNew" class="btn" type="button" title="Nuevo guion"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Nuevo guion</span></button>
+  </div>
+  <button id="btnConn" class="btn ghost conn" type="button"><span class="dot"></span><span class="lbl"></span></button>
+  <div class="savebar" id="savebar" hidden>
+    <div class="status" id="status" aria-live="polite"></div>
+    <button id="btnSave" class="btn primary save" type="button"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span class="lbl">Cargar cambios</span></button>
+  </div>
+</header>
+
+<div class="banners" id="banners" aria-live="polite"></div>
+
+<main class="wrap" id="wrap">
+  <section class="state card" id="state" hidden></section>
+
+  <section class="doc card" id="doc" aria-labelledby="docTitle" hidden>
+    <div class="doc-head">
+      <h1 id="docTitle"></h1>
+      <input id="titleInput" class="title-input" type="text" aria-label="Título del guion" maxlength="120" hidden>
+      <p class="doc-meta" id="docMeta"></p>
+    </div>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Modo">
+        <button id="mLeer" type="button" aria-pressed="true">Leer</button>
+        <button id="mEditar" type="button" aria-pressed="false">Editar</button>
+      </div>
+      <span class="gap"></span>
+      <button id="btnFile" class="btn small" type="button"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Cargar archivo</button>
+      <button id="btnPlan" class="btn small" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15l3 3-3 3"/></svg>Importar del plan</button>
+      <input type="file" id="fileTxt" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
+    </div>
+    <div id="reader" class="reader"></div>
+    <div id="readerEmpty" class="empty" hidden></div>
+    <textarea id="editor" class="editor" spellcheck="true" aria-label="Texto del guion" placeholder="Escribí el guion acá. Una línea que empieza con ## es un título de sección." hidden></textarea>
+    <p class="hint" id="editHint" hidden>Una línea que empieza con <code>##&nbsp;</code> es un título de sección. Se guarda en esta compu mientras escribís; para que lo vean los demás, tocá <b>Cargar cambios</b>.</p>
+  </section>
+
+  <aside class="notes card" id="notes" aria-labelledby="notesTitle" hidden>
+    <div class="notes-head"><h2 id="notesTitle">Anotaciones</h2><span class="count" id="notesCount"></span></div>
+    <form class="addnote" id="addNote" autocomplete="off">
+      <label class="sr" for="noteText">Nueva anotación</label>
+      <textarea id="noteText" placeholder="Una idea, una mejora, algo pendiente…" rows="3"></textarea>
+      <div class="chips" role="radiogroup" aria-label="Tipo" id="noteChips"></div>
+      <div class="foot"><small id="kbdHint">Ctrl + Enter para agregar</small><button class="btn small primary" type="submit">Agregar</button></div>
+    </form>
+    <div class="locked" id="notesLocked" hidden></div>
+    <ul class="notelist" id="noteList"></ul>
+    <div class="empty" id="notesEmpty" hidden></div>
+    <details class="donebox" id="doneBox" hidden><summary id="doneSum"></summary><ul class="notelist" id="doneList"></ul></details>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Conectar -->
+<dialog class="dlg" id="dlgConnect" aria-labelledby="cnTitle">
+  <form id="cnForm" method="dialog">
+    <h2 id="cnTitle">Conectar con GitHub</h2>
+    <p class="lead" id="cnWhy">Para cargar cambios necesitás un token tuyo de GitHub. Se hace una sola vez.</p>
+    <ol class="steps">
+      <li><span>Abrí <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">crear un token</a>, ponele un nombre (por ejemplo “Guiones”) y un vencimiento.</span></li>
+      <li><span>En <b>Repository access</b> elegí <b>Only select repositories</b> y marcá <b class="repoName">meh889/binder-studio</b>.</span></li>
+      <li><span>En <b>Permissions → Contents</b> elegí <b>Read and write</b>. Generalo, copialo y pegalo acá abajo.</span></li>
+    </ol>
+    <details class="help"><summary>¿No te aparece el repo en la lista?</summary>
+      <p>Pasa cuando el repo es de otra cuenta. Pedile a @meh889 que te sume como colaborador y usá un <a href="https://github.com/settings/tokens/new?scopes=public_repo&amp;description=Guiones%20Binder%20Studio" target="_blank" rel="noopener">token clásico</a> con el permiso <b>public_repo</b>.</p>
+    </details>
+    <label class="field">Token
+      <input type="password" id="cnToken" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="github_pat_…">
+    </label>
+    <p class="err" id="cnErr" role="alert"></p>
+    <p class="small">Queda guardado solo en este navegador. No se lo pases a nadie.</p>
+    <div class="actions">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn primary" type="submit" id="cnGo">Conectar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Cuenta -->
+<dialog class="dlg" id="dlgAcct" aria-labelledby="acTitle">
+  <div class="in">
+    <h2 id="acTitle">Tu conexión</h2>
+    <div class="acct"><div><b id="acLogin"></b><p class="small" id="acWhat"></p></div></div>
+    <div class="actions">
+      <button class="btn danger" type="button" id="acOut">Desconectar</button>
+      <button class="btn primary" type="button" data-close>Listo</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Nuevo -->
+<dialog class="dlg" id="dlgNew" aria-labelledby="nwTitle">
+  <form id="nwForm" method="dialog">
+    <h2 id="nwTitle">Nuevo guion</h2>
+    <label class="field">Título
+      <input type="text" id="nwTitulo" maxlength="120" placeholder="Por ejemplo: Todas las cartas de Ponyta" autocomplete="off">
+    </label>
+    <p class="small" id="nwSlug">&nbsp;</p>
+    <p class="err" id="nwErr" role="alert"></p>
+    <div class="actions">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Crear</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Importar del plan -->
+<dialog class="dlg" id="dlgPlan" aria-labelledby="plTitle">
+  <form id="plForm" method="dialog">
+    <h2 id="plTitle">Importar del plan</h2>
+    <p class="lead">Elegí el <b>video.json</b> de la carpeta de la especie. Si sumás el <b>binder.json</b>, entra también el guion de cada carta. Podés elegir los dos juntos.</p>
+    <label class="filepick">
+      <input type="file" id="plFiles" accept=".json,application/json" multiple>
+      <span class="btn">Elegir archivos</span>
+    </label>
+    <ul class="planinfo" id="plInfo"></ul>
+    <p class="warnbox" id="plWarn" hidden></p>
+    <p class="err" id="plErr" role="alert"></p>
+    <div class="actions">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn primary" type="submit" id="plGo" disabled>Armar guion</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Pregunta genérica -->
+<dialog class="dlg" id="dlgAsk" aria-labelledby="akTitle">
+  <div class="in">
+    <h2 id="akTitle"></h2>
+    <p class="lead" id="akText"></p>
+    <div class="actions" id="akBtns"></div>
+  </div>
+</dialog>
+
+<!-- Conflicto de texto -->
+<dialog class="dlg wide" id="dlgConflict" aria-labelledby="cfTitle">
+  <div class="in">
+    <h2 id="cfTitle">El guion cambió en GitHub</h2>
+    <p class="lead" id="cfWhy"></p>
+    <div class="cf-grid">
+      <section><h3>Tu versión</h3><span class="small" id="cfMineN"></span><pre class="cf-text" id="cfMine"></pre></section>
+      <section><h3 id="cfTheirsH"></h3><span class="small" id="cfTheirsN"></span><pre class="cf-text" id="cfTheirs"></pre></section>
+    </div>
+    <p class="small" id="cfNote"></p>
+    <div class="actions" id="cfBtns">
+      <button class="btn ghost" type="button" data-v="cancel" id="cfCancel">Decidir después</button>
+      <button class="btn" type="button" data-v="theirs" id="cfTheirsB"></button>
+      <button class="btn primary" type="button" data-v="mine">Dejar la mía</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= configuración ================= */
+const DEFAULT_API = 'https://api.github.com';
+const DEFAULT_REPO = 'meh889/binder-studio';
+const qs = new URLSearchParams(location.search);
+let API = DEFAULT_API, REPO = DEFAULT_REPO;
+const qApi = qs.get('api'), qRepo = qs.get('repo');
+if (qApi && /^https?:\/\/[^\s/?#]+(\/[^\s?#]*)?$/i.test(qApi)) API = qApi.replace(/\/+$/, '');
+if (qRepo && /^[\w.-]+\/[\w.-]+$/.test(qRepo)) REPO = qRepo;
+const CFG = { api: API, repo: REPO, branch: 'main', dir: 'guiones', test: API !== DEFAULT_API || REPO !== DEFAULT_REPO };
+// El token de github.com nunca se manda a otra API: con ?api= se usa otro casillero.
+const NS = API === DEFAULT_API ? '' : '@' + API;
+const K = {
+  token: 'guion.token' + NS,
+  login: 'guion.login' + NS,
+  last: 'guion.ultimo:' + NS + REPO,
+  meta: 'guion.meta:' + NS + REPO,
+  draftPrefix: 'guion.borrador:' + NS + REPO + ':',
+  backup: s => 'guion.respaldo:' + NS + REPO + ':' + s,
+};
+K.draft = s => K.draftPrefix + s;
+
+const TIPOS = { idea: 'Idea', mejora: 'Mejora', concepto: 'Concepto', pendiente: 'Pendiente' };
+const TIPO_COLOR = { idea: 'var(--tag-idea)', mejora: 'var(--tag-mejora)', concepto: 'var(--tag-concepto)', pendiente: 'var(--tag-pendiente)' };
+
+/* ================= utilidades ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+  json(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } },
+  setJson(k, v) { this.set(k, JSON.stringify(v)); },
+  keys() { try { return Object.keys(localStorage); } catch { return []; } },
+};
+const clone = o => o == null ? o : JSON.parse(JSON.stringify(o));
+function el(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'checked' || k === 'value' || k === 'disabled') e[k] = v;
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return e;
+}
+const nf = n => n.toLocaleString('es-AR');
+function ago(iso) {
+  const t = Date.parse(iso || '');
+  if (!t) return '';
+  const s = (Date.now() - t) / 1000;
+  if (s < 45) return 'hace un momento';
+  const m = Math.round(s / 60);
+  if (m < 60) return `hace ${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = new Date(t), now = new Date(), y = new Date(now);
+  y.setDate(now.getDate() - 1);
+  if (d.toDateString() === y.toDateString()) return 'ayer';
+  const days = Math.round(h / 24);
+  if (days < 7) return `hace ${days} días`;
+  return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+}
+const fullDate = iso => { const t = Date.parse(iso || ''); return t ? new Date(t).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' }) : ''; };
+const timeEl = iso => el('time', { datetime: iso, 'data-ago': iso, title: fullDate(iso) }, ago(iso));
+function refreshTimes() { document.querySelectorAll('[data-ago]').forEach(t => { t.textContent = ago(t.getAttribute('data-ago')); }); }
+
+function b64ToText(b64) {
+  const bin = atob(String(b64 || '').replace(/\s+/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+function textToB64(text) {
+  const bytes = new TextEncoder().encode(text);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function slugify(t) {
+  return String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '') || 'guion';
+}
+const newId = () => 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+function countWords(text) {
+  const body = String(text || '').split('\n').filter(l => !/^##\s/.test(l)).join(' ');
+  const m = body.match(/[\p{L}\p{N}][\p{L}\p{N}'’.,-]*/gu);
+  return m ? m.length : 0;
+}
+function readFileText(file) {
+  return new Promise((ok, fail) => { const r = new FileReader(); r.onload = () => ok(String(r.result || '')); r.onerror = () => fail(r.error); r.readAsText(file, 'utf-8'); });
+}
+
+/* ================= documento ================= */
+function normDoc(o) {
+  o = o && typeof o === 'object' ? o : {};
+  return {
+    app: 'binder-studio-guion', version: 1,
+    titulo: String(o.titulo || '').trim() || 'Sin título',
+    guion: typeof o.guion === 'string' ? o.guion.replace(/\r\n?/g, '\n') : '',
+    notas: Array.isArray(o.notas) ? o.notas.filter(n => n && n.id).map(n => ({
+      id: String(n.id), texto: String(n.texto || ''), tipo: TIPOS[n.tipo] ? n.tipo : 'idea',
+      autor: String(n.autor || ''), fecha: String(n.fecha || ''), hecha: !!n.hecha,
+    })) : [],
+    actualizado: String(o.actualizado || ''), actualizadoPor: String(o.actualizadoPor || ''),
+  };
+}
+const noteKey = n => JSON.stringify([n.texto, n.tipo, n.autor, n.fecha, n.hecha]);
+const core = d => d ? JSON.stringify([d.titulo, d.guion, d.notas.map(n => [n.id, noteKey(n)]).sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)]) : '';
+const EMPTY = { titulo: '', guion: '', notas: [] };
+
+/* Junta tu versión con la de GitHub.
+   - notas: unión por id; si cambiaste una nota, queda la tuya; si no, la de GitHub.
+   - título: si lo cambiaste vos, el tuyo.
+   - texto: si lo cambiaron los dos (distinto), conflict = true (se pregunta). */
+function merge(base, local, remote) {
+  base = base || EMPTY;
+  const out = clone(remote);
+  out.titulo = local.titulo !== base.titulo ? local.titulo : remote.titulo;
+  const lc = local.guion !== base.guion, rc = remote.guion !== base.guion;
+  let conflict = false;
+  if (lc && !rc) out.guion = local.guion;
+  else if (lc && rc && local.guion !== remote.guion) conflict = true;
+  const B = new Map(base.notas.map(n => [n.id, n])), L = new Map(local.notas.map(n => [n.id, n])), R = new Map(remote.notas.map(n => [n.id, n]));
+  const ids = [...new Set([...R.keys(), ...L.keys()])];
+  const notas = [];
+  for (const id of ids) {
+    const b = B.get(id), l = L.get(id), r = R.get(id);
+    if (l && r) {
+      if (!b) notas.push(noteKey(l) !== noteKey(r) ? l : r);
+      else { // campo por campo: lo que cambiaste vos gana; lo demás, lo de GitHub
+        const n = { ...r };
+        for (const f of ['texto', 'tipo', 'hecha']) if (l[f] !== b[f]) n[f] = l[f];
+        notas.push(n);
+      }
+    }
+    else if (l && !r) { if (!b || noteKey(l) !== noteKey(b)) notas.push(l); }      // nueva tuya, o la borraron allá pero vos la cambiaste
+    else if (!l && r) { if (!b || noteKey(r) !== noteKey(b)) notas.push(r); }      // nueva de otro, o la borraste vos pero allá la cambiaron
+  }
+  out.notas = clone(notas);
+  return { doc: out, conflict };
+}
+
+/* ================= plan → guion ================= */
+function cleanMarks(t) { return String(t || '').replace(/[*_~]/g, '').replace(/\s*\/\s*/g, ' ').replace(/\s+/g, ' ').trim(); }
+function shortTxt(t, n = 52) { const c = cleanMarks(t); return c.length > n ? c.slice(0, n - 1).trimEnd() + '…' : c; }
+function parseRange(spec, total) {
+  const s = String(spec || '').trim();
+  if (!s) return total ? [1, total] : null;
+  const m = /^#?(\d+)\s*(?:[-–]\s*#?(\d+))?$/.exec(s);
+  if (!m) return null;
+  const a = +m[1], b = m[2] ? +m[2] : a;
+  return [Math.min(a, b), Math.max(a, b)];
+}
+const SCENE_NAMES = { adelanto: 'Adelanto', muro: 'Muro de cartas', caos: 'Del caos al orden', rafaga: 'Ráfaga', titulo: 'Portada', cartel: 'Cartel', binder: 'Binder', carta: 'Carta', media: 'Imagen o clip', lista: 'Lista', cierre: 'Cierre' };
+function sceneLabel(s, totalCards) {
+  const name = SCENE_NAMES[s.tipo] || (s.tipo ? s.tipo[0].toUpperCase() + s.tipo.slice(1) : 'Escena');
+  let detail = '';
+  if (s.tipo === 'binder') {
+    const r = parseRange(s.cartas, totalCards);
+    detail = r ? (r[0] === r[1] ? `carta ${r[0]}` : `cartas ${r[0]}–${r[1]}`) : (s.cartas ? `cartas ${s.cartas}` : 'todas las cartas');
+  } else if (s.tipo === 'carta') detail = [s.carta, shortTxt(s.texto, 40)].filter(Boolean).join(' · ');
+  else if (s.tipo === 'lista') detail = shortTxt(s.titulo);
+  else if (s.tipo === 'media') detail = shortTxt(s.texto) || String(s.media || '').split('/').pop();
+  else if (s.tipo === 'cartel' && String(s.valor || '').trim()) detail = shortTxt(String(s.valor).trim() + ' ' + (s.texto || ''));
+  else detail = shortTxt(s.texto || s.titulo);
+  return detail ? `${name}: ${detail}` : name;
+}
+function buildFromPlan(video, binder) {
+  const cards = binder ? (binder.project && Array.isArray(binder.project.cards) ? binder.project.cards : Array.isArray(binder.cards) ? binder.cards : []) : null;
+  const total = cards ? cards.length : 0;
+  const blocks = [];
+  let cardScripts = 0;
+  for (const s of video.escenas || []) {
+    if (!s || typeof s !== 'object') continue;
+    const head = String(s.capitulo || '').trim() || sceneLabel(s, total);
+    const body = [];
+    if (typeof s.guion === 'string' && s.guion.trim()) body.push(s.guion.replace(/\r\n?/g, '\n').trim());
+    if (s.tipo === 'binder' && cards && cards.length) {
+      const r = parseRange(s.cartas, total);
+      if (r) for (let i = Math.max(1, r[0]); i <= Math.min(total, r[1]); i++) {
+        const c = cards[i - 1], prev = cards[i - 2];
+        if (!c) continue;
+        const g = String(c.grupo || '').trim();
+        const starts = !g || !prev || String(prev.grupo || '').trim() !== g;
+        const sc = typeof c.script === 'string' ? c.script.trim() : '';
+        if (starts && sc) { body.push(sc.replace(/\r\n?/g, '\n')); cardScripts++; }
+      }
+    }
+    blocks.push('## ' + head.replace(/\s*\n\s*/g, ' ') + (body.length ? '\n\n' + body.join('\n\n') : ''));
+  }
+  return { text: blocks.join('\n\n') + '\n', sections: blocks.length, cardScripts };
+}
+
+/* ================= GitHub ================= */
+const S = {
+  token: store.get(K.token) || '',
+  login: store.get(K.login) || '',
+  canPush: false,
+  list: [], listState: 'loading', listErr: null,
+  cur: null, docState: 'idle',
+  mode: 'leer', noteType: 'idea', editNote: null,
+  saving: false, banners: new Map(),
+};
+const filePath = slug => `/repos/${CFG.repo}/contents/${CFG.dir}/${encodeURIComponent(slug)}.json`;
+
+async function gh(path, { method = 'GET', body, token } = {}) {
+  const tk = token !== undefined ? token : S.token;
+  const headers = { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (tk) headers.Authorization = 'Bearer ' + tk;
+  if (body) headers['Content-Type'] = 'application/json';
+  let res;
+  try {
+    res = await fetch(CFG.api + path, { method, headers, body: body ? JSON.stringify(body) : undefined, cache: method === 'GET' ? 'no-cache' : 'no-store' });
+  } catch (e) {
+    return { ok: false, status: 0, data: null };
+  }
+  let data = null;
+  try { data = await res.json(); } catch {}
+  const msg = data && typeof data.message === 'string' ? data.message : '';
+  const rateLimited = (res.status === 403 || res.status === 429) && (res.headers.get('x-ratelimit-remaining') === '0' || /rate limit/i.test(msg));
+  return { ok: res.ok, status: res.status, data, msg, rateLimited };
+}
+
+async function fetchFile(slug) {
+  const r = await gh(filePath(slug) + `?ref=${encodeURIComponent(CFG.branch)}`);
+  if (r.status === 404) return { missing: true };
+  if (!r.ok) return { error: r };
+  try {
+    const raw = r.data.content ? b64ToText(r.data.content) : '';
+    return { doc: normDoc(JSON.parse(raw)), sha: r.data.sha };
+  } catch (e) {
+    return { error: { status: 'parse', msg: 'El archivo no es un guion válido.' } };
+  }
+}
+
+async function pool(items, n, fn) {
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) await fn(items[i++]); }));
+}
+
+function errText(r, what = 'leer los guiones') {
+  if (!r) return `No pude ${what}.`;
+  if (r.status === 0) return `No pude ${what}: no hay conexión con GitHub.`;
+  if (r.rateLimited) return 'GitHub limita las lecturas sin conectarse (60 por hora). Conectate con GitHub para seguir, o probá en un rato.';
+  if (r.status === 401) return 'Tu token de GitHub ya no anda. Conectate de nuevo.';
+  if (r.status === 'parse') return r.msg;
+  return `No pude ${what} (GitHub respondió ${r.status}${r.msg ? ': ' + r.msg : ''}).`;
+}
+
+async function checkToken() {
+  const u = await gh('/user');
+  if (u.status === 401) { dropToken(); toast('Tu token de GitHub venció o lo borraron. Conectate de nuevo.', 'err'); return; }
+  if (!u.ok) { S.canPush = !!S.login; return; } // sin red: lo sabremos al cargar
+  S.login = u.data.login; store.set(K.login, S.login);
+  const r = await gh(`/repos/${CFG.repo}`);
+  S.canPush = !!(r.ok && r.data && r.data.permissions && r.data.permissions.push);
+}
+function dropToken() {
+  S.token = ''; S.login = ''; S.canPush = false;
+  store.del(K.token); store.del(K.login);
+}
+const canWrite = () => !!S.token && S.canPush;
+
+/* ================= lista ================= */
+async function loadList({ quiet = false } = {}) {
+  if (!quiet) { S.listState = 'loading'; render(); }
+  const r = await gh(`/repos/${CFG.repo}/contents/${CFG.dir}?ref=${encodeURIComponent(CFG.branch)}`);
+  let files = [];
+  if (r.status === 404) files = [];
+  else if (!r.ok) {
+    if (r.status === 401 && S.token) { dropToken(); toast('Tu token de GitHub ya no anda. Conectate de nuevo.', 'err'); return loadList({ quiet }); }
+    if (quiet) return false;
+    S.listState = 'error'; S.listErr = r; render(); return false;
+  } else files = (Array.isArray(r.data) ? r.data : []).filter(f => f && f.type === 'file' && /\.json$/i.test(f.name));
+
+  const meta = store.json(K.meta) || {};
+  const slugOf = f => f.name.replace(/\.json$/i, '');
+  const need = files.filter(f => !meta[slugOf(f)] || meta[slugOf(f)].sha !== f.sha);
+  let limited = false;
+  await pool(need, 6, async f => {
+    const x = await fetchFile(slugOf(f));
+    if (x.doc) meta[slugOf(f)] = { sha: x.sha, titulo: x.doc.titulo, actualizado: x.doc.actualizado, actualizadoPor: x.doc.actualizadoPor };
+    else if (x.error && x.error.rateLimited) limited = true;
+  });
+  const keep = {};
+  const list = files.map(f => {
+    const s = slugOf(f), m = meta[s] && meta[s].sha === f.sha ? meta[s] : null;
+    if (m) keep[s] = m;
+    return { slug: s, sha: f.sha, titulo: m ? m.titulo : s, actualizado: m ? m.actualizado : '', actualizadoPor: m ? m.actualizadoPor : '' };
+  });
+  store.setJson(K.meta, keep);
+  // guiones nuevos que todavía no se cargaron (solo en esta compu)
+  if (S.token) for (const k of store.keys()) {
+    if (!k.startsWith(K.draftPrefix)) continue;
+    const slug = k.slice(K.draftPrefix.length), d = store.json(k);
+    if (!d || d.base || list.some(x => x.slug === slug)) continue;
+    list.push({ slug, local: true, titulo: normDoc(d.doc).titulo, actualizado: d.at || '' });
+  }
+  // el que está abierto y es nuevo
+  if (S.cur && !S.cur.base && !list.some(x => x.slug === S.cur.slug)) list.push({ slug: S.cur.slug, local: true, titulo: S.cur.doc.titulo, actualizado: '' });
+  list.sort((a, b) => (b.actualizado || '').localeCompare(a.actualizado || '') || a.titulo.localeCompare(b.titulo, 'es'));
+  S.list = list;
+  S.listState = 'ok';
+  if (limited) setBanner('rate', { kind: 'warn', text: errText({ rateLimited: true }), action: S.token ? null : { label: 'Conectar con GitHub', fn: () => openConnect() } });
+  render();
+  return true;
+}
+
+/* ================= abrir ================= */
+function setHash(slug) {
+  const h = '#' + encodeURIComponent(slug);
+  if (location.hash !== h) history.replaceState(null, '', h);
+}
+async function openScript(slug, { skipDirtyCheck = false } = {}) {
+  if (!skipDirtyCheck && S.cur && S.cur.slug === slug) return;
+  if (!skipDirtyCheck && isDirty()) {
+    const ok = await confirmLeave();
+    if (!ok) { syncPicker(); return; }
+  }
+  const item = S.list.find(x => x.slug === slug);
+  S.cur = null; S.editNote = null; S.docState = 'loading'; render();
+  let base = null, sha = null, doc;
+  if (item && !item.local) {
+    const x = await fetchFile(slug);
+    if (x.error) {
+      S.docState = 'error'; S.docErr = x.error; render(); return;
+    }
+    if (x.missing) { toast('Ese guion ya no está en GitHub.'); await loadList(); return openDefault(); }
+    base = x.doc; sha = x.sha; doc = clone(base);
+  } else {
+    const d = store.json(K.draft(slug));
+    doc = normDoc(d ? d.doc : { titulo: item ? item.titulo : slug });
+  }
+  S.cur = { slug, sha, base, doc, checked: Date.now() };
+  S.docState = 'ok';
+  store.set(K.last, slug);
+  setHash(slug);
+  if (base && S.token) await restoreDraft();
+  S.mode = S.cur.doc.guion.trim() || !canWrite() ? 'leer' : 'editar';
+  render(true);
+}
+function openDefault() {
+  const want = decodeURIComponent(location.hash.slice(1) || '');
+  const last = store.get(K.last);
+  const pickOne = [want, last].find(s => s && S.list.some(x => x.slug === s)) || (S.list[0] && S.list[0].slug);
+  if (want && !S.list.some(x => x.slug === want)) toast('No encontré ese guion. Te abro otro.');
+  if (pickOne) return openScript(pickOne, { skipDirtyCheck: true });
+  S.cur = null; S.docState = 'idle'; history.replaceState(null, '', location.pathname + location.search); render();
+}
+
+/* borradores (lo que no se cargó queda en esta compu) */
+let draftT = 0;
+function scheduleDraft() { clearTimeout(draftT); draftT = setTimeout(saveDraft, 350); }
+function saveDraft() {
+  clearTimeout(draftT);
+  const c = S.cur;
+  if (!c || !S.token) return; // sin conexión no se toca el borrador (queda para cuando vuelvas)
+  if (isDirty()) store.setJson(K.draft(c.slug), { base: c.base, sha: c.sha, doc: c.doc, at: new Date().toISOString() });
+  else store.del(K.draft(c.slug));
+}
+async function restoreDraft() {
+  const c = S.cur, d = store.json(K.draft(c.slug));
+  if (!d || !d.doc) return;
+  const dBase = d.base ? normDoc(d.base) : null, dDoc = normDoc(d.doc);
+  if (dBase && core(dBase) === core(dDoc)) { store.del(K.draft(c.slug)); return; }
+  if (d.sha && d.sha === c.sha) { c.doc = dDoc; toast('Recuperé cambios tuyos que no se habían cargado.'); return; }
+  const m = merge(dBase, dDoc, c.base);
+  let guion = m.doc.guion;
+  if (m.conflict) {
+    const by = c.base.actualizadoPor ? '@' + c.base.actualizadoPor : 'alguien';
+    const v = await askConflict(dDoc.guion, c.base, `Quedaron cambios tuyos sin cargar de la otra vez, y mientras tanto ${by} cargó otra versión del texto. Las anotaciones ya se juntaron solas.`, false);
+    guion = v === 'mine' ? dDoc.guion : c.base.guion;
+    if (v !== 'mine') { backupMine(c.slug, dDoc.guion); offerBackup(c.slug); }
+  }
+  c.doc = { ...m.doc, guion };
+  if (core(c.doc) !== core(c.base)) toast('Recuperé cambios tuyos que no se habían cargado.');
+  saveDraft();
+}
+function backupMine(slug, text) {
+  store.setJson(K.backup(slug), { at: new Date().toISOString(), guion: text });
+}
+function offerBackup(slug) {
+  setBanner('respaldo', { kind: 'info', text: 'Tu versión del texto quedó guardada en este navegador, por si querés rescatar algo.', action: { label: 'Copiar mi versión', fn: () => copyBackup(slug) } });
+}
+async function copyBackup(slug) {
+  const b = store.json(K.backup(slug));
+  if (!b) return toast('No encontré tu versión guardada.');
+  try { await navigator.clipboard.writeText(b.guion); toast('Copiada. Pegala donde quieras.'); }
+  catch {
+    const a = el('a', { href: URL.createObjectURL(new Blob([b.guion], { type: 'text/plain;charset=utf-8' })), download: `${slug}-mi-version.txt` });
+    document.body.append(a); a.click(); a.remove();
+    toast('Te la bajé como archivo de texto.');
+  }
+}
+
+const isDirty = () => !!S.cur && (!S.cur.base || core(S.cur.base) !== core(S.cur.doc));
+
+/* ================= guardar ================= */
+async function save() {
+  if (S.saving) return;
+  const c = S.cur;
+  if (!c) return;
+  if (!S.token) return openConnect('Para cargar cambios en GitHub conectate primero.');
+  if (!S.canPush) return toast(`Tu cuenta no tiene permiso para escribir en ${CFG.repo}. Pedile a @meh889 que te sume.`, 'err');
+  if (!isDirty()) return toast('No hay cambios para cargar.');
+  S.saving = true; renderStatus();
+  let mergedWith = '';
+  try {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (S.cur !== c) return;
+      const sent = { ...clone(c.doc), app: 'binder-studio-guion', version: 1, actualizado: new Date().toISOString(), actualizadoPor: S.login || '' };
+      const body = {
+        message: `Guion: ${sent.titulo} (por ${S.login || 'alguien'})`,
+        content: textToB64(JSON.stringify(sent, null, 2) + '\n'),
+        branch: CFG.branch,
+      };
+      if (c.sha) body.sha = c.sha;
+      const r = await gh(filePath(c.slug), { method: 'PUT', body });
+      if (r.ok && r.data && r.data.content) {
+        c.sha = r.data.content.sha;
+        c.base = normDoc(sent);
+        c.doc.actualizado = sent.actualizado; c.doc.actualizadoPor = sent.actualizadoPor;
+        const meta = store.json(K.meta) || {};
+        meta[c.slug] = { sha: c.sha, titulo: sent.titulo, actualizado: sent.actualizado, actualizadoPor: sent.actualizadoPor };
+        store.setJson(K.meta, meta);
+        const it = S.list.find(x => x.slug === c.slug);
+        const fresh = { slug: c.slug, sha: c.sha, titulo: sent.titulo, actualizado: sent.actualizado, actualizadoPor: sent.actualizadoPor };
+        if (it) Object.assign(it, fresh, { local: false }); else S.list.unshift(fresh);
+        clearBanner('newer');
+        saveDraft();
+        toast(isDirty() ? 'Cargado. Lo que escribiste mientras tanto falta cargar.'
+          : mergedWith ? `Listo: se juntó con lo que cargó ${mergedWith === 'otra persona' ? mergedWith : '@' + mergedWith} y quedó cargado.`
+          : 'Listo, quedó cargado en GitHub.');
+        return;
+      }
+      const shaIssue = r.status === 409 || (r.status === 422 && /sha/i.test(r.msg || ''));
+      if (!shaIssue) { saveError(r); return; }
+      const remote = await fetchFile(c.slug);
+      if (remote.error) { saveError(remote.error); return; }
+      if (remote.missing) { c.sha = null; continue; }
+      const goOn = await reconcile(c, remote);
+      if (!goOn) { toast('No se cargó nada. Cuando quieras, tocá Cargar cambios de nuevo.'); return; }
+      mergedWith = remote.doc.actualizadoPor || 'otra persona';
+      if (!isDirty()) { toast('Ya estaba todo cargado.'); return; }
+    }
+    toast('GitHub cambió varias veces seguidas. Probá de nuevo en un momento.', 'err');
+  } finally {
+    S.saving = false; render();
+  }
+}
+function saveError(r) {
+  if (r.status === 401) { dropToken(); render(); openConnect('Tu token ya no anda. Pegá uno nuevo para cargar.'); return; }
+  if (r.rateLimited) return toast('GitHub frenó por un rato las cargas. Probá en unos minutos; tus cambios siguen acá.', 'err');
+  if (r.status === 403) return toast('GitHub no te dejó cargar. Revisá que el token tenga Contents: Read and write.', 'err');
+  if (r.status === 404) return toast(`Con tu token GitHub no ve ${CFG.repo}. Revisá Repository access del token.`, 'err');
+  if (r.status === 0) return toast('No hay conexión con GitHub. Tus cambios siguen acá; probá de nuevo.', 'err');
+  toast(errText(r, 'cargar'), 'err');
+}
+
+/* Trae lo de GitHub y lo junta con lo tuyo. Devuelve false si elegiste decidir después. */
+async function reconcile(c, remote) {
+  const m = merge(c.base, c.doc, remote.doc);
+  let guion = m.doc.guion;
+  if (m.conflict) {
+    const by = remote.doc.actualizadoPor ? '@' + remote.doc.actualizadoPor : 'Alguien';
+    const v = await askConflict(c.doc.guion, remote.doc, `${by} cargó otra versión del texto mientras editabas. Las anotaciones ya se juntaron solas; con el texto, elegí vos.`, true);
+    if (v === 'cancel') return false;
+    if (v === 'mine') guion = c.doc.guion;
+    else { backupMine(c.slug, c.doc.guion); guion = remote.doc.guion; offerBackup(c.slug); }
+  }
+  if (S.cur !== c) return false;
+  c.base = remote.doc; c.sha = remote.sha;
+  c.doc = { ...m.doc, guion };
+  saveDraft();
+  render(true);
+  return true;
+}
+
+/* revisar si alguien cargó algo al volver a la pestaña */
+async function checkRemote() {
+  const c = S.cur;
+  if (!c || !c.sha || S.saving || Date.now() - (c.checked || 0) < 15000) return;
+  c.checked = Date.now();
+  const x = await fetchFile(c.slug);
+  if (S.cur !== c || !x.doc || x.sha === c.sha || S.saving) return;
+  const by = x.doc.actualizadoPor ? '@' + x.doc.actualizadoPor : 'Alguien';
+  if (!isDirty()) {
+    c.base = x.doc; c.sha = x.sha; c.doc = clone(x.doc);
+    const it = S.list.find(i => i.slug === c.slug);
+    if (it) Object.assign(it, { sha: x.sha, titulo: x.doc.titulo, actualizado: x.doc.actualizado, actualizadoPor: x.doc.actualizadoPor });
+    render(true);
+    toast(`${by} cargó cambios. Ya los estás viendo.`);
+  } else {
+    setBanner('newer', { kind: 'info', text: `${by} cargó una versión nueva. Al cargar lo tuyo se juntan; si los dos cambiaron el texto, elegís vos.` });
+  }
+  loadList({ quiet: true });
+}
+
+/* ================= interfaz ================= */
+const dom = {
+  pick: $('#pick'), btnNew: $('#btnNew'), btnConn: $('#btnConn'), savebar: $('#savebar'), status: $('#status'), btnSave: $('#btnSave'),
+  banners: $('#banners'), state: $('#state'), doc: $('#doc'), notes: $('#notes'),
+  title: $('#docTitle'), titleInput: $('#titleInput'), meta: $('#docMeta'),
+  mLeer: $('#mLeer'), mEditar: $('#mEditar'), btnFile: $('#btnFile'), btnPlan: $('#btnPlan'), fileTxt: $('#fileTxt'),
+  reader: $('#reader'), readerEmpty: $('#readerEmpty'), editor: $('#editor'), editHint: $('#editHint'),
+  noteForm: $('#addNote'), noteText: $('#noteText'), noteChips: $('#noteChips'), notesLocked: $('#notesLocked'),
+  noteList: $('#noteList'), notesEmpty: $('#notesEmpty'), doneBox: $('#doneBox'), doneSum: $('#doneSum'), doneList: $('#doneList'), notesCount: $('#notesCount'),
+  toast: $('#toast'),
+};
+const NEEDS_FIELD_SIZING = !(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'));
+
+function render(full = false) {
+  renderTop();
+  renderBanners();
+  renderMain(full);
+  renderNotes();
+  renderStatus();
+}
+
+function renderTop() {
+  // selector
+  const p = dom.pick;
+  p.textContent = '';
+  if (S.listState === 'loading' && !S.list.length) { p.append(el('option', null, 'Cargando…')); p.disabled = true; }
+  else if (!S.list.length) { p.append(el('option', null, S.listState === 'error' ? 'No pude leer la lista' : 'Sin guiones todavía')); p.disabled = true; }
+  else {
+    if (!S.cur) p.append(el('option', { value: '' }, 'Elegí un guion'));
+    for (const it of S.list) {
+      const t = S.cur && S.cur.slug === it.slug ? S.cur.doc.titulo : it.titulo;
+      p.append(el('option', { value: it.slug }, t + (it.local ? ' (sin cargar)' : '')));
+    }
+    p.disabled = false;
+    syncPicker();
+  }
+  // conexión
+  const c = dom.btnConn;
+  c.classList.toggle('on', canWrite());
+  c.classList.toggle('bad', !!S.token && !S.canPush);
+  const lbl = c.querySelector('.lbl');
+  lbl.textContent = '';
+  if (S.token) { lbl.append('@' + (S.login || 'conectado')); c.title = canWrite() ? 'Conectado con GitHub' : 'Conectado, pero sin permiso para escribir'; }
+  else { lbl.append(el('span', { class: 'lbl-long' }, 'Conectar con GitHub'), el('span', { class: 'lbl-short' }, 'Conectar')); c.title = 'Conectate con GitHub para escribir y cargar cambios'; }
+  dom.btnNew.setAttribute('aria-disabled', canWrite() ? 'false' : 'true');
+}
+function syncPicker() { if (S.cur && dom.pick.value !== S.cur.slug) dom.pick.value = S.cur.slug; }
+
+function renderStatus() {
+  const c = S.cur;
+  dom.savebar.hidden = !c;
+  if (!c) return;
+  const dirty = isDirty();
+  const st = dom.status;
+  st.textContent = '';
+  const l1 = el('span', { class: 'st1' + (dirty ? ' dirty' : '') + (S.token ? '' : ' ro') }, el('span', { class: 'pip' }));
+  if (!S.token) l1.append('Solo lectura');
+  else if (S.saving) l1.append('Cargando…');
+  else if (dirty) l1.append(c.base ? 'Cambios sin cargar' : 'Guion nuevo, sin cargar');
+  else l1.append('Todo cargado');
+  const l2 = el('span', { class: 'st2' });
+  if (c.base && c.base.actualizado) {
+    l2.append('Última carga: ', timeEl(c.base.actualizado));
+    if (c.base.actualizadoPor) l2.append(' por @' + c.base.actualizadoPor);
+  } else if (c.base) l2.append('En GitHub');
+  else l2.append('Todavía no está en GitHub');
+  st.append(l1, l2);
+  const b = dom.btnSave;
+  b.querySelector('.lbl').textContent = S.saving ? 'Cargando…' : 'Cargar cambios';
+  b.classList.toggle('clean', !dirty && !S.saving);
+  b.setAttribute('aria-disabled', !canWrite() || !dirty || S.saving ? 'true' : 'false');
+  b.title = !S.token ? 'Para cargar cambios, conectate con GitHub' : !S.canPush ? 'Tu cuenta no puede escribir en el repo' : !dirty ? 'No hay cambios para cargar' : 'Guarda en GitHub para que lo vean todos (Ctrl+S)';
+  document.title = (dirty ? '• ' : '') + c.doc.titulo + ' · Guiones';
+}
+
+function setBanner(id, b) { S.banners.set(id, b); renderBanners(); }
+function clearBanner(id) { if (S.banners.delete(id)) renderBanners(); }
+function renderBanners() {
+  const box = dom.banners;
+  box.textContent = '';
+  if (CFG.test) box.append(el('div', { class: 'banner' }, el('p', null, `Modo prueba: ${CFG.api} · ${CFG.repo}`)));
+  for (const [id, b] of S.banners) {
+    const row = el('div', { class: 'banner ' + (b.kind || '') }, el('p', null, b.text));
+    if (b.action) row.append(el('button', { class: 'btn small', type: 'button', onclick: b.action.fn }, b.action.label));
+    row.append(el('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Cerrar aviso', onclick: () => clearBanner(id) }, 'Cerrar'));
+    box.append(row);
+  }
+}
+
+function renderState(kind) {
+  const s = dom.state;
+  s.textContent = '';
+  if (kind === 'loading') {
+    s.append(el('h2', null, 'Cargando guiones…'), el('div', { class: 'skel w2' }), el('div', { class: 'skel w1' }), el('div', { class: 'skel w3' }));
+  } else if (kind === 'error') {
+    const r = S.listErr || {};
+    s.append(el('h2', null, r.rateLimited ? 'GitHub pide que te conectes' : 'No pude leer los guiones'), el('p', null, errText(r)));
+    const row = el('div', { class: 'row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => loadList().then(ok => ok && openDefault()) }, 'Probar de nuevo'));
+    if (!S.token) row.append(el('button', { class: 'btn', type: 'button', onclick: () => openConnect() }, 'Conectar con GitHub'));
+    s.append(row);
+  } else if (kind === 'docerror') {
+    s.append(el('h2', null, 'No pude abrir el guion'), el('p', null, errText(S.docErr, 'abrir el guion')));
+    const row = el('div', { class: 'row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => openDefault() }, 'Probar de nuevo'));
+    if (!S.token) row.append(el('button', { class: 'btn', type: 'button', onclick: () => openConnect() }, 'Conectar con GitHub'));
+    s.append(row);
+  } else if (kind === 'empty') {
+    s.append(el('h2', null, 'Todavía no hay guiones'));
+    if (canWrite()) {
+      s.append(el('p', null, 'Creá el primero: le ponés un título y arrancás a escribir, o lo traés del plan del video.'),
+        el('div', { class: 'row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => openNew() }, 'Nuevo guion')));
+    } else {
+      s.append(el('p', null, 'Cuando alguien del equipo cargue uno, lo vas a ver acá. Para escribir uno, conectate con GitHub.'),
+        el('div', { class: 'row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => openConnect() }, 'Conectar con GitHub')));
+    }
+  }
+}
+
+function renderMain(full) {
+  let st = null;
+  if (S.listState === 'loading' && !S.cur) st = 'loading';
+  else if (S.listState === 'error' && !S.cur) st = 'error';
+  else if (S.docState === 'loading') st = 'loading';
+  else if (S.docState === 'error') st = 'docerror';
+  else if (!S.cur) st = S.list.length ? 'loading' : 'empty';
+  dom.state.hidden = !st;
+  dom.doc.hidden = dom.notes.hidden = !!st;
+  if (st) { renderState(st); return; }
+
+  const c = S.cur, edit = S.mode === 'editar' && canWrite();
+  dom.title.textContent = c.doc.titulo;
+  dom.title.hidden = edit;
+  dom.titleInput.hidden = !edit;
+  if (edit && document.activeElement !== dom.titleInput) dom.titleInput.value = c.doc.titulo;
+  renderMeta();
+
+  dom.mLeer.setAttribute('aria-pressed', String(!edit));
+  dom.mEditar.setAttribute('aria-pressed', String(edit));
+  const lock = canWrite() ? 'false' : 'true';
+  for (const b of [dom.mEditar, dom.btnFile, dom.btnPlan]) b.setAttribute('aria-disabled', lock);
+  dom.mEditar.title = canWrite() ? '' : 'Para editar, conectate con GitHub';
+
+  dom.editor.hidden = !edit;
+  dom.editHint.hidden = !edit;
+  if (edit) {
+    if (full || dom.editor.value !== c.doc.guion && document.activeElement !== dom.editor) dom.editor.value = c.doc.guion;
+    else if (dom.editor.value !== c.doc.guion) setEditorValue(c.doc.guion);
+    autosize();
+  }
+  const hasText = !!c.doc.guion.trim();
+  dom.reader.hidden = edit || !hasText;
+  dom.readerEmpty.hidden = edit || hasText;
+  if (!edit) {
+    if (hasText) renderReader(dom.reader, c.doc.guion);
+    else renderReaderEmpty();
+  }
+}
+function setEditorValue(v) {
+  const e = dom.editor, a = e.selectionStart, b = e.selectionEnd;
+  e.value = v;
+  try { e.setSelectionRange(Math.min(a, v.length), Math.min(b, v.length)); } catch {}
+}
+function renderMeta() {
+  const c = S.cur;
+  if (!c) return;
+  const w = countWords(c.doc.guion);
+  const secs = c.doc.guion.split('\n').filter(l => /^##\s/.test(l)).length;
+  const parts = [];
+  if (w) parts.push(`${nf(w)} ${w === 1 ? 'palabra' : 'palabras'}`, `unos ${Math.max(1, Math.round(w / 150))} min de voz`);
+  else parts.push('Sin texto todavía');
+  if (secs) parts.push(`${nf(secs)} ${secs === 1 ? 'sección' : 'secciones'}`);
+  dom.meta.textContent = parts.join(' · ');
+}
+function renderReaderEmpty() {
+  const e = dom.readerEmpty;
+  e.textContent = '';
+  e.append(el('h3', null, 'Todavía no hay guion'));
+  if (canWrite()) {
+    e.append(el('p', null, 'Escribilo acá, traelo de un archivo .txt o .md, o armalo desde el plan del video (video.json).'),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn primary', type: 'button', onclick: () => setMode('editar') }, 'Empezar a escribir'),
+        el('button', { class: 'btn', type: 'button', onclick: () => openPlan() }, 'Importar del plan')));
+  } else {
+    e.append(el('p', null, 'Nadie lo escribió todavía. Para escribirlo, conectate con GitHub.'),
+      el('div', { class: 'row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => openConnect() }, 'Conectar con GitHub')));
+  }
+}
+function renderReader(box, text) {
+  box.textContent = '';
+  const lines = text.split('\n');
+  let para = [], n = 0;
+  const flush = () => {
+    if (!para.length) return;
+    const p = el('p');
+    para.forEach((ln, i) => {
+      if (i) p.append(el('br'));
+      if (/^\s*\(.*\)\s*$/.test(ln)) p.append(el('span', { class: 'acot' }, ln.trim()));
+      else p.append(ln);
+    });
+    box.append(p);
+    para = [];
+  };
+  for (const ln of lines) {
+    const m = /^##\s+(.*)$/.exec(ln);
+    if (m) { flush(); n++; box.append(el('h2', null, el('span', { class: 'sec-n', 'aria-hidden': 'true' }, String(n).padStart(2, '0')), m[1].trim())); }
+    else if (!ln.trim()) flush();
+    else para.push(ln);
+  }
+  flush();
+}
+function autosize() {
+  if (!NEEDS_FIELD_SIZING) return;
+  const e = dom.editor, y = window.scrollY;
+  e.style.height = 'auto';
+  e.style.height = e.scrollHeight + 2 + 'px';
+  window.scrollTo(0, y);
+}
+
+/* ---------- anotaciones ---------- */
+function chipRow(container, value, onPick) {
+  container.textContent = '';
+  for (const [k, label] of Object.entries(TIPOS)) {
+    const b = el('button', { type: 'button', class: 'chip', role: 'radio', 'aria-checked': String(k === value), tabindex: k === value ? '0' : '-1', 'data-v': k },
+      el('i', { style: `background:${TIPO_COLOR[k]}` }), label);
+    b.addEventListener('click', () => onPick(k));
+    b.addEventListener('keydown', ev => {
+      const keys = Object.keys(TIPOS), i = keys.indexOf(k);
+      let j = -1;
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') j = (i + 1) % keys.length;
+      if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') j = (i + keys.length - 1) % keys.length;
+      if (j >= 0) { ev.preventDefault(); onPick(keys[j]); container.querySelector(`[data-v="${keys[j]}"]`).focus(); }
+    });
+    container.append(b);
+  }
+}
+function renderNotes() {
+  const c = S.cur;
+  if (!c) return;
+  const w = canWrite();
+  dom.noteForm.hidden = !w;
+  dom.notesLocked.hidden = w;
+  if (!w) {
+    dom.notesLocked.textContent = '';
+    dom.notesLocked.append(el('p', null, S.token ? `Tu cuenta no puede escribir en ${CFG.repo}. Podés leer las anotaciones de los demás.` : 'Para anotar ideas o pendientes, conectate con GitHub.'));
+    if (!S.token) dom.notesLocked.append(el('button', { class: 'btn small primary', type: 'button', onclick: () => openConnect() }, 'Conectar con GitHub'));
+  } else chipRow(dom.noteChips, S.noteType, k => { S.noteType = k; renderNotes(); });
+
+  const baseMap = new Map((c.base ? c.base.notas : []).map(n => [n.id, noteKey(n)]));
+  const byDate = (a, b) => (b.fecha || '').localeCompare(a.fecha || '');
+  const open = c.doc.notas.filter(n => !n.hecha).sort(byDate);
+  const done = c.doc.notas.filter(n => n.hecha).sort(byDate);
+  dom.notesCount.textContent = open.length ? `${nf(open.length)} ${open.length === 1 ? 'abierta' : 'abiertas'}` : '';
+  const draw = (list, ul) => {
+    ul.textContent = '';
+    for (const n of list) ul.append(noteItem(n, baseMap.get(n.id) !== noteKey(n)));
+  };
+  draw(open, dom.noteList);
+  draw(done, dom.doneList);
+  dom.noteList.hidden = !open.length;
+  dom.doneBox.hidden = !done.length;
+  dom.doneSum.textContent = `Hechas (${nf(done.length)})`;
+  dom.notesEmpty.hidden = !!c.doc.notas.length;
+  if (!c.doc.notas.length) {
+    dom.notesEmpty.textContent = w ? 'Sin anotaciones todavía. Sumá ideas, mejoras, conceptos o pendientes para el video.' : 'Sin anotaciones todavía.';
+  } else if (!open.length) {
+    dom.notesEmpty.hidden = false;
+    dom.notesEmpty.textContent = 'Todo hecho. Nada pendiente por ahora.';
+  }
+}
+function noteItem(n, unsaved) {
+  const c = S.cur, w = canWrite(), mine = w && n.autor && n.autor === S.login;
+  const li = el('li', { class: 'note' + (n.hecha ? ' done' : ''), 'data-id': n.id });
+  const cb = el('input', { type: 'checkbox', checked: n.hecha, disabled: !w, 'aria-label': n.hecha ? 'Marcar como no hecha' : 'Marcar como hecha' });
+  cb.addEventListener('change', () => { n.hecha = cb.checked; onDocChange(); renderNotes(); });
+  const body = el('div', { class: 'note-body' });
+  if (S.editNote === n.id) {
+    let tipo = n.tipo;
+    const ta = el('textarea', { 'aria-label': 'Editar anotación' });
+    ta.value = n.texto;
+    const chips = el('div', { class: 'chips', role: 'radiogroup', 'aria-label': 'Tipo' });
+    const setT = k => { tipo = k; chipRow(chips, tipo, setT); };
+    chipRow(chips, tipo, setT);
+    const saveIt = () => {
+      const t = ta.value.trim();
+      if (!t) { ta.focus(); return; }
+      n.texto = t; n.tipo = tipo; S.editNote = null; onDocChange(); renderNotes();
+    };
+    ta.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); saveIt(); }
+      if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); S.editNote = null; renderNotes(); }
+    });
+    body.append(el('div', { class: 'note-edit' }, ta, chips, el('div', { class: 'row' },
+      el('button', { class: 'btn small ghost', type: 'button', onclick: () => { S.editNote = null; renderNotes(); } }, 'Cancelar'),
+      el('button', { class: 'btn small primary', type: 'button', onclick: saveIt }, 'Guardar'))));
+    li.append(cb, body);
+    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); });
+    return li;
+  }
+  const top = el('div', { class: 'note-top' }, el('span', { class: 'tag t-' + n.tipo }, TIPOS[n.tipo]));
+  const who = el('span', { class: 'who' }, n.autor ? '@' + n.autor : 'sin autor');
+  if (n.fecha) who.append(' · ', timeEl(n.fecha));
+  top.append(who);
+  if (unsaved) who.append(' · ', el('span', { class: 'unsaved', title: 'Se guarda con Cargar cambios' }, 'sin cargar'));
+  body.append(top, el('p', { class: 'note-text' }, n.texto));
+  if (mine) {
+    body.append(el('div', { class: 'note-actions' },
+      el('button', { class: 'btn ghost', type: 'button', onclick: () => { S.editNote = n.id; renderNotes(); } }, 'Editar'),
+      el('button', { class: 'btn ghost danger', type: 'button', onclick: async () => {
+        const v = await ask('¿Borrar esta anotación?', n.texto.length > 120 ? n.texto.slice(0, 118) + '…' : n.texto, [{ v: 'cancel', label: 'Cancelar', cls: 'ghost' }, { v: 'del', label: 'Borrar', cls: 'primary' }]);
+        if (v !== 'del') return;
+        c.doc.notas = c.doc.notas.filter(x => x.id !== n.id);
+        onDocChange(); renderNotes();
+      } }, 'Borrar')));
+  }
+  li.append(cb, body);
+  return li;
+}
+function addNote() {
+  const t = dom.noteText.value.trim();
+  if (!t || !S.cur) { dom.noteText.focus(); return; }
+  S.cur.doc.notas.push({ id: newId(), texto: t, tipo: S.noteType, autor: S.login || '', fecha: new Date().toISOString(), hecha: false });
+  dom.noteText.value = '';
+  onDocChange(); renderNotes();
+  dom.noteText.focus();
+}
+
+function onDocChange() { renderStatus(); renderMeta(); scheduleDraft(); renderTopTitle(); }
+function renderTopTitle() {
+  if (!S.cur) return;
+  const o = [...dom.pick.options].find(x => x.value === S.cur.slug);
+  const it = S.list.find(x => x.slug === S.cur.slug);
+  if (o) o.textContent = S.cur.doc.titulo + (it && it.local ? ' (sin cargar)' : '');
+}
+
+function setMode(m) {
+  if (m === 'editar' && !canWrite()) return openConnect('Para editar el guion conectate con GitHub.');
+  S.mode = m;
+  renderMain(true);
+  if (m === 'editar') { dom.editor.focus({ preventScroll: true }); }
+}
+
+/* ---------- toast ---------- */
+let toastT = 0;
+function toast(msg, kind = '') {
+  const t = dom.toast;
+  t.textContent = msg;
+  t.className = 'toast show ' + kind;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.className = 'toast ' + kind; }, kind === 'err' ? 7000 : 4200);
+}
+
+/* ================= diálogos ================= */
+function wireClose(d) { d.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => d.close('cancel'))); }
+document.querySelectorAll('dialog').forEach(wireClose);
+
+function ask(title, text, buttons) {
+  const d = $('#dlgAsk');
+  $('#akTitle').textContent = title;
+  $('#akText').textContent = text || '';
+  $('#akText').hidden = !text;
+  const box = $('#akBtns');
+  box.textContent = '';
+  return new Promise(res => {
+    // Se resuelve en el clic mismo: el evento close puede llegar tarde (pestaña en segundo plano).
+    let done = false;
+    const finish = v => {
+      if (done) return;
+      done = true;
+      d.removeEventListener('close', onClose);
+      d.removeEventListener('cancel', onCancel);
+      if (d.open) d.close();
+      res(v);
+    };
+    const onClose = () => finish('cancel');
+    const onCancel = ev => { ev.preventDefault(); finish('cancel'); };
+    for (const b of buttons) box.append(el('button', { class: 'btn ' + (b.cls || ''), type: 'button', onclick: () => finish(b.v) }, b.label));
+    d.addEventListener('close', onClose);
+    d.addEventListener('cancel', onCancel);
+    d.showModal();
+    const prim = box.querySelector('.primary'); if (prim) prim.focus();
+  });
+}
+async function confirmLeave() {
+  const c = S.cur;
+  const v = await ask('Tenés cambios sin cargar', `En “${c.doc.titulo}”. Si los descartás, se pierden.`, [
+    { v: 'cancel', label: 'Seguir acá', cls: 'ghost' },
+    { v: 'discard', label: 'Descartarlos' },
+    ...(canWrite() ? [{ v: 'save', label: 'Cargar y seguir', cls: 'primary' }] : []),
+  ]);
+  if (v === 'discard') { store.del(K.draft(c.slug)); if (!c.base) S.list = S.list.filter(x => x.slug !== c.slug); return true; }
+  if (v === 'save') { await save(); return !isDirty(); }
+  return false;
+}
+
+function firstDiff(a, b) {
+  const A = a.split('\n'), B = b.split('\n');
+  let i = 0;
+  while (i < A.length && i < B.length && A[i] === B[i]) i++;
+  return i;
+}
+function diffPreview(pre, text, line) {
+  pre.textContent = '';
+  const L = text.split('\n'), from = Math.max(0, line - 2);
+  if (from > 0) pre.append('…\n');
+  pre.append(L.slice(from, line).join('\n') + (line > from ? '\n' : ''));
+  pre.append(el('mark', null, L[line] !== undefined ? (L[line] || ' ') : '(acá termina)'));
+  if (line + 1 < L.length) pre.append('\n' + L.slice(line + 1).join('\n'));
+}
+function askConflict(mine, remoteDoc, why, allowLater) {
+  const d = $('#dlgConflict');
+  const by = remoteDoc.actualizadoPor ? '@' + remoteDoc.actualizadoPor : 'la otra';
+  $('#cfWhy').textContent = why;
+  $('#cfTheirsH').textContent = remoteDoc.actualizadoPor ? `La de @${remoteDoc.actualizadoPor}` : 'La de GitHub';
+  const wm = countWords(mine), wt = countWords(remoteDoc.guion);
+  $('#cfMineN').textContent = `${nf(wm)} palabras`;
+  $('#cfTheirsN').textContent = `${nf(wt)} palabras` + (remoteDoc.actualizado ? ` · cargada ${ago(remoteDoc.actualizado)}` : '');
+  const line = firstDiff(mine, remoteDoc.guion);
+  diffPreview($('#cfMine'), mine, line);
+  diffPreview($('#cfTheirs'), remoteDoc.guion, line);
+  $('#cfTheirsB').textContent = remoteDoc.actualizadoPor ? `Traer la de @${remoteDoc.actualizadoPor}` : 'Traer la de GitHub';
+  $('#cfNote').textContent = `Lo marcado es la primera diferencia. “Dejar la mía” reemplaza el texto en GitHub. Si traés la de ${by}, la tuya queda copiada en el portapapeles y guardada en este navegador.`;
+  $('#cfCancel').hidden = !allowLater;
+  return new Promise(res => {
+    const btns = d.querySelectorAll('[data-v]');
+    const done = v => {
+      btns.forEach(b => b.removeEventListener('click', handlers.get(b)));
+      d.removeEventListener('cancel', onCancel);
+      d.close();
+      res(v);
+    };
+    const handlers = new Map();
+    btns.forEach(b => {
+      const h = () => {
+        const v = b.getAttribute('data-v');
+        if (v === 'theirs' && navigator.clipboard) navigator.clipboard.writeText(mine).catch(() => {});
+        done(v);
+      };
+      handlers.set(b, h);
+      b.addEventListener('click', h);
+    });
+    const onCancel = ev => { ev.preventDefault(); if (allowLater) done('cancel'); };
+    d.addEventListener('cancel', onCancel);
+    d.showModal();
+    d.querySelector('.primary').focus();
+  });
+}
+
+/* conectar */
+function openConnect(why) {
+  if (S.token && !why) return openAccount();
+  const d = $('#dlgConnect');
+  $('#cnWhy').textContent = why || 'Para escribir y cargar cambios necesitás un token tuyo de GitHub. Se hace una sola vez.';
+  d.querySelectorAll('.repoName').forEach(x => { x.textContent = CFG.repo; });
+  $('#cnErr').textContent = '';
+  $('#cnToken').value = '';
+  d.showModal();
+  $('#cnToken').focus();
+}
+$('#cnForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const tk = $('#cnToken').value.trim().replace(/^Bearer\s+/i, '');
+  const err = $('#cnErr'), go = $('#cnGo');
+  if (!tk) { err.textContent = 'Pegá el token.'; return; }
+  err.textContent = ''; go.disabled = true; go.textContent = 'Revisando…';
+  try {
+    const u = await gh('/user', { token: tk });
+    if (u.status === 401) { err.textContent = 'Ese token no anda. ¿Lo copiaste entero? ¿Ya venció?'; return; }
+    if (!u.ok) { err.textContent = u.status === 0 ? 'No hay conexión con GitHub. Probá de nuevo.' : `GitHub respondió ${u.status}. Probá de nuevo.`; return; }
+    const login = u.data.login;
+    const r = await gh(`/repos/${CFG.repo}`, { token: tk });
+    if (r.status === 404 || r.status === 403) { err.textContent = `Con ese token GitHub no ve ${CFG.repo}. En Repository access elegí ese repo.`; return; }
+    if (!r.ok) { err.textContent = `GitHub respondió ${r.status}. Probá de nuevo.`; return; }
+    if (!(r.data.permissions && r.data.permissions.push)) { err.textContent = `@${login} puede leer pero no escribir en ${CFG.repo}. Pedile a @meh889 que te sume como colaborador.`; return; }
+    S.token = tk; S.login = login; S.canPush = true;
+    store.set(K.token, tk); store.set(K.login, login);
+    $('#dlgConnect').close();
+    clearBanner('rate');
+    toast(`Conectado como @${login}.`);
+    const wasError = S.listState === 'error' || S.docState === 'error';
+    if (wasError) { await loadList(); await openDefault(); }
+    else { await loadList({ quiet: true }); render(); }
+  } finally {
+    go.disabled = false; go.textContent = 'Conectar';
+  }
+});
+function openAccount() {
+  $('#acLogin').textContent = '@' + (S.login || '…');
+  $('#acWhat').textContent = S.canPush ? `Podés escribir y cargar cambios en ${CFG.repo}.` : `Podés leer, pero tu cuenta no puede escribir en ${CFG.repo}.`;
+  $('#dlgAcct').showModal();
+}
+$('#acOut').addEventListener('click', async () => {
+  if (isDirty()) {
+    const v = await ask('Tenés cambios sin cargar', 'Si te desconectás, quedan guardados en este navegador pero no los ve nadie más.', [{ v: 'cancel', label: 'Cancelar', cls: 'ghost' }, { v: 'out', label: 'Desconectar igual', cls: 'primary' }]);
+    if (v !== 'out') return;
+    saveDraft();
+  }
+  $('#dlgAcct').close();
+  dropToken();
+  if (S.cur && !S.cur.base) { S.list = S.list.filter(x => x.slug !== S.cur.slug); S.cur = null; }
+  else if (S.cur && S.cur.base) { S.cur.doc = clone(S.cur.base); }
+  S.mode = 'leer'; S.editNote = null;
+  toast('Listo, te desconectaste. El token se borró de este navegador.');
+  if (!S.cur) openDefault(); else render(true);
+});
+
+/* nuevo */
+function openNew() {
+  if (!canWrite()) return openConnect('Para crear un guion conectate con GitHub.');
+  const d = $('#dlgNew');
+  $('#nwTitulo').value = '';
+  $('#nwErr').textContent = '';
+  updSlug();
+  d.showModal();
+  $('#nwTitulo').focus();
+}
+function uniqueSlug(t) {
+  const base = slugify(t);
+  let s = base, i = 2;
+  while (S.list.some(x => x.slug === s)) s = `${base}-${i++}`;
+  return s;
+}
+function updSlug() {
+  const t = $('#nwTitulo').value.trim();
+  $('#nwSlug').textContent = t ? `Se guarda como ${CFG.dir}/${uniqueSlug(t)}.json` : ' ';
+}
+$('#nwTitulo').addEventListener('input', updSlug);
+$('#nwForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const t = $('#nwTitulo').value.trim();
+  if (!t) { $('#nwErr').textContent = 'Ponele un título.'; return; }
+  if (isDirty() && !(await confirmLeave())) return;
+  $('#dlgNew').close();
+  const slug = uniqueSlug(t);
+  const doc = normDoc({ titulo: t });
+  S.list.unshift({ slug, local: true, titulo: t, actualizado: '' });
+  S.cur = { slug, sha: null, base: null, doc };
+  S.docState = 'ok'; S.mode = 'editar'; S.editNote = null;
+  store.set(K.last, slug); setHash(slug);
+  saveDraft();
+  render(true);
+  dom.editor.focus();
+});
+
+/* importar del plan */
+let plan = { video: null, binder: null, names: {} };
+function openPlan() {
+  if (!canWrite()) return openConnect('Para importar el plan conectate con GitHub.');
+  plan = { video: null, binder: null, names: {} };
+  $('#plFiles').value = '';
+  $('#plErr').textContent = '';
+  renderPlan();
+  $('#dlgPlan').showModal();
+}
+function renderPlan() {
+  const ul = $('#plInfo');
+  ul.textContent = '';
+  const v = plan.video, b = plan.binder;
+  if (v) {
+    const sc = v.escenas.length, ch = v.escenas.filter(s => s && String(s.capitulo || '').trim()).length;
+    ul.append(el('li', null, el('b', { class: 'ok' }, '✓'), el('span', null, `${plan.names.video}: ${nf(sc)} escenas, ${nf(ch)} capítulos`)));
+  } else ul.append(el('li', null, el('b', { class: 'no' }, '·'), el('span', null, 'Falta el video.json (el plan).')));
+  if (b) {
+    const cards = (b.project && b.project.cards) || b.cards || [];
+    ul.append(el('li', null, el('b', { class: 'ok' }, '✓'), el('span', null, `${plan.names.binder}: ${nf(cards.length)} cartas, ${nf(cards.filter(c => c && String(c.script || '').trim()).length)} con guion`)));
+  } else ul.append(el('li', null, el('b', { class: 'no' }, '·'), el('span', null, 'Sin binder.json: los tramos de binder entran sin el guion de cada carta.')));
+  const go = $('#plGo'), warn = $('#plWarn');
+  go.disabled = !v;
+  const cur = S.cur ? S.cur.doc.guion.trim() : '';
+  if (v) {
+    const r = buildFromPlan(v, b);
+    const words = countWords(r.text);
+    let msg = `Va a quedar un guion de ${nf(words)} palabras en ${nf(r.sections)} secciones`;
+    if (b) msg += `, con ${nf(r.cardScripts)} guiones de cartas`;
+    ul.append(el('li', null, el('b', { class: 'ok' }, '→'), el('span', null, msg + '.')));
+  }
+  warn.hidden = !cur || !v;
+  if (cur) warn.textContent = `Esto reemplaza el guion de ahora (${nf(countWords(cur))} palabras).`;
+  go.textContent = cur ? 'Reemplazar guion' : 'Armar guion';
+}
+$('#plFiles').addEventListener('change', async ev => {
+  const err = $('#plErr');
+  err.textContent = '';
+  const bad = [];
+  for (const f of ev.target.files) {
+    try {
+      const j = JSON.parse(await readFileText(f));
+      if (j && Array.isArray(j.escenas)) { plan.video = j; plan.names.video = f.name; }
+      else if (j && ((j.project && Array.isArray(j.project.cards)) || Array.isArray(j.cards))) { plan.binder = j; plan.names.binder = f.name; }
+      else bad.push(f.name);
+    } catch { bad.push(f.name); }
+  }
+  if (bad.length) err.textContent = `No reconocí ${bad.join(', ')}: tiene que ser el video.json o el binder.json de Binder Studio.`;
+  ev.target.value = '';
+  renderPlan();
+});
+$('#plForm').addEventListener('submit', ev => {
+  ev.preventDefault();
+  if (!plan.video || !S.cur) return;
+  const r = buildFromPlan(plan.video, plan.binder);
+  $('#dlgPlan').close();
+  applyText(r.text);
+  toast(`Listo: ${nf(r.sections)} secciones desde el plan. Revisalo y tocá Cargar cambios.`);
+});
+
+/* cargar archivo */
+dom.fileTxt.addEventListener('change', async ev => {
+  const f = ev.target.files[0];
+  ev.target.value = '';
+  if (!f || !S.cur) return;
+  let text;
+  try { text = (await readFileText(f)).replace(/\r\n?/g, '\n').replace(/^﻿/, ''); } catch { return toast('No pude leer ese archivo.', 'err'); }
+  if (!text.trim()) return toast('Ese archivo está vacío.');
+  const cur = S.cur.doc.guion;
+  if (cur.trim()) {
+    const v = await ask(`¿Qué hago con ${f.name}?`, `Ya hay un guion de ${nf(countWords(cur))} palabras.`, [
+      { v: 'cancel', label: 'Cancelar', cls: 'ghost' },
+      { v: 'add', label: 'Agregar al final' },
+      { v: 'rep', label: 'Reemplazar', cls: 'primary' },
+    ]);
+    if (v === 'cancel') return;
+    if (v === 'add') text = cur.replace(/\s+$/, '') + '\n\n' + text;
+  }
+  applyText(text);
+  toast(`Cargué ${f.name}. Tocá Cargar cambios para que lo vean los demás.`);
+});
+function applyText(text) {
+  S.cur.doc.guion = text;
+  S.mode = 'leer';
+  onDocChange();
+  render(true);
+  window.scrollTo({ top: 0 });
+}
+
+/* ================= eventos ================= */
+dom.pick.addEventListener('change', () => { const v = dom.pick.value; if (v) openScript(v); });
+dom.btnNew.addEventListener('click', openNew);
+dom.btnConn.addEventListener('click', () => openConnect());
+dom.btnSave.addEventListener('click', save);
+dom.mLeer.addEventListener('click', () => setMode('leer'));
+dom.mEditar.addEventListener('click', () => setMode('editar'));
+dom.btnFile.addEventListener('click', () => { if (!canWrite()) return openConnect('Para cargar un archivo conectate con GitHub.'); dom.fileTxt.click(); });
+dom.btnPlan.addEventListener('click', openPlan);
+dom.editor.addEventListener('input', () => { if (!S.cur) return; S.cur.doc.guion = dom.editor.value; autosize(); onDocChange(); });
+dom.titleInput.addEventListener('input', () => { if (!S.cur) return; S.cur.doc.titulo = dom.titleInput.value.trim() || 'Sin título'; dom.title.textContent = S.cur.doc.titulo; onDocChange(); });
+dom.noteForm.addEventListener('submit', ev => { ev.preventDefault(); addNote(); });
+dom.noteText.addEventListener('keydown', ev => { if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); addNote(); } });
+document.addEventListener('keydown', ev => {
+  if ((ev.ctrlKey || ev.metaKey) && !ev.shiftKey && !ev.altKey && ev.key.toLowerCase() === 's') { ev.preventDefault(); save(); }
+});
+window.addEventListener('beforeunload', ev => {
+  saveDraft();
+  if (isDirty()) { ev.preventDefault(); ev.returnValue = ''; }
+});
+window.addEventListener('hashchange', () => {
+  const s = decodeURIComponent(location.hash.slice(1) || '');
+  if (s && S.list.some(x => x.slug === s) && (!S.cur || S.cur.slug !== s)) openScript(s);
+});
+window.addEventListener('focus', checkRemote);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkRemote(); });
+window.addEventListener('resize', () => { if (S.mode === 'editar') autosize(); });
+setInterval(refreshTimes, 60000);
+if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $('#kbdHint').textContent = '⌘ + Enter para agregar';
+
+/* ================= arranque ================= */
+(async function init() {
+  render();
+  if (S.token) await checkToken();
+  const ok = await loadList();
+  if (ok) await openDefault();
+})();
+
+})();
+</script>
+</body>
+</html>

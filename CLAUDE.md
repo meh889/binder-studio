@@ -1,6 +1,6 @@
 # Binder Studio — guía para Claude
 
-Binder Studio (`index.html`, una sola página, sin build) arma videos de *master lists* de Pokémon TCG: un binder que se ve filmado de verdad sobre un playmat (cada carta sube a la cámara en la mano, entra en su bolsillo y se tilda en una hoja de checklist impresa al lado) más escenas de edición (ráfagas, carteles cinéticos, cartas en grande), grabadas directo desde el navegador con la voz del creador.
+Binder Studio (`index.html`, una sola página, sin build) arma videos de *master lists* de Pokémon TCG: un binder que se ve filmado de verdad sobre un playmat (cada carta sube a la cámara en la mano, entra en su bolsillo y se tilda en una hoja de checklist impresa al lado) más escenas de edición (ráfagas, carteles cinéticos, cartas en grande): la app los arma y los previsualiza (**Ver video**). No graba: el video final se edita en DaVinci Resolve con clips en 4K a 60 fps que renderiza Claude cuadro por cuadro desde el mismo plan (ver Notas técnicas). El guion y las anotaciones del equipo viven aparte, en `guion.html` y `guiones/*.json` del repo.
 
 El usuario trabaja con **una carpeta por especie** en su compu:
 
@@ -12,7 +12,6 @@ Ponyta/
 ├── media/           imágenes, GIF y clips para ráfagas y escenas
 ├── musica/          música de fondo
 ├── _editadas/       recortes hechos con el editor
-└── videos/          videos grabados
 ```
 
 ## Antes del plan: trabajar el guion juntos
@@ -47,7 +46,7 @@ Después, en el chat: un resumen corto de la estructura (escenas y capítulos) y
 
 Campos comunes a todas las escenas:
 - `tipo`: uno de los de abajo.
-- `guion`: lo que el creador dice en esa escena. Aparece en el teleprompter mientras graba. Copiá el texto del guion original, repartido entre escenas; no lo reescribas salvo para cortarlo.
+- `guion`: lo que el creador dice en esa escena. Aparece en la columna del guion de Ver video. Copiá el texto del guion original, repartido entre escenas; no lo reescribas salvo para cortarlo.
 - `capitulo` (opcional): nombre del capítulo de YouTube que empieza en esta escena. Poné entre 4 y 8 capítulos en todo el video, el primero en la primera escena.
 
 Tipos:
@@ -104,12 +103,11 @@ Al armar una lista multi-idioma, ordená cada arte **por edición, en orden cron
 
 ## Notas técnicas
 
-- Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080; la grabación usa `captureStream` + `MediaRecorder`, con el micrófono, la música y efectos sintetizados mezclados por Web Audio.
+- Todo el código vive en `index.html` (un IIFE). Render en un `<canvas>` de 1920×1080 (`setRes(2)` lo pasa a 4K); la música, los clips y los efectos sintetizados (`playSfx`) suenan por Web Audio. No hay grabador: se sacó en noviembre de 2026.
 - `binder.json` = cartas y marca; `video.json` = escenas. La herramienta guarda ambos.
 - Los datos de cartas salen de TCGdex (repo `tcgdex/cards-database`, se puede clonar desde la sesión).
-- Qué se graba no depende de la pestaña: el escenario sigue a la pestaña (Cartas = binder, Plan = video, `syncStage`), y Grabar/Ensayar usan `recTarget` ("video" o "binder", en los ajustes de Grabar) y, con "Desde acá" prendido, la posición del escenario (`stagePos` → `resolveFrom`).
-- Grabación por partes: `P` pausa y retoma (`MediaRecorder.pause`, el reloj y los capítulos descuentan la pausa); grabando, `Esc` primero pausa. "Desde acá" arranca el estudio en una escena y, en un tramo de binder, en una carta (`openStudio(record, {scene, card}, target)`); en el ensayo, `R` pasa a grabar desde ese punto (`recordFromHere`). Al terminar, `nextFrom` calcula dónde sigue la parte siguiente ("Grabar la siguiente"). Al guardar en la carpeta, cada video lleva un `.json` al lado con `seconds`, `chapters` y `from`, y "Unir partes" reproduce las partes en orden dentro de un solo `MediaRecorder` y corre los capítulos.
-- El grabador MP4 de Chrome retiene el video hasta que llega el audio: si el audio de la página no está corriendo cuando arranca la toma, se pierde todo lo anterior y el archivo sale más corto. Por eso `audioReady()` espera a que el reloj del audio avance antes de la cuenta 3-2-1; si en 5 s no arranca, la toma se graba sin sonido (y el diálogo lo dice) en vez de salir cortada.
+- Ver video (`openStudio(from, target)`) abre el escenario a pantalla completa con la columna del guion (`updPrompter`). Qué muestra no depende de la pestaña: usa `recTarget` ("video" o "binder", en los ajustes de al lado) y, con "Desde acá", la posición del escenario (`stagePos` → `resolveFrom`).
+- Clips en 4K para editar: se renderizan cuadro por cuadro con un reloj virtual (se reemplazan `performance.now`, `requestAnimationFrame` y los timers de la página para avanzar 1/60 s por cuadro, se llama `setRes(2)`, se aprietan las → en tiempos fijos según lo que dura decir cada línea del guion, cada cuadro se guarda como JPEG y se codifica a H.264 de 100 Mbps con `AVAssetWriter` en Swift). Los efectos salen en un WAV aparte: se anota cada `playSfx` con su tiempo virtual y se mezclan en un `OfflineAudioContext` con la misma síntesis. Los clips van en `<especie>/clips-4k/`.
 - Salida con sticker (`leaveScene`, `TR`, `drawStickerTr`): `stickerCover` calcula una vez por sticker qué ancho necesita para tapar todo el cuadro con su parte opaca; el sticker entra girando desde afuera, se pega (`stamp`), la escena siguiente arranca debajo (`goScene(…, {keepTr:true})`) y se despega con un pliegue que muestra el dorso (`cov.back`).
 - Zoom en grupos (`groupZoomTo`, `sc.cz`): los zooms de la primera carta de un grupo mueven la cámara hacia esa carta donde está apoyada y se acercan casi tanto como el mismo zoom con la carta sola (`groupFocus`), para que se lean los detalles chicos (un ©, el símbolo del set) aunque el escaneo se vea un poco más blando. Si la primera carta tiene zooms, se dibuja arriba de las demás del grupo, y las etiquetas de idioma se desvanecen mientras dura el zoom, así nada tapa el detalle.
 - Los números de los carteles `contador` y del `suspenso` del adelanto se escriben como acá (`amount`): punto para los miles y coma para los decimales (`US$809.943`).

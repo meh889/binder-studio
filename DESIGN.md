@@ -1,6 +1,6 @@
 ---
 name: Binder Studio
-description: Herramienta de escritorio para armar, ensayar y grabar videos de master lists de Pokémon TCG.
+description: Herramienta de escritorio para armar y previsualizar videos de master lists de Pokémon TCG.
 colors:
   case: "#101315"
   shelf: "#171b1e"
@@ -374,13 +374,13 @@ components:
 
 **Creative North Star: "La vitrina de la tienda de cartas"**
 
-La interfaz es una vitrina oscura de vidrio bajo luz de tubo: la colección está en un estante iluminado, cada carta dentro de su toploader, con etiquetas de papel escritas a mano que dicen lo que todavía le falta. Al lado, el escenario 16:9 siempre muestra el resultado. La carcasa es casi monocroma: dos valores de fondo (vitrina y estante), dos grises de vidrio para superficies y estados, y una sola tinta clara. El color aparece solo donde reporta un estado: en las etiquetas de papel y en la tinta roja de grabación.
+La interfaz es una vitrina oscura de vidrio bajo luz de tubo: la colección está en un estante iluminado, cada carta dentro de su toploader, con etiquetas de papel escritas a mano que dicen lo que todavía le falta. Al lado, el escenario 16:9 siempre muestra el resultado. La carcasa es casi monocroma: dos valores de fondo (vitrina y estante), dos grises de vidrio para superficies y estados, y una sola tinta clara. El color aparece solo donde reporta un estado: en las etiquetas de papel y en la tinta roja de alerta.
 
-La densidad es de herramienta de trabajo para un monitor grande: un solo tamaño de lectura (14px) y jerarquía por peso, no por escalones de tamaño. Las cosas se separan por tono de superficie, no por líneas. El escenario no se rige por este sistema: el canvas de 1920×1080 que se graba es un sistema propio, con sus tokens `video-*`, documentado en [Canvas de video](#canvas-de-video-19201080) al final de este archivo.
+La densidad es de herramienta de trabajo para un monitor grande: un solo tamaño de lectura (14px) y jerarquía por peso, no por escalones de tamaño. Las cosas se separan por tono de superficie, no por líneas. El escenario no se rige por este sistema: el canvas de 1920×1080 de los clips es un sistema propio, con sus tokens `video-*`, documentado en [Canvas de video](#canvas-de-video-19201080) al final de este archivo.
 
 **Key Characteristics:**
 - Carcasa de dos valores (`case`, `shelf`) más dos superficies de vidrio (`glass`, `rail`) y una tinta (`ink`).
-- Color solo en etiquetas de papel con agujero perforado y en la tinta roja de grabación.
+- Color solo en etiquetas de papel con agujero perforado y en la tinta roja de alerta.
 - M PLUS 2 para toda palabra de interfaz; Klee One solo en etiquetas y en el número de la etiqueta de precio.
 - Cada miniatura de carta va en un marco de toploader de acetato.
 - La fila seleccionada se lee como un estante con borde iluminado.
@@ -394,12 +394,12 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 - **Tinta de tubo** (`ink`): texto principal, botón primario, pestaña de vista y chip activos (invertidos: fondo tinta, texto vitrina), anillo de foco, marcador de arrastre, el bolsillo "ahora" en las tiras. Es la única voz de énfasis de la carcasa.
 
 ### Secondary
-- **Tinta de grabación** (`rec`): exclusivamente grabar. Botón Grabar, estado armado, punto parpadeante del indicador de toma, bolsillo de carta que falta en la tira. Hover un paso más oscuro (#bb2219).
+- **Tinta roja** (`rec`): lo que falta o lo que se confirma con cuidado: bolsillo de carta que falta en la tira y el botón de confirmar en una pregunta peligrosa. Hover un paso más oscuro (#bb2219). (Antes era la tinta de grabar; la app ya no graba.)
 
 ### Tertiary (etiquetas de papel)
 - **Etiqueta amarilla** (`tag-yellow`): pendiente (por ejemplo "sin guion"); también el punto de guardado sucio, el caret de texto y el filo del toast de aviso.
 - **Etiqueta rosa** (`tag-pink`): falta algo en la carta; también el punto de escena con pendientes.
-- **Etiqueta menta** (`tag-mint`): hecho; punto de guardado ok, bolsillos completos, medidor de micrófono, checkboxes y radios.
+- **Etiqueta menta** (`tag-mint`): hecho; punto de guardado ok, bolsillos completos, checkboxes y radios.
 - **Papel blanco** (`paper`) con **tinta de precio** (`price`): la etiqueta "me falta" y la etiqueta de precio con el número de carta.
 - **Tinta de etiqueta** (`tag-ink`): texto sobre las etiquetas de color.
 
@@ -414,9 +414,9 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 - **Bolsillo vacío** (`pocket-empty`): los bolsillos que todavía no se llenaron en la tira de páginas (3:1 contra el estante, para que se cuenten de un vistazo).
 
 ### Named Rules
-**La Regla del Color que Informa.** Fuera del escenario, un color solo aparece si reporta un estado de una carta, del guardado o de la grabación. El acento del canal no tiñe la herramienta: vive en el escenario y en la vista Marca. La única muestra afuera es el punto de 11px del botón Marca, que es la puerta a esa vista.
+**La Regla del Color que Informa.** Fuera del escenario, un color solo aparece si reporta un estado de una carta, o del guardado. El acento del canal no tiñe la herramienta: vive en el escenario y en la vista Marca. La única muestra afuera es el punto de 11px del botón Marca, que es la puerta a esa vista.
 
-**La Regla de la Tinta Roja.** `rec` significa grabar y nada más. Un botón destructivo usa texto rosado claro (#ff9d93) sobre vidrio, nunca el fondo rojo.
+**La Regla de la Tinta Roja.** `rec` señala lo que falta o pide cuidado, nunca decora. Un botón destructivo común usa texto rosado claro (#ff9d93) sobre vidrio, nunca el fondo rojo.
 
 ## Typography
 
@@ -446,11 +446,11 @@ Una vitrina gris-azulada muy oscura con una tinta fría casi blanca; el único c
 
 Una sola pantalla de trabajo de alto completo (`100dvh`), sin scroll de página en escritorio:
 
-- **Barra superior** de 56px: marca, carpeta y estado de guardado (se recorta con puntos suspensivos antes que nada), selector de vista segmentado (Cartas / Plan del video), el botón Marca aparte (se presiona y vuelve a la pestaña de antes), deshacer/rehacer, Ensayar y Grabar con su split de ajustes. Grabar dice en chico qué graba ("video" o "binder", y "desde acá" si está prendido); eso se elige en los ajustes, no depende de la pestaña.
+- **Barra superior** de 56px: marca, carpeta y estado de guardado (se recorta con puntos suspensivos antes que nada), selector de vista segmentado (Cartas / Plan del video), el botón Marca aparte (se presiona y vuelve a la pestaña de antes), el enlace Guion (abre `guion.html`), deshacer/rehacer y Ver video con su split de ajustes. Ver video dice en chico "desde acá" si está prendido; qué muestra se elige en los ajustes, no depende de la pestaña.
 - **Tres columnas**: estante 340px · escenario flexible · inspector 360px. Desde 1800px: 380 / 400. Hasta 1560px: 316 / 340. Hasta 1180px: 300 / 320 y la marca pierde "Studio". Hasta 980px: una columna, la página scrollea y la barra superior envuelve.
 - **Columna central**: escenario 16:9 cuyo ancho es `min(100%, (100dvh − 56px − 310px) × 16/9)` (190px sin carpeta, cuando no hay guion abajo); transporte, tira de páginas/escenas y guion comparten exactamente ese ancho. Los segmentos de la tira crecen en proporción a las cartas que contienen (`flex: var(--w)`). El escenario sigue a la pestaña: Cartas muestra el binder, Plan del video reproduce el video, y cada uno vuelve a donde había quedado.
 - **Guion bajo el escenario**: lo que dice el teleprompter en ese punto (el guion de la carta en escena, o el de la primera de un grupo de mismo arte, o el de la escena), editable ahí; llena el resto de la columna (mínimo 110px). En la portada del binder queda deshabilitado con la explicación.
-- **Estudio**: pantalla completa negra, escenario a la izquierda, columna de teleprompter de 400px a la derecha (no se graba).
+- **Ver video**: pantalla completa negra, escenario a la izquierda, columna del guion de 400px a la derecha.
 - **Ritmo**: paneles con padding 16px; secciones e interiores con 14px; separaciones entre controles de 6–10px; formularios en pares de dos columnas con gap 10px.
 - El inspector es un contenedor (`container-type: inline-size`): por debajo de 380px de ancho las acciones de imagen esconden su texto largo.
 
@@ -480,7 +480,7 @@ Tactiles y callados: vidrio por defecto, tinta solo para la acción principal.
 - **Shape:** esquina suave (7px), alto 34px (30px en la variante chica, 13px de texto), íconos de trazo 18px con stroke 1.75.
 - **Default:** fondo vidrio, texto tinta, 600.
 - **Primary:** tinta con texto vitrina; hover a blanco puro.
-- **Grabar / armado:** tinta roja con texto blanco.
+- **Confirmar con cuidado / armado:** tinta roja con texto blanco.
 - **Ghost:** transparente, texto tenue; hover a tinta.
 - **Danger:** texto #ff9d93 sobre el fondo del botón.
 - **Hover / Active / Disabled:** hover a riel (solo con puntero fino); `:active` escala .97; deshabilitado al 38% de opacidad. Transición 140ms.
@@ -516,21 +516,18 @@ Marco de acetato 63/88 alrededor de toda miniatura (44px en el estante, 104px en
 - **Selector de vista:** riel segmentado sobre estante (radio 9px, padding 3px); cada pestaña 700 en `dim` con contador 12px; la seleccionada se invierte a tinta con texto vitrina.
 - **Estante:** filas de 44px de miniatura + título 700 + meta 12.5px; grupos de mismo arte comparten un fondo de tinta al 4% con esquinas unidas; asa de arrastre visible en hover o selección; marcador de soltar de 3px en tinta.
 - **Tira:** segmentos en estante (8px de radio) con bolsillos de 7×9px (`pocket-empty` vacío, menta hecho, rojo falta, tinta ahora); activo en riel con borde superior iluminado. Un segmento de escena angosto se nombra con su capítulo o, si es un cartel, con su primera palabra.
-- **Plan del video:** arriba, fija, la fila "El video" (música, capítulos, unir partes); cada capítulo es un encabezado ("Capítulo" en `dim` 12px + nombre 700 12.5px y una línea de vidrio) sobre la escena donde empieza. La meta de cada fila admite dos renglones.
-- **Selectores segmentados (ajustes de Grabar):** "Qué graba" y "Desde dónde" en vitrina con padding 3px; la opción elegida se invierte a tinta, como el selector de vista.
+- **Plan del video:** arriba, fija, la fila "El video" (música y capítulos); cada capítulo es un encabezado ("Capítulo" en `dim` 12px + nombre 700 12.5px y una línea de vidrio) sobre la escena donde empieza. La meta de cada fila admite dos renglones.
+- **Selectores segmentados (ajustes de Ver video):** "Qué muestra" y "Desde dónde" en vitrina con padding 3px; la opción elegida se invierte a tinta, como el selector de vista.
 
 ### Menus, Popovers, Toasts, Dialogs
 Menús (min 220px) y popovers (360px) en riel con sombra flotante, entran con escala .97 y −4px en 160–180ms. Toasts abajo a la derecha, entran 12px desde abajo en 400ms. Diálogos en estante, 16px de radio, entran con escala .97 en 220ms. Todo respeta `prefers-reduced-motion` (sin animación de entrada ni parpadeo).
 
 ### Inspector
 - **Carta:** imagen, etiquetas, acciones de imagen, "me falta", "mismo arte" y el dato en pantalla a la vista; los datos de catálogo (set, número, año, rareza, variantes, ilustrador, idioma, grupo) en un desplegable de vidrio "Datos de la carta", abierto si falta el set o el número. El guion está debajo del escenario.
-- **Escena:** título con el botón de volver a verla; una fila de vidrio "Desde acá" con Ensayar y Grabar (rojo, porque graba); después lo que la escena muestra (con el fondo como lista de opciones y el tramo de binder como dos números), el capítulo, y al pie, separado por una línea de vidrio, el tipo de escena y su lugar en el plan (subir, bajar, duplicar, quitar).
+- **Escena:** título con el botón de volver a verla; una fila de vidrio "Desde acá" con Ver video; después lo que la escena muestra (con el fondo como lista de opciones y el tramo de binder como dos números), el capítulo, y al pie, separado por una línea de vidrio, el tipo de escena y su lugar en el plan (subir, bajar, duplicar, quitar).
 
-### Studio (teleprompter)
-Columna vitrina de 400px junto al escenario negro: indicador de toma (punto de 12px, gris en ensayo, rojo parpadeando 1.2s al grabar, amarillo en pausa), tiempo tabular (corre también en el ensayo), tira de progreso de 8px proporcional, texto del guion grande, "a un toque" en estante, atajos en `kbd` de vidrio. En el ensayo, un botón rojo "Grabar desde acá" (tecla R) pasa a grabar desde ese punto. Grabando, Esc primero pausa y recién el segundo Esc termina. La cuenta regresiva es un 180px 900 sobre vitrina al 96%.
-
-### Tu video (fin de la toma)
-El diálogo entra entero en la pantalla (el video se achica primero). Debajo de los capítulos, una fila de vidrio dice dónde arranca la parte siguiente con "Grabar la siguiente" (guarda en la carpeta si hace falta y vuelve a grabar desde ahí). Una vez guardada o descargada, "Descartar" pasa a "Cerrar" y Esc cierra.
+### Ver video (columna del guion)
+Columna vitrina de 400px junto al escenario negro: "VISTA PREVIA" con el tiempo tabular que corre, tira de progreso, el paso actual, el guion grande (tamaño ajustable con A− y A+), lo que viene, los atajos y Salir.
 
 ## Do's and Don'ts
 
@@ -544,14 +541,14 @@ El diálogo entra entero en la pantalla (el video se achica primero). Debajo de 
 
 ### Don't:
 - **Don't** teñir la carcasa con el acento del canal ni con ningún color que no reporte estado.
-- **Don't** usar `rec` para nada que no sea grabar; lo destructivo va en texto #ff9d93.
+- **Don't** usar `rec` de adorno: solo para lo que falta o pide cuidado; lo destructivo común va en texto #ff9d93.
 - **Don't** usar Klee One fuera de etiquetas y etiqueta de precio.
 - **Don't** agregar bordes de 1px a paneles, campos o tarjetas; los contornos son sombras inset.
-- **Don't** aplicar estas reglas al canvas grabado: el escenario de 1920×1080 se gobierna con su propio sistema, en [Canvas de video](#canvas-de-video-19201080).
+- **Don't** aplicar estas reglas al canvas del video: el escenario de 1920×1080 se gobierna con su propio sistema, en [Canvas de video](#canvas-de-video-19201080).
 
 ## Canvas de video (1920×1080)
 
-Segundo sistema del proyecto, separado de la interfaz: lo que se graba y ven los seguidores del canal. Sus tokens llevan el prefijo `video-` en el frontmatter y en `.impeccable/design.json`; ninguna regla de la interfaz (carcasa de vitrina, M PLUS 2, Klee One, etiquetas de papel de la herramienta) se aplica acá, ni al revés. Los valores son píxeles del canvas de 1920×1080.
+Segundo sistema del proyecto, separado de la interfaz: lo que sale en los clips y ven los seguidores del canal. Sus tokens llevan el prefijo `video-` en el frontmatter y en `.impeccable/design.json`; ninguna regla de la interfaz (carcasa de vitrina, M PLUS 2, Klee One, etiquetas de papel de la herramienta) se aplica acá, ni al revés. Los valores son píxeles del canvas de 1920×1080.
 
 ### Overview
 
