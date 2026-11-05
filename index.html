@@ -2306,67 +2306,162 @@ function labelTape(text, px){
   chars.forEach((ch, i) => { const jy = (hash(text + "y" + i) - .5)*px*.06; x.fillStyle = "rgba(8,16,48,.4)"; x.fillText(ch, cx + 1.5, base + jy + 2); x.fillStyle = "rgba(255,255,255,.95)"; x.fillText(ch, cx, base + jy); cx += adv[i]; });
   tapeCache.set(key, c); return c;
 }
+// Three loose lists that land on the mess while the creator says "una lista acá, otra allá, otra en japonés":
+// a printed web list, a spreadsheet and a Japanese one, made from the species' own cards.
+const caosSheetCache = new Map();
+function caosSheet(kind){
+  const key = kind + "|" + cards().length; let c = caosSheetCache.get(key); if(c) return c;
+  const w = 440, h = 580, k = 2.6; c = document.createElement("canvas"); c.width = w*k; c.height = h*k;
+  const x = c.getContext("2d"); x.scale(k, k); x.drawImage(paperTex(), 0, 0, w, h);
+  const list = cards(), uniq = (pick, n) => { const seen = new Set(), out = []; for(const cd of list){ if(!pick(cd)) continue; const id = (cd.set || "") + "|" + (cd.num || "") + "|" + (cd.idioma || ""); if(seen.has(id)) continue; seen.add(id); out.push(cd); if(out.length >= n) break; } return out; };
+  const ink = "rgba(28,24,30,.86)", grey = "rgba(28,24,30,.45)", fit = (t, max) => { t = String(t || ""); while(t.length > 3 && x.measureText(t).width > max) t = t.slice(0, -2) + "…"; return t; };
+  if(kind === "web"){
+    x.fillStyle = "rgba(40,40,50,.08)"; x.fillRect(22, 22, w - 44, 30); x.fillStyle = grey; x.font = fBody(11); x.fillText("Página 1 de 4", 30, 41);
+    x.fillStyle = ink; x.font = fBody(25, 700); x.fillText(`${P().title1 || "Pokémon"} — Card List`, 26, 92);
+    x.fillStyle = grey; x.font = fBody(12); x.fillText("Set", 28, 122); x.fillText("No.", w - 90, 122);
+    uniq(cd => cd.idioma === "EN", 21).forEach((cd, i) => { const y = 148 + i*20; x.strokeStyle = "rgba(0,0,0,.08)"; x.beginPath(); x.moveTo(26, y + 6); x.lineTo(w - 26, y + 6); x.stroke();
+      x.fillStyle = ink; x.font = fBody(13); x.fillText(fit(cd.set, w - 140), 28, y); x.fillText(cd.num || "—", w - 90, y); });
+  } else if(kind === "xls"){
+    x.fillStyle = grey; x.font = fBody(12); x.fillText(`lista_${String(P().title1 || "pokemon").toLowerCase().replace(/\s+/g, "-")}_final(2).xlsx`, 26, 40);
+    const cols = [26, 236, 330, w - 26], rows = 25, rh = 19, y0 = 56;
+    x.fillStyle = "rgba(60,120,80,.16)"; x.fillRect(cols[0], y0, cols[3] - cols[0], rh);
+    x.strokeStyle = "rgba(0,0,0,.18)"; x.lineWidth = .8;
+    for(let r = 0; r <= rows; r++){ x.beginPath(); x.moveTo(cols[0], y0 + r*rh); x.lineTo(cols[3], y0 + r*rh); x.stroke(); }
+    cols.forEach(cx => { x.beginPath(); x.moveTo(cx, y0); x.lineTo(cx, y0 + rows*rh); x.stroke(); });
+    x.fillStyle = ink; x.font = fBody(12, 700); ["Set", "Nº", "Idioma"].forEach((t, i) => x.fillText(t, cols[i] + 6, y0 + 14));
+    x.font = fBody(12); uniq(cd => ["FR", "DE", "IT", "PT", "ES", "NL"].includes(cd.idioma), rows - 1).forEach((cd, i) => { const y = y0 + (i + 1)*rh + 14;
+      x.fillText(fit(cd.set, cols[1] - cols[0] - 12), cols[0] + 6, y); x.fillText(cd.num || "", cols[1] + 6, y); x.fillText(cd.idioma, cols[2] + 6, y); });
+  } else {
+    const jp = s => `${s}px "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif`;
+    const jn = {bulbasaur:"フシギダネ", ivysaur:"フシギソウ", venusaur:"フシギバナ", charmander:"ヒトカゲ", squirtle:"ゼニガメ", pikachu:"ピカチュウ", ponyta:"ポニータ"}[String(P().title1 || "").toLowerCase()] || P().title1 || "";
+    x.fillStyle = ink; x.font = "700 " + jp(27); x.fillText(`${jn} カードリスト`, 26, 64);
+    x.fillStyle = "rgba(170,40,40,.75)"; x.fillRect(26, 78, 120, 3);
+    uniq(cd => cd.idioma === "JP", 19).forEach((cd, i) => { const y = 116 + i*24; x.strokeStyle = "rgba(0,0,0,.08)"; x.beginPath(); x.moveTo(26, y + 8); x.lineTo(w - 26, y + 8); x.stroke();
+      x.fillStyle = ink; x.font = jp(14); x.fillText(fit(jn, 96), 28, y); x.fillText(cd.num || "—", 128, y); x.fillStyle = grey; x.font = fBody(12); x.fillText(fit(cd.set, w - 230), 200, y); });
+  }
+  const g = x.createLinearGradient(0, 0, w, 0); g.addColorStop(.48, "rgba(0,0,0,0)"); g.addColorStop(.5, "rgba(0,0,0,.07)"); g.addColorStop(.52, "rgba(255,255,255,.08)"); g.addColorStop(.55, "rgba(0,0,0,0)");
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  caosSheetCache.set(key, c); return c;
+}
+// the camera over the mat: from each key's time it eases to that framing; handheld sway on top, so nothing ever sits still
+function caosCam(keys, t, from){
+  let c = from || {x:W/2, y:H/2, z:1, r:0};
+  for(const [t0, x, y, z, r, d] of keys){ if(t < t0) break; const e = easeInOut(clamp((t - t0)/d, 0, 1)); c = {x:lerp(c.x, x, e), y:lerp(c.y, y, e), z:lerp(c.z, z, e), r:lerp(c.r, r, e)}; }
+  return c;
+}
+function caosApply(c, t){
+  const hx = Math.sin(t*.00071)*7 + Math.sin(t*.00131 + 1.3)*4, hy = Math.cos(t*.00059)*6 + Math.sin(t*.00117 + .4)*3, hr = Math.sin(t*.00047 + .8)*.004;
+  ctx.translate(W/2, H/2); ctx.scale(c.z, c.z); ctx.rotate(c.r + hr); ctx.translate(-c.x - hx, -c.y - hy);
+}
+// The scene follows what the creator says (two paragraphs, one per →):
+// first →  0-4 s cards keep raining onto the mat · 4.5 s "LA INFO ESTÁ / DESPARRAMADA" · 6.3 s the letters spill off ·
+//          6.5 / 7.5 / 8.3 s "una lista acá, otra allá, otra en japonés": three lists slap down and the camera goes to each ·
+//          9.5 s "es re fácil perderse": the camera pulls back and tilts and the mess shifts around
+// second → the lists and the extra cards clear off, the page's cards fly in one by one ("carta por carta"), the tape sticks
+//          on ("todo en un solo lugar") and the camera pushes slowly into card one ("arrancando por el principio")
+const CAOS_SHEETS = [{kind:"web", x:500, y:390, r:-.15, t:6500}, {kind:"xls", x:1430, y:400, r:.11, t:7500}, {kind:"jp", x:980, y:700, r:-.05, t:8300}];
+const CAOS_MESS = 9500;
 function drawCaos(s, el, T){
   const {page, all} = caosCards(s), k = Math.min(VM.step, 1), se = performance.now() - VM.stepT;
-  drawBg(T); lampLight();
-  // where each card lands in the mess: spread over the mat, turned every way
-  // a loose 7 × 3 grid, shuffled and nudged, so the mess covers the whole mat instead of piling up in one place
   const fr = v => { const t = Math.sin(v*12.9898 + 78.233)*43758.5453; return t - Math.floor(t); };
   const spot = j => { const cell = (j*8) % 21, col = cell % 7, row = Math.floor(cell/7);
     return {x:150 + (col + .5)*(W - 300)/7 + (fr(j + .1) - .5)*150, y:180 + (row + .5)*(H - 360)/3 + (fr(j + .7) - .5)*130, r:(fr(j + .3) - .5)*1.4}; };
+  // "perderse": every card slides a little its own way
+  const messAt = t => easeInOut(clamp((t - CAOS_MESS)/1700, 0, 1));
+  const shifted = (j, m) => { const sp = spot(j); return {x:sp.x + (fr(j + 3.1) - .5)*190*m, y:sp.y + (fr(j + 4.7) - .5)*150*m, r:sp.r + (fr(j + 6.2) - .5)*.9*m}; };
   const CW = 236;
   const card = (c, x, y, w, rot, alpha) => { const sp = flySprite(c); if(!sp) return; ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x, y); ctx.rotate(rot);
     ctx.save(); ctx.globalAlpha *= .55; ctx.drawImage(shadowTex(), -w*.62, -w*88/63*.55, w*1.32, w*88/63*1.24); ctx.restore(); drawFlySprite(sp, w, false); ctx.restore(); };
-  // the binder page the cards end up in: a black page of nine pockets on the lilac cover
+  const sheet = (sh, x, y, rot, sc, alpha) => { const im = caosSheet(sh.kind), w = 440, h = 580; ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x, y); ctx.rotate(rot); ctx.scale(sc, sc);
+    ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 26; ctx.shadowOffsetX = 6; ctx.shadowOffsetY = 14; ctx.drawImage(im, -w/2, -h/2, w, h); ctx.restore(); };
   const PW = 760, PH = 1000, px = 610, py = H/2 + 6, cw = 212, ch = 296, gx = 20, gy = 18, x0 = px - PW/2 + 30, y0 = py - PH/2 + 34;
   const pocket = i => ({x:x0 + (i % 3)*(cw + gx) + cw/2, y:y0 + Math.floor(i/3)*(ch + gy) + ch/2});
+  const toward = (a, b, f) => lerp(a, b, f);
+  // the mat moves with the camera; drawn larger so a tilt or a pull-back never shows its edge
+  const mat = () => { drawBg(T); ctx.save(); ctx.translate(W/2, H/2); ctx.scale(1.45, 1.45); ctx.translate(-W/2, -H/2); drawBg(T); ctx.restore(); };
+  drawBg(T);
   if(k === 0){
+    const keys = [[0, W/2 + 40, H/2 + 10, 1.07, -.012, 4400]];
+    CAOS_SHEETS.forEach((sh, i) => keys.push([sh.t + 60, toward(W/2, sh.x, .55), toward(H/2, sh.y, .5), 1.17, [-.03, .025, -.01][i], 420]));
+    keys.push([CAOS_MESS, W/2 - 30, H/2 + 20, .93, -.11, 1600]);
+    const cam = caosCam(keys, se); cam.r -= Math.max(0, se - CAOS_MESS - 1600)*.000018; cam.z -= Math.max(0, se - CAOS_MESS - 1600)*.000012;
+    VM.caosCam = cam; VM.caosEnd = se;
+    const m = messAt(se);
+    ctx.save(); caosApply(cam, se); mat(); ctx.restore(); lampLight();
+    ctx.save(); caosApply(cam, se);
+    // the cards keep raining in for as long as the first sentence lasts
     all.forEach((c, j) => {
-      const t0 = 40 + j*48, p = clamp((se - t0)/340, 0, 1); if(p <= 0) return; const sp = spot(j), e = LIFT(p);
-      if(p > .55 && !VM.played["cd" + j] && j % 3 === 0){ VM.played["cd" + j] = 1; playSfx("slide"); }
+      const t0 = 60 + j*170, p = clamp((se - t0)/360, 0, 1); if(p <= 0) return; const sp = shifted(j, m), e = LIFT(p);
+      if(p > .55 && !VM.played["cd" + j] && j % 2 === 0){ VM.played["cd" + j] = 1; playSfx("slide"); }
       card(c, sp.x, sp.y - 520*(1 - e), CW*(1.25 - .25*e), sp.r + (1 - e)*.6, Math.min(1, p*4));
     });
-    // the words, over a shade so they read on top of the mess; the last one falls apart letter by letter
-    const ta = clamp((se - 350)/300, 0, 1); if(ta <= 0) return;
-    const g = ctx.createRadialGradient(W/2, H/2, 60, W/2, H/2, H*.7); g.addColorStop(0, `rgba(10,5,14,${.72*ta})`); g.addColorStop(1, `rgba(10,5,14,${.25*ta})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // "una lista acá, otra allá, otra en japonés"
+    CAOS_SHEETS.forEach((sh, i) => {
+      const p = clamp((se - sh.t)/330, 0, 1); if(p <= 0) return; const e = LIFT(p);
+      if(p > .7 && !VM.played["cs" + i]){ VM.played["cs" + i] = 1; playSfx("deal"); playSfx("thump"); VM.shake = Math.max(VM.shake, 6); }
+      sheet(sh, sh.x + (fr(i + 8.1) - .5)*120*m, sh.y - 380*(1 - e) + (fr(i + 9.4) - .5)*90*m, sh.r + (1 - e)*(i % 2 ? -.35 : .35) + (fr(i + 2.6) - .5)*.4*m, 1.3 - .3*e, Math.min(1, p*5));
+    });
+    ctx.restore();
+    if(se >= CAOS_MESS && !VM.played.cmess){ VM.played.cmess = 1; playSfx("whoosh"); }
+    // the words, over a shade so they read on top of the mess; the last one falls apart letter by letter and then spills off
+    const TX = 4500, OUT = 6250, ta = clamp((se - TX)/300, 0, 1)*(1 - clamp((se - OUT)/380, 0, 1)); if(se < TX) return;
+    if(ta > 0){ const g = ctx.createRadialGradient(W/2, H/2, 60, W/2, H/2, H*.7); g.addColorStop(0, `rgba(10,5,14,${.72*ta})`); g.addColorStop(1, `rgba(10,5,14,${.25*ta})`); ctx.fillStyle = g; ctx.fillRect(-60, -60, W + 120, H + 120); }
     const lines = String(s.texto || "").split("\n").map(x => x.trim()).filter(Boolean), first = lines.slice(0, -1).join("\n"), last = lines[lines.length - 1] || "";
-    if(first) drawKin(first, se - 350, {x:200, y:210, w:W - 400, h:230}, 170, "dark", "golpe", "cz");
+    if(first && ta > 0){ ctx.save(); ctx.globalAlpha *= clamp(1 - (se - OUT)/300, 0, 1); drawKin(first, se - TX, {x:200, y:210, w:W - 400, h:230}, 170, "dark", "golpe", "cz"); ctx.restore(); }
     const word = up(last.replace(/[*_~]/g, "")), size = 230; ctx.font = fDisp(size);
     const widths = [...word].map(ch => ctx.measureText(ch).width + size*.04), total = widths.reduce((a, b) => a + b, 0); let x = W/2 - total/2;
     [...word].forEach((ch, i) => {
-      const t0 = 700 + i*55, p = clamp((se - t0)/300, 0, 1); if(p <= 0){ x += widths[i]; return; }
+      const t0 = TX + 500 + i*55, p = clamp((se - t0)/300, 0, 1); if(p <= 0){ x += widths[i]; return; }
       if(!VM.played["cl" + i] && i % 2 === 0){ VM.played["cl" + i] = 1; playSfx(i === 0 ? "hit" : "thump"); }
-      const e = LIFT(p), dy = (fr(i + 11.3) - .5)*170, rot = (fr(i + 5.9) - .5)*1.1, cx = x + widths[i]/2 + (fr(i + 2.2) - .5)*40;
-      ctx.save(); ctx.translate(cx, 690 + dy*e - 300*(1 - e)); ctx.rotate(rot*e); ctx.globalAlpha *= Math.min(1, p*3);
+      const ft = Math.max(0, se - (OUT + 40 + fr(i + 1.7)*220))/1000, fa = 1 - clamp(ft/.65, 0, 1); if(fa <= 0){ x += widths[i]; return; }
+      const e = LIFT(p), dy = (fr(i + 11.3) - .5)*170, rot = (fr(i + 5.9) - .5)*1.1, cx = x + widths[i]/2 + (fr(i + 2.2) - .5)*40 + (fr(i + 7.7) - .5)*500*ft;
+      ctx.save(); ctx.translate(cx, 690 + dy*e - 300*(1 - e) + 2600*ft*ft - 160*ft); ctx.rotate(rot*e + (fr(i + 3.3) - .5)*5*ft); ctx.globalAlpha *= Math.min(1, p*3)*fa;
       ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 26; ctx.shadowOffsetY = 6; ctx.fillStyle = T.acc; ctx.textAlign = "center"; ctx.fillText(ch, 0, size*.34); ctx.restore();
       x += widths[i];
     });
     ctx.textAlign = "left";
     return;
   }
-  // second →: the page slides in, the page's cards fly to their pockets in order, the others slide off the mat
-  const pin = easeOutQuint(clamp(se/520, 0, 1));
+  // second →
+  const end0 = VM.caosEnd != null ? VM.caosEnd : CAOS_MESS + 1600, m = messAt(end0), q0 = pocket(0);
+  const cam = caosCam([[0, W/2, H/2, 1, 0, 750], [4300, toward(W/2, q0.x, .82), toward(H/2, q0.y, .8), 1.62, -.012, 5400]], se, VM.caosCam);
+  ctx.save(); caosApply(cam, se + end0); mat(); ctx.restore(); lampLight();
+  ctx.save(); caosApply(cam, se + end0);
+  // the page slides in
+  const pin = easeOutQuint(clamp(se/560, 0, 1));
   ctx.save(); ctx.translate(0, (1 - pin)*H); ctx.shadowColor = "rgba(20,8,24,.6)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18;
   ctx.fillStyle = "#9b78ad"; rr(px - PW/2 - 18, py - PH/2 - 18, PW + 36, PH + 36, 22); ctx.fill(); ctx.shadowColor = "transparent";
   ctx.fillStyle = "rgba(60,36,72,.35)"; ctx.fillRect(px - PW/2 - 18, py - PH/2 - 18, 22, PH + 36);
   ctx.fillStyle = "#141215"; rr(px - PW/2, py - PH/2, PW, PH, 10); ctx.fill();
   for(let i = 0; i < 9; i++){ const q = pocket(i); ctx.fillStyle = "rgba(255,255,255,.035)"; ctx.fillRect(q.x - cw/2 - 5, q.y - ch/2 - 5, cw + 10, ch + 10); ctx.fillStyle = "rgba(255,255,255,.2)"; ctx.fillRect(q.x - cw/2 - 4, q.y - ch/2 + 8, 1.6, ch - 16); }
   ctx.restore();
+  // the extra cards and the three lists clear off the mat
+  all.forEach((c, j) => { if(page.includes(c)) return; const sp = shifted(j, m), q = clamp((se - 60 - (j % 5)*40)/650, 0, 1), dx = sp.x - W/2, dy = sp.y - H/2, d = Math.hypot(dx, dy) || 1, e = q*q;
+    if(e < 1) card(c, sp.x + dx/d*1600*e, sp.y + dy/d*1600*e, CW, sp.r + e*.8, 1); });
+  CAOS_SHEETS.forEach((sh, i) => { const q = clamp((se - 120 - i*90)/620, 0, 1), e = q*q; if(e >= 1) return;
+    if(q > 0 && !VM.played["cso" + i]){ VM.played["cso" + i] = 1; if(i === 0) playSfx("whoosh"); }
+    const sx = sh.x + (fr(i + 8.1) - .5)*120*m, sy = sh.y + (fr(i + 9.4) - .5)*90*m, dx = sx - W/2 || 1, dy = sy - H/2, d = Math.hypot(dx, dy) || 1;
+    sheet(sh, sx + dx/d*1700*e, sy + dy/d*1700*e, sh.r + (fr(i + 2.6) - .5)*.4*m + e*(i % 2 ? .6 : -.6), 1, 1); });
+  // "carta por carta": the page's cards fly to their pockets one at a time
   all.forEach((c, j) => {
-    const sp = spot(j), pi = page.indexOf(c);
-    if(pi < 0){ const q = clamp((se - 80)/650, 0, 1), dx = sp.x - W/2, dy = sp.y - H/2, d = Math.hypot(dx, dy) || 1, e = q*q; card(c, sp.x + dx/d*1500*e, sp.y + dy/d*1500*e, CW, sp.r + e*.8, 1 - e*.4); return; }
-    const t0 = 320 + pi*95, p = clamp((se - t0)/460, 0, 1), e = easeInOut(p), q = pocket(pi);
-    if(p >= 1 && !VM.played["cp" + pi]){ VM.played["cp" + pi] = 1; playSfx("slide"); }
-    card(c, lerp(sp.x, q.x, e), lerp(sp.y, q.y, e) - 60*Math.sin(Math.PI*e), lerp(CW, cw, e), lerp(sp.r, 0, e), 1);
+    const pi = page.indexOf(c); if(pi < 0) return; const sp = shifted(j, m);
+    const t0 = 1050 + pi*215, p = clamp((se - t0)/430, 0, 1), e = easeInOut(p), q = pocket(pi);
+    if(p >= 1 && !VM.played["cp" + pi]){ VM.played["cp" + pi] = 1; playSfx("slide"); VM.shake = Math.max(VM.shake, 2.5); }
+    card(c, lerp(sp.x, q.x, e), lerp(sp.y, q.y, e) - 70*Math.sin(Math.PI*e), lerp(CW, cw, e)*(1 + .08*Math.sin(Math.PI*e)), lerp(sp.r, 0, e), 1);
   });
-  // the label-maker tape, in one or two strips (" / " breaks it), stuck on beside the page
+  // "arrancando por el principio": a glint runs across card one as the camera gets there
+  const gl = clamp((se - 7300)/700, 0, 1);
+  if(gl > 0 && gl < 1 && page[0]){ ctx.save(); ctx.beginPath(); ctx.rect(q0.x - cw/2, q0.y - ch/2, cw, ch); ctx.clip(); const gx2 = q0.x - cw + gl*cw*2.2, gg = ctx.createLinearGradient(gx2 - 70, q0.y - ch/2, gx2 + 70, q0.y + ch/2);
+    gg.addColorStop(0, "rgba(255,255,255,0)"); gg.addColorStop(.5, "rgba(255,255,255,.32)"); gg.addColorStop(1, "rgba(255,255,255,0)"); ctx.fillStyle = gg; ctx.fillRect(q0.x - cw/2, q0.y - ch/2, cw, ch); ctx.restore(); }
+  // "todo en un solo lugar": the label-maker tape, in one or two strips (" / " breaks it), stuck on beside the page
   const strips = String(s.cinta || "").split(" / ").map(x => x.trim()).filter(Boolean);
   strips.forEach((txt, i) => {
-    const t0 = 1350 + i*260, p = clamp((se - t0)/240, 0, 1); if(p <= 0) return;
+    const t0 = 3150 + i*300, p = clamp((se - t0)/240, 0, 1); if(p <= 0) return;
     if(!VM.played["ct" + i]){ VM.played["ct" + i] = 1; playSfx("hit"); VM.shake = Math.max(VM.shake, 10); }
     const tp = labelTape(txt, 92), sc = 1 + .14*(1 - LIFT(p)), cx = 1430 + (i ? 40 : -10), cy = H/2 - 70 + i*150, rot = i ? .025 : -.03;
     ctx.save(); ctx.globalAlpha *= Math.min(1, p*4); ctx.translate(cx, cy); ctx.rotate(rot); ctx.scale(sc, sc); ctx.drawImage(tp, -tp.width/2, -tp.height/2); ctx.restore();
   });
+  ctx.restore();
 }
 function drawRafaga(s, el, T){
   const items = sceneItems(s), r = clamp((parseFloat(String(s.ritmo).replace(",", ".")) || .28), .08, 3)*1000;
